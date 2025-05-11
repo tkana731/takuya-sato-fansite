@@ -43,7 +43,7 @@ export default async function handler(req, res) {
                         display_order: 'asc'
                     }
                 },
-                schedulePerformers: {
+                performers: {  // schedulePerformers から performers に変更
                     include: {
                         performer: true
                     },
@@ -74,7 +74,7 @@ export default async function handler(req, res) {
                 : 'TBD';
 
             // 出演者情報を整形
-            const performers = schedule.schedulePerformers.map(p => p.performer.name).join('、');
+            const performers = schedule.performers.map(p => p.performer.name).join('、'); // schedulePerformers から performers に変更
             const description = schedule.description || (performers ? `出演：${performers}` : '');
 
             return {

@@ -1,11 +1,11 @@
-// pages/api/roles/index.js
+// pages/api/characters/index.js
 import prisma from '../../../lib/prisma';
 
 export default async function handler(req, res) {
     if (req.method === 'GET') {
         try {
             // クエリパラメータからフィルタリング条件を取得
-            const { actorId, search } = req.query;
+            const { actorId, search, hasBirthday } = req.query;
 
             // クエリ条件を作成
             const where = {};
@@ -13,6 +13,13 @@ export default async function handler(req, res) {
             // 声優IDによるフィルタリング
             if (actorId) {
                 where.actorId = actorId;
+            }
+
+            // 誕生日の有無でフィルタリング
+            if (hasBirthday === 'true') {
+                where.birthday = { not: null };
+            } else if (hasBirthday === 'false') {
+                where.birthday = null;
             }
 
             // 名前による検索
@@ -23,8 +30,8 @@ export default async function handler(req, res) {
                 ];
             }
 
-            // 役割データを取得
-            const roles = await prisma.role.findMany({
+            // キャラクターデータを取得
+            const characters = await prisma.role.findMany({
                 where,
                 include: {
                     actor: true
@@ -36,13 +43,13 @@ export default async function handler(req, res) {
 
             return res.status(200).json({
                 success: true,
-                data: roles
+                data: characters
             });
         } catch (error) {
-            console.error('役割データの取得エラー:', error);
+            console.error('キャラクターデータの取得エラー:', error);
             return res.status(500).json({
                 success: false,
-                message: '役割データの取得に失敗しました',
+                message: 'キャラクターデータの取得に失敗しました',
                 error: error.message
             });
         }
@@ -69,8 +76,8 @@ export default async function handler(req, res) {
                 }
             }
 
-            // Prismaクライアントを使用して役割を作成
-            const newRole = await prisma.role.create({
+            // Prismaクライアントを使用してキャラクターを作成
+            const newCharacter = await prisma.role.create({
                 data: {
                     name,
                     actorId,
@@ -81,14 +88,14 @@ export default async function handler(req, res) {
 
             return res.status(201).json({
                 success: true,
-                data: newRole,
-                message: '役割が正常に登録されました'
+                data: newCharacter,
+                message: 'キャラクターが正常に登録されました'
             });
         } catch (error) {
-            console.error('役割登録エラー:', error);
+            console.error('キャラクター登録エラー:', error);
             return res.status(500).json({
                 success: false,
-                message: '役割の登録に失敗しました',
+                message: 'キャラクターの登録に失敗しました',
                 error: error.message
             });
         }

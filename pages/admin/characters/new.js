@@ -6,6 +6,7 @@ import AdminLayout from '../../../components/Admin/AdminLayout';
 import FormBuilder from '../../../components/Admin/FormBuilder';
 import useProtectedRoute from '../../../hooks/useProtectedRoute';
 import { supabase } from '../../../lib/supabase';
+import axios from 'axios';
 
 export default function NewCharacter() {
     // 管理者のみアクセス可能
@@ -44,34 +45,23 @@ export default function NewCharacter() {
     const handleSubmit = async (values) => {
         setSubmitting(true);
         try {
-            // 誕生日のバリデーション（存在する場合）
-            if (values.birthday) {
-                const birthdayRegex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])$/;
-                if (!birthdayRegex.test(values.birthday)) {
-                    throw new Error('誕生日はMM/DD形式（例:05/15）で入力してください');
-                }
+            // APIエンドポイントを使用してキャラクターを作成
+            const response = await axios.post('/api/characters', {
+                name: values.name,
+                actorId: values.actorId,
+                seriesName: values.seriesName || null,
+                birthday: values.birthday || null
+            });
+
+            if (!response.data.success) {
+                throw new Error(response.data.message);
             }
-
-            // 新規キャラクターを作成
-            const { data, error } = await supabase
-                .from('mst_roles')
-                .insert([
-                    {
-                        name: values.name,
-                        actor_id: values.actorId,
-                        series_name: values.seriesName || null,
-                        birthday: values.birthday || null
-                    }
-                ])
-                .select();
-
-            if (error) throw error;
 
             // 成功時は一覧ページへリダイレクト
             router.push('/admin/characters');
         } catch (error) {
             console.error('キャラクター登録エラー:', error);
-            alert('キャラクターの登録に失敗しました: ' + error.message);
+            alert('キャラクターの登録に失敗しました: ' + (error.response?.data?.message || error.message));
         } finally {
             setSubmitting(false);
         }

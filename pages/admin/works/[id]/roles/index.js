@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import AdminLayout from '../../../../../components/Admin/AdminLayout';
 import useProtectedRoute from '../../../../../hooks/useProtectedRoute';
 import { supabase } from '../../../../../lib/supabase';
+import axios from 'axios';
 
 export default function WorkRoles() {
     // 管理者のみアクセス可能
@@ -106,49 +107,21 @@ export default function WorkRoles() {
         setSuccess('');
 
         try {
-            // 役割の重複チェック
-            const isDuplicate = roles.some(role => role.role_id === selectedRole);
-            if (isDuplicate) {
-                setError('この役割は既に追加されています');
-                setIsSubmitting(false);
-                return;
+            // APIを使用して役割を追加
+            const response = await axios.post(`/api/works/${id}/roles`, {
+                roleId: selectedRole,
+                isMainRole: isMainRole
+            });
+
+            if (!response.data.success) {
+                throw new Error(response.data.message);
             }
-
-            // 最大の表示順を取得
-            const maxOrderRole = roles.reduce((max, role) => {
-                return role.display_order > max ? role.display_order : max;
-            }, 0);
-
-            // 役割を追加
-            const { data, error } = await supabase
-                .from('rel_work_roles')
-                .insert([
-                    {
-                        work_id: id,
-                        role_id: selectedRole,
-                        is_main_role: isMainRole,
-                        display_order: maxOrderRole + 1
-                    }
-                ])
-                .select(`
-                    id,
-                    role_id,
-                    is_main_role,
-                    display_order,
-                    role:mst_roles (
-                        id,
-                        name,
-                        seriesName:series_name
-                    )
-                `);
-
-            if (error) throw error;
 
             // 成功メッセージを表示
             setSuccess('役割が正常に追加されました');
 
             // 役割リストを更新
-            setRoles([...roles, ...data]);
+            setRoles([...roles, response.data.data]);
 
             // フォームをリセット
             setSelectedRole('');
@@ -156,7 +129,7 @@ export default function WorkRoles() {
 
         } catch (error) {
             console.error('役割追加エラー:', error);
-            setError('役割の追加に失敗しました: ' + error.message);
+            setError('役割の追加に失敗しました: ' + (error.response?.data?.message || error.message));
         } finally {
             setIsSubmitting(false);
         }
@@ -172,13 +145,12 @@ export default function WorkRoles() {
             setError('');
             setSuccess('');
 
-            // 役割を削除
-            const { error } = await supabase
-                .from('rel_work_roles')
-                .delete()
-                .eq('id', roleId);
+            // APIを使用して役割を削除
+            const response = await axios.delete(`/api/works/${id}/roles/${roleId}`);
 
-            if (error) throw error;
+            if (!response.data.success) {
+                throw new Error(response.data.message);
+            }
 
             // 成功メッセージを表示
             setSuccess('役割が正常に削除されました');
@@ -188,7 +160,7 @@ export default function WorkRoles() {
 
         } catch (error) {
             console.error('役割削除エラー:', error);
-            setError('役割の削除に失敗しました: ' + error.message);
+            setError('役割の削除に失敗しました: ' + (error.response?.data?.message || error.message));
         }
     };
 

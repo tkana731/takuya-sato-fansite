@@ -6,6 +6,7 @@ import AdminLayout from '../../../components/Admin/AdminLayout';
 import FormBuilder from '../../../components/Admin/FormBuilder';
 import useProtectedRoute from '../../../hooks/useProtectedRoute';
 import { supabase } from '../../../lib/supabase';
+import axios from 'axios';
 
 export default function NewRole() {
     // 管理者のみアクセス可能
@@ -44,23 +45,23 @@ export default function NewRole() {
     const handleSubmit = async (values) => {
         setSubmitting(true);
         try {
-            // 役割データを作成
-            const { data, error } = await supabase.from('mst_roles').insert([
-                {
-                    name: values.name,
-                    actor_id: values.actorId || null,
-                    birthday: values.birthday || null,
-                    series_name: values.seriesName || null
-                }
-            ]).select();
+            // APIエンドポイントを使用して役割を作成
+            const response = await axios.post('/api/roles', {
+                name: values.name,
+                actorId: values.actorId || null,
+                birthday: values.birthday || null,
+                seriesName: values.seriesName || null
+            });
 
-            if (error) throw error;
+            if (!response.data.success) {
+                throw new Error(response.data.message);
+            }
 
             // 成功時は一覧ページへリダイレクト
             router.push('/admin/roles');
         } catch (error) {
             console.error('役割登録エラー:', error);
-            alert('役割の登録に失敗しました: ' + error.message);
+            alert('役割の登録に失敗しました: ' + (error.response?.data?.message || error.message));
         } finally {
             setSubmitting(false);
         }

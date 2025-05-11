@@ -31,7 +31,7 @@ export default async function handler(req, res) {
                 postal_code: postalCode || null,
                 address: address || null,
                 capacity: capacity || null,
-                official_url: officialUrl || null,
+                officialUrl: officialUrl || null,
                 google_maps_url: googleMapsUrl || null,
                 display_order: nextOrder,
                 prefecture: {

@@ -70,7 +70,7 @@ export default async function handler(req, res) {
                 endDate: schedule.end_date ? schedule.end_date.toISOString() : null,
                 isAllDay: schedule.is_all_day,
                 description: schedule.description,
-                officialUrl: schedule.official_url,
+                officialUrl: schedule.officialUrl,
                 performanceInfo
             };
 
@@ -119,7 +119,7 @@ export default async function handler(req, res) {
                 end_date: endDate ? new Date(endDate) : null,
                 is_all_day: isAllDay || false,
                 description: description || null,
-                official_url: officialUrl || null
+                officialUrl: officialUrl || null
             };
 
             // カテゴリに応じてロケーションフィールドを設定

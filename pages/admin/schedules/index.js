@@ -76,7 +76,7 @@ export default function SchedulesAdmin() {
                         locationType: isBroadcast ? '放送局/配信' : '会場',
                         description: schedule.description || '',
                         isAllDay: schedule.is_all_day,
-                        officialUrl: schedule.official_url || '#'
+                        officialUrl: schedule.officialUrl || '#'
                     };
                 });
 

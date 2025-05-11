@@ -518,7 +518,7 @@ async function main() {
                 start_date: scheduleDate1,
                 is_all_day: false,
                 description: '十龍之介役として出演',
-                official_url: 'https://example.com/idolish7-fanmeeting',
+                officialUrl: 'https://example.com/idolish7-fanmeeting',
             },
         });
 

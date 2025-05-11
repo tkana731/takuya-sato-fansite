@@ -28,9 +28,9 @@ model Work {
   title           String
   year            Int?
   description     String?
-  officialUrl     String?
-  xUrl            String?
-  instagramUrl    String?
+  officialUrl  String? @map("official_url")
+  xUrl            String? @map("x_url")
+  instagramUrl    String? @map("instagram_url")
   created_at       DateTime          @default(now())
   category        WorkCategory      @relation(fields: [category_id], references: [id])
   broadcastChannels BroadcastChannel[]
@@ -50,8 +50,8 @@ model Work {
 model BroadcastStation {
   id           String            @id @default(uuid())
   name         String
-  typeId       String
-  officialUrl  String?
+  typeId       String  @map("type_id")
+  officialUrl  String? @map("official_url")
   display_order Int
   created_at    DateTime          @default(now())
   type         StationType       @relation(fields: [typeId], references: [id])
@@ -105,9 +105,9 @@ model BroadcastChannel {
 model Role {
   id        String     @id @default(uuid())
   name      String
-  actorId   String?
+  actorId   String?  @map("actor_id")
   birthday  String?
-  seriesName String?
+  seriesName String? @map("series_name")
   created_at DateTime   @default(now())
   actor     Actor?     @relation(fields: [actorId], references: [id])
   workRoles WorkRole[]
@@ -118,9 +118,9 @@ model Role {
 model Actor {
   id           String   @id @default(uuid())
   name         String
-  officialUrl  String?
-  xUrl         String?
-  instagramUrl String?
+  officialUrl  String? @map("official_url")
+  xUrl            String? @map("x_url")
+  instagramUrl    String? @map("instagram_url")
   created_at    DateTime @default(now())
   roles        Role[]
 
@@ -172,7 +172,7 @@ model Venue {
   prefecture_id String
   address      String?
   capacity     String?
-  official_url  String?
+  officialUrl  String? @map("official_url")
   google_maps_url String?
   display_order Int
   created_at    DateTime   @default(now())
@@ -194,9 +194,9 @@ model Schedule {
   end_date           DateTime?           @db.Date()
   is_all_day          Boolean
   description       String?
-  official_url       String?
-  x_url              String?
-  instagram_url      String?
+  officialUrl  String? @map("official_url")
+  xUrl            String? @map("x_url")
+  instagramUrl    String? @map("instagram_url")
   created_at         DateTime            @default(now())
   category          ScheduleCategory    @relation(fields: [category_id], references: [id])
   work              Work?               @relation(fields: [work_id], references: [id])
@@ -229,9 +229,9 @@ model Performer {
   id            String              @id @default(uuid())
   name          String
   is_takuya_sato  Boolean
-  official_url   String?
-  x_url          String?
-  instagram_url  String?
+  officialUrl  String? @map("official_url")
+  xUrl            String? @map("x_url")
+  instagramUrl    String? @map("instagram_url")
   created_at     DateTime            @default(now())
   workPerformers WorkPerformer[]
   schedulePerformers SchedulePerformer[]
@@ -268,9 +268,9 @@ model SchedulePerformer {
 model Staff {
   id           String      @id @default(uuid())
   name         String
-  officialUrl  String?
-  xUrl         String?
-  instagramUrl String?
+  officialUrl  String? @map("official_url")
+  xUrl            String? @map("x_url")
+  instagramUrl    String? @map("instagram_url")
   created_at    DateTime    @default(now())
   workStaff    WorkStaff[]
 
@@ -318,9 +318,9 @@ model Series {
   id           String      @id @default(uuid())
   name         String
   description  String?
-  officialUrl  String?
-  xUrl         String?
-  instagramUrl String?
+  officialUrl  String? @map("official_url")
+  xUrl            String? @map("x_url")
+  instagramUrl    String? @map("instagram_url")
   display_order Int
   created_at    DateTime    @default(now())
   workSeries   WorkSeries[]

@@ -137,7 +137,7 @@ export default async function handler(req, res) {
                 location: location,
                 locationType: isBroadcast ? '放送/配信' : '会場',
                 description: description,
-                link: schedule.official_url || '#'
+                link: schedule.officialUrl || '#'
             };
         });
 

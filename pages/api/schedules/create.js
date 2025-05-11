@@ -49,7 +49,7 @@ export default async function handler(req, res) {
             end_date: endDate ? new Date(endDate) : null,
             is_all_day: isAllDay || false,
             description: description || null,
-            official_url: officialUrl || null
+            officialUrl: officialUrl || null
         };
 
         // カテゴリに応じてロケーションフィールドを設定

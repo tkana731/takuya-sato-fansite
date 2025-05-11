@@ -6,6 +6,7 @@ import AdminLayout from '../../../../components/Admin/AdminLayout';
 import FormBuilder from '../../../../components/Admin/FormBuilder';
 import useProtectedRoute from '../../../../hooks/useProtectedRoute';
 import { supabase } from '../../../../lib/supabase';
+import axios from 'axios';
 
 export default function EditVideo() {
     // 管理者のみアクセス可能
@@ -25,14 +26,14 @@ export default function EditVideo() {
             try {
                 setDataLoading(true);
 
-                // 動画データを取得
-                const { data: videoData, error: videoError } = await supabase
-                    .from('videos')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
+                // APIを使用して動画データを取得
+                const response = await axios.get(`/api/videos/${id}`);
 
-                if (videoError) throw videoError;
+                if (!response.data.success) {
+                    throw new Error(response.data.message);
+                }
+
+                const videoData = response.data.data;
 
                 // 作品データを取得（関連付け用）
                 const { data: worksData, error: worksError } = await supabase
@@ -47,15 +48,15 @@ export default function EditVideo() {
                     id: videoData.id,
                     title: videoData.title,
                     workId: videoData.work_id || '',
-                    videoUrl: videoData.video_url,
-                    publishedAt: videoData.published_at ? new Date(videoData.published_at).toISOString().split('T')[0] : ''
+                    videoUrl: videoData.videoUrl,
+                    publishedAt: videoData.publishedAt ? new Date(videoData.publishedAt).toISOString().split('T')[0] : ''
                 };
 
                 setVideoData(formattedData);
                 setWorks(worksData || []);
             } catch (error) {
                 console.error('データの取得エラー:', error);
-                alert('データの取得に失敗しました');
+                alert('データの取得に失敗しました: ' + (error.response?.data?.message || error.message));
             } finally {
                 setDataLoading(false);
             }
@@ -68,27 +69,23 @@ export default function EditVideo() {
     const handleSubmit = async (values) => {
         setSubmitting(true);
         try {
-            // 日付データの変換
-            const publishedDate = new Date(values.publishedAt);
+            // APIを使用して動画データを更新
+            const response = await axios.put(`/api/videos/${id}`, {
+                title: values.title,
+                workId: values.workId || null,
+                videoUrl: values.videoUrl,
+                publishedAt: values.publishedAt
+            });
 
-            // 動画データを更新
-            const { error } = await supabase
-                .from('videos')
-                .update({
-                    title: values.title,
-                    work_id: values.workId || null,
-                    video_url: values.videoUrl,
-                    published_at: publishedDate
-                })
-                .eq('id', id);
-
-            if (error) throw error;
+            if (!response.data.success) {
+                throw new Error(response.data.message);
+            }
 
             // 成功時は一覧ページへリダイレクト
             router.push('/admin/videos');
         } catch (error) {
             console.error('動画更新エラー:', error);
-            alert('動画の更新に失敗しました: ' + error.message);
+            alert('動画の更新に失敗しました: ' + (error.response?.data?.message || error.message));
         } finally {
             setSubmitting(false);
         }

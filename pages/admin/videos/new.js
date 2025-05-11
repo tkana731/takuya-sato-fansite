@@ -6,6 +6,7 @@ import AdminLayout from '../../../components/Admin/AdminLayout';
 import FormBuilder from '../../../components/Admin/FormBuilder';
 import useProtectedRoute from '../../../hooks/useProtectedRoute';
 import { supabase } from '../../../lib/supabase';
+import axios from 'axios';
 
 export default function NewVideo() {
     // 管理者のみアクセス可能
@@ -44,26 +45,23 @@ export default function NewVideo() {
     const handleSubmit = async (values) => {
         setSubmitting(true);
         try {
-            // 日付データの変換
-            const publishedDate = new Date(values.publishedAt);
+            // APIを使用して動画データを作成
+            const response = await axios.post('/api/videos/create', {
+                title: values.title,
+                workId: values.workId || null,
+                videoUrl: values.videoUrl,
+                publishedAt: values.publishedAt
+            });
 
-            // 動画データを作成
-            const { data, error } = await supabase.from('videos').insert([
-                {
-                    title: values.title,
-                    work_id: values.workId || null,
-                    video_url: values.videoUrl,
-                    published_at: publishedDate
-                }
-            ]).select();
-
-            if (error) throw error;
+            if (!response.data.success) {
+                throw new Error(response.data.message);
+            }
 
             // 成功時は一覧ページへリダイレクト
             router.push('/admin/videos');
         } catch (error) {
             console.error('動画登録エラー:', error);
-            alert('動画の登録に失敗しました: ' + error.message);
+            alert('動画の登録に失敗しました: ' + (error.response?.data?.message || error.message));
         } finally {
             setSubmitting(false);
         }

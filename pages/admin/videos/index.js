@@ -5,6 +5,7 @@ import AdminLayout from '../../../components/Admin/AdminLayout';
 import DataTable from '../../../components/Admin/DataTable';
 import useProtectedRoute from '../../../hooks/useProtectedRoute';
 import { supabase } from '../../../lib/supabase';
+import axios from 'axios';
 
 export default function VideosAdmin() {
     // 管理者のみアクセス可能
@@ -62,18 +63,18 @@ export default function VideosAdmin() {
     // 動画削除
     const handleDelete = async (id) => {
         try {
-            const { error } = await supabase
-                .from('videos')
-                .delete()
-                .eq('id', id);
+            // APIを使用して動画を削除
+            const response = await axios.delete(`/api/videos/${id}`);
 
-            if (error) throw error;
+            if (!response.data.success) {
+                throw new Error(response.data.message);
+            }
 
             // 削除成功時は一覧から削除
             setVideos(videos.filter(video => video.id !== id));
         } catch (error) {
             console.error('動画削除エラー:', error);
-            alert('削除処理中にエラーが発生しました');
+            alert('削除処理中にエラーが発生しました: ' + (error.response?.data?.message || error.message));
         }
     };
 

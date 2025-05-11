@@ -1,26 +1,25 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* モックアップからのカスタムCSS変数 */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-color: #0078d4;
+  --primary-dark: #005a9e;
+  --primary-light: #e6f2ff;
+  --secondary-color: #f0f3f7;
+  --accent-color: #e4157e;
+  --dark-color: #333333;
+  --light-color: #ffffff;
+  --gray-color: #e2e8f0;
+  --gray-dark: #64748b;
+  --text-color: #333333;
+  --stu48-footer: #0a2e55;
+  --stu48-background: #aed4f3;
+  --event-color: #ff8a00;
+  --stage-color: #8a2be2;
+  --broadcast-color: #00b050;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+/* その他のグローバルスタイル */
+/* モックアップからアニメーション、バブル、波状区切りなどのCSS */

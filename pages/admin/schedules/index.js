@@ -52,7 +52,7 @@ export default function SchedulesAdmin() {
 
                 // データを整形
                 const formattedSchedules = data.map(schedule => {
-                    const date = new Date(schedule.startDate);
+                    const date = new Date(schedule.start_date);
                     const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
 
                     // カテゴリ名に基づいて判定
@@ -65,7 +65,7 @@ export default function SchedulesAdmin() {
 
                     return {
                         id: schedule.id,
-                        date: schedule.startDate,
+                        date: schedule.start_date,
                         weekday: weekdays[date.getDay()],
                         title: schedule.title,
                         category: schedule.category?.name === 'イベント' ? 'event' :
@@ -75,8 +75,8 @@ export default function SchedulesAdmin() {
                         location: location || '未設定',
                         locationType: isBroadcast ? '放送局/配信' : '会場',
                         description: schedule.description || '',
-                        isAllDay: schedule.isAllDay,
-                        officialUrl: schedule.officialUrl || '#'
+                        isAllDay: schedule.is_all_day,
+                        officialUrl: schedule.official_url || '#'
                     };
                 });
 

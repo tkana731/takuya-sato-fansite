@@ -40,7 +40,7 @@ export default async function handler(req, res) {
                 broadcastStation: true,
                 performances: {
                     orderBy: {
-                        displayOrder: 'asc'
+                        display_order: 'asc'
                     }
                 },
                 schedulePerformers: {
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
                         performer: true
                     },
                     orderBy: {
-                        displayOrder: 'asc'
+                        display_order: 'asc'
                     }
                 }
             },

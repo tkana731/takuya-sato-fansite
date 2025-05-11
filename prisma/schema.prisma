@@ -74,10 +74,10 @@ model StationType {
 model Weekday {
   id           String             @id @default(uuid())
   name         String
-  shortName    String
+  short_name    String
   code         String
   display_order Int
-  createdAt    DateTime           @default(now())
+  created_at    DateTime           @default(now())
   channels     BroadcastChannel[]
 
   @@map("mst_weekdays")
@@ -129,13 +129,13 @@ model Actor {
 
 model WorkRole {
   id          String   @id @default(uuid())
-  workId      String
-  roleId      String
-  isMainRole  Boolean
+  work_id      String
+  role_id      String
+  is_main_role  Boolean
   display_order Int
-  createdAt   DateTime @default(now())
-  work        Work     @relation(fields: [workId], references: [id])
-  role        Role     @relation(fields: [roleId], references: [id])
+  created_at   DateTime @default(now())
+  work        Work     @relation(fields: [work_id], references: [id])
+  role        Role     @relation(fields: [role_id], references: [id])
 
   @@map("rel_work_roles")
 }
@@ -228,11 +228,11 @@ model SchedulePerformance {
 model Performer {
   id            String              @id @default(uuid())
   name          String
-  isTakuyaSato  Boolean
-  officialUrl   String?
-  xUrl          String?
-  instagramUrl  String?
-  createdAt     DateTime            @default(now())
+  is_takuya_sato  Boolean
+  official_url   String?
+  x_url          String?
+  instagram_url  String?
+  created_at     DateTime            @default(now())
   workPerformers WorkPerformer[]
   schedulePerformers SchedulePerformer[]
 
@@ -291,13 +291,13 @@ model WorkStaff {
   id          String    @id @default(uuid())
   workId      String
   staffId     String
-  staffRoleId String
+  staff_role_id String
   description String?
   display_order Int
   createdAt   DateTime  @default(now())
   work        Work      @relation(fields: [workId], references: [id])
   staff       Staff     @relation(fields: [staffId], references: [id])
-  staffRole   StaffRole @relation(fields: [staffRoleId], references: [id])
+  staffRole   StaffRole @relation(fields: [staff_role_id], references: [id])
 
   @@map("rel_work_staff")
 }

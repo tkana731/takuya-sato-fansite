@@ -245,13 +245,13 @@ async function main() {
 
         // 曜日の作成
         const weekdays = [
-            { id: '1', name: '月曜日', shortName: '月', code: 'mon', display_order: 1 },
-            { id: '2', name: '火曜日', shortName: '火', code: 'tue', display_order: 2 },
-            { id: '3', name: '水曜日', shortName: '水', code: 'wed', display_order: 3 },
-            { id: '4', name: '木曜日', shortName: '木', code: 'thu', display_order: 4 },
-            { id: '5', name: '金曜日', shortName: '金', code: 'fri', display_order: 5 },
-            { id: '6', name: '土曜日', shortName: '土', code: 'sat', display_order: 6 },
-            { id: '7', name: '日曜日', shortName: '日', code: 'sun', display_order: 7 },
+            { id: '1', name: '月曜日', short_name: '月', code: 'mon', display_order: 1 },
+            { id: '2', name: '火曜日', short_name: '火', code: 'tue', display_order: 2 },
+            { id: '3', name: '水曜日', short_name: '水', code: 'wed', display_order: 3 },
+            { id: '4', name: '木曜日', short_name: '木', code: 'thu', display_order: 4 },
+            { id: '5', name: '金曜日', short_name: '金', code: 'fri', display_order: 5 },
+            { id: '6', name: '土曜日', short_name: '土', code: 'sat', display_order: 6 },
+            { id: '7', name: '日曜日', short_name: '日', code: 'sun', display_order: 7 },
         ];
 
         for (const weekday of weekdays) {
@@ -462,7 +462,7 @@ async function main() {
                 create: {
                     id: '1',
                     work_id: idolish7Anime.id,
-                    roleId: '1', // 十龍之介
+                    role_id: '1', // 十龍之介
                     isMainRole: true,
                     display_order: 1,
                 },

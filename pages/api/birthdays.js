@@ -1,40 +1,35 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+// pages/api/birthdays.js
+import prisma from '../../lib/prisma';
 
 export default async function handler(req, res) {
-    if (req.method === 'GET') {
-        try {
-            // 今日の日付を取得
-            const today = new Date();
-            const month = today.getMonth() + 1; // 0-11 -> 1-12
-            const day = today.getDate();
+    if (req.method !== 'GET') {
+        return res.status(405).json({ message: 'Method not allowed' });
+    }
 
-            // 誕生日が今日のキャラクターを検索
-            const todayBirthday = `${month}/${day < 10 ? '0' + day : day}`; // MM/DD形式
+    try {
+        // 今日の日付を取得
+        const today = new Date();
+        const month = today.getMonth() + 1; // 0-11 -> 1-12
+        const day = today.getDate();
 
-            const birthdayCharacters = await prisma.role.findMany({
-                where: {
-                    birthday: todayBirthday,
-                    workRoles: {
-                        some: {} // 何らかの作品に関連付けられているロール
-                    }
-                },
-                select: {
-                    id: true,
-                    name: true,
-                    seriesName: true,
-                    birthday: true,
-                },
-            });
+        // 誕生日が今日のキャラクターを検索 (MM/DD形式)
+        const formattedBirthday = `${month < 10 ? '0' + month : month}/${day < 10 ? '0' + day : day}`;
 
-            res.status(200).json(birthdayCharacters);
-        } catch (error) {
-            console.error('誕生日キャラクターの取得エラー:', error);
-            res.status(500).json({ error: '誕生日キャラクターの取得に失敗しました' });
-        }
-    } else {
-        res.setHeader('Allow', ['GET']);
-        res.status(405).end(`Method ${req.method} Not Allowed`);
+        const birthdayCharacters = await prisma.role.findMany({
+            where: {
+                birthday: formattedBirthday
+            },
+            select: {
+                id: true,
+                name: true,
+                seriesName: true,
+                birthday: true
+            }
+        });
+
+        return res.status(200).json(birthdayCharacters);
+    } catch (error) {
+        console.error('誕生日キャラクターの取得エラー:', error);
+        return res.status(500).json({ error: '誕生日キャラクターの取得に失敗しました' });
     }
 }

@@ -1,5 +1,6 @@
 // components/Video/VideoSection.js
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function VideoSection({ videos = [] }) {
     // APIから取得したデータがない場合のフォールバックデータ
@@ -21,7 +22,15 @@ export default function VideoSection({ videos = [] }) {
                 <div className="youtube-grid">
                     <div className="youtube-card">
                         <div className="youtube-thumbnail">
-                            <img src={fallbackVideo.thumbnailUrl} alt="佐藤拓也 最新動画" />
+                            {/* プレースホルダー画像でNext.js Image コンポーネントを使用 */}
+                            <div style={{ position: 'relative', width: '100%', height: '180px' }}>
+                                <Image
+                                    src={fallbackVideo.thumbnailUrl}
+                                    alt="佐藤拓也 最新動画"
+                                    fill
+                                    style={{ objectFit: 'cover' }}
+                                />
+                            </div>
                             <div className="play-button">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                     <polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon>

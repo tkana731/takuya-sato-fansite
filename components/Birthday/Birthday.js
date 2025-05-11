@@ -18,7 +18,7 @@ export default function Birthday({ characters = [] }) {
         <section className="birthday-section" id="birthday">
             <div className="container">
                 <div className="section-header">
-                    <h2 className="section-title">TODAY'S BIRTHDAY</h2>
+                    <h2 className="section-title">TODAY&apos;S BIRTHDAY</h2>
                     <p className="section-subtitle">今日が誕生日のキャラクター</p>
                 </div>
                 <div className="birthday-cards">

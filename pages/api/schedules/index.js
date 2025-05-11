@@ -18,17 +18,21 @@ export default async function handler(req, res) {
         const fromDate = from ? new Date(from) : today;
         const toDate = to ? new Date(to) : oneMonthLater;
 
+        // ISO文字列に変換（日付部分のみを抽出）
+        const fromDateStr = fromDate.toISOString().split('T')[0];
+        const toDateStr = toDate.toISOString().split('T')[0];
+
         // デバッグ用
         console.log("スケジュールAPI: 検索期間", {
-            from: fromDate,
-            to: toDate
+            from: fromDateStr,
+            to: toDateStr
         });
 
-        // クエリー条件の構築
+        // クエリー条件の構築 - 文字列で日付範囲を指定
         let whereCondition = {
             start_date: {
-                gte: fromDate,
-                lte: toDate
+                gte: new Date(fromDateStr),
+                lte: new Date(toDateStr + 'T23:59:59.999Z')
             }
         };
 
@@ -79,25 +83,20 @@ export default async function handler(req, res) {
 
         console.log(`スケジュールAPI: ${schedules.length}件のスケジュールが見つかりました`);
 
-        // データベースの構造をデバッグ
+        // デバッグ情報
         if (schedules.length > 0) {
-            console.log("スケジュールAPI: 最初のスケジュールの構造", JSON.stringify({
+            console.log("スケジュールAPI: 最初のスケジュールの情報", {
                 id: schedules[0].id,
                 title: schedules[0].title,
-                category: schedules[0].category,
-                venue: schedules[0].venue,
-                broadcastStation: schedules[0].broadcastStation,
-                performances: schedules[0].performances.length > 0 ? {
-                    display_start_time: schedules[0].performances[0].display_start_time,
-                    start_time: schedules[0].performances[0].start_time
-                } : 'なし',
-                performers: schedules[0].performers.length
-            }));
+                startDate: schedules[0].start_date,
+                categoryName: schedules[0].category?.name
+            });
         }
 
         // フロントエンドで利用しやすい形式に整形
         const formattedSchedules = schedules.map(schedule => {
-            const startDate = schedule.start_date;
+            // Dateオブジェクトを確実に作成
+            const startDate = new Date(schedule.start_date);
             const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
             const weekday = weekdays[startDate.getDay()];
 
@@ -108,7 +107,6 @@ export default async function handler(req, res) {
                 : (schedule.venue ? schedule.venue.name : '');
 
             // パフォーマンス情報を整形
-            // ここが問題の箇所です - 正しいフィールド名を使用する
             const timeInfo = schedule.performances.length > 0
                 ? schedule.performances.map(p => p.display_start_time).join(' / ')
                 : 'TBD';
@@ -126,9 +124,12 @@ export default async function handler(req, res) {
                 schedule.category?.name === '舞台・朗読' ? 'stage' :
                     schedule.category?.name === '生放送' ? 'broadcast' : 'other';
 
+            // 日付をYYYY-MM-DD形式に整形
+            const formattedDate = startDate.toISOString().split('T')[0];
+
             return {
                 id: schedule.id,
-                date: startDate.toISOString().split('T')[0],
+                date: formattedDate,
                 weekday: weekday,
                 category: categoryCode,
                 categoryName: schedule.category?.name || '',
@@ -164,9 +165,14 @@ export default async function handler(req, res) {
         return res.status(200).json(response);
     } catch (error) {
         console.error('スケジュールの取得エラー:', error);
+
+        // より詳細なエラー情報を返す
         return res.status(500).json({
             error: 'スケジュールの取得に失敗しました',
             message: error.message,
+            name: error.name,
+            code: error.code,
+            meta: error.meta,
             stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }

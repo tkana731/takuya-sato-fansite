@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
         // クエリー条件の構築
         let whereCondition = {
-            startDate: {
+            start_date: {
                 gte: from ? new Date(from) : today,
                 lte: to ? new Date(to) : oneMonthLater
             }
@@ -37,6 +37,7 @@ export default async function handler(req, res) {
             include: {
                 category: true,
                 venue: true,
+                broadcastStation: true, // 放送局情報も取得
                 performances: {
                     orderBy: {
                         performanceDate: 'asc'
@@ -52,14 +53,20 @@ export default async function handler(req, res) {
                 }
             },
             orderBy: {
-                startDate: 'asc'
+                start_date: 'asc'
             }
         });
 
         // フロントエンドで利用しやすい形式に整形
         const formattedSchedules = schedules.map(schedule => {
-            const startDate = schedule.startDate;
+            const startDate = schedule.start_date;
             const weekday = ['日', '月', '火', '水', '木', '金', '土'][startDate.getDay()];
+
+            // カテゴリに応じてロケーション情報を選択
+            const isBroadcast = schedule.category.name === '生放送';
+            const location = isBroadcast
+                ? (schedule.broadcastStation ? schedule.broadcastStation.name : '')
+                : (schedule.venue ? schedule.venue.name : '');
 
             return {
                 id: schedule.id,
@@ -73,7 +80,8 @@ export default async function handler(req, res) {
                 time: schedule.performances.length > 0 ?
                     schedule.performances.map(p => p.displayStartTime).join(' / ') :
                     'TBD',
-                location: schedule.venue.name,
+                location: location,
+                locationType: isBroadcast ? '放送/配信' : '会場',
                 description: schedule.description ||
                     (schedule.performers.length > 0 ?
                         `出演：${schedule.performers.map(p => p.performer.name).join('、')}` : ''),

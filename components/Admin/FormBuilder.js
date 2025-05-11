@@ -32,6 +32,12 @@ export default function FormBuilder({
             ...values,
             [name]: newValue,
         });
+
+        // フィールド定義にonChangeハンドラがあれば実行
+        const field = fields.find(f => f.name === name);
+        if (field && typeof field.onChange === 'function') {
+            field.onChange(e);
+        }
     };
 
     // セレクトボックス変更ハンドラ

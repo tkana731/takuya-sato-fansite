@@ -419,7 +419,7 @@ async function main() {
             update: {},
             create: {
                 id: '1',
-                categoryId: animeCategory.id,
+                category_id: animeCategory.id,
                 title: 'アイドリッシュセブン Third BEAT!',
                 year: 2025,
                 description: 'アイドルグループIDOLiSH7の活躍を描くアニメ',
@@ -432,7 +432,7 @@ async function main() {
             update: {},
             create: {
                 id: '2',
-                categoryId: animeCategory.id,
+                category_id: animeCategory.id,
                 title: 'クラシック★スターズ',
                 year: 2025,
                 description: '名作曲家たちが現代に転生してアイドルとして活躍するアニメ',
@@ -446,8 +446,8 @@ async function main() {
             update: {},
             create: {
                 id: '1',
-                seriesId: idolish7.id,
-                workId: idolish7Anime.id,
+                series_id: idolish7.id,
+                work_id: idolish7Anime.id,
                 sequenceNumber: 3,
                 subtitle: 'Third BEAT!',
                 displayOrder: 1,
@@ -461,7 +461,7 @@ async function main() {
                 update: {},
                 create: {
                     id: '1',
-                    workId: idolish7Anime.id,
+                    work_id: idolish7Anime.id,
                     roleId: '1', // 十龍之介
                     isMainRole: true,
                     displayOrder: 1,
@@ -479,7 +479,7 @@ async function main() {
             update: {},
             create: {
                 id: '1',
-                workId: idolish7Anime.id,
+                work_id: idolish7Anime.id,
                 stationId: tokyoMX.id,
                 weekdayId: '7', // 日曜日
                 displayBroadcastTime: '22:30～',
@@ -494,7 +494,7 @@ async function main() {
             update: {},
             create: {
                 id: '2',
-                workId: idolish7Anime.id,
+                work_id: idolish7Anime.id,
                 stationId: bs11.id,
                 weekdayId: '1', // 月曜日
                 displayBroadcastTime: '24:00～',
@@ -511,14 +511,14 @@ async function main() {
             update: {},
             create: {
                 id: '1',
-                categoryId: eventCategory.id,
-                workId: idolish7Anime.id,
-                venueId: shibuyaStreamHall.id,
+                category_id: eventCategory.id,
+                work_id: idolish7Anime.id,
+                venue_id: shibuyaStreamHall.id,
                 title: 'アイドリッシュセブン ファンミーティング',
-                startDate: scheduleDate1,
-                isAllDay: false,
+                start_date: scheduleDate1,
+                is_all_day: false,
                 description: '十龍之介役として出演',
-                officialUrl: 'https://example.com/idolish7-fanmeeting',
+                official_url: 'https://example.com/idolish7-fanmeeting',
             },
         });
 

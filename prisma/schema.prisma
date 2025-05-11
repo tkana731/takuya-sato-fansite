@@ -24,7 +24,7 @@ model WorkCategory {
 
 model Work {
   id              String            @id @default(uuid())
-  categoryId      String
+  category_id      String
   title           String
   year            Int?
   description     String?
@@ -32,7 +32,7 @@ model Work {
   xUrl            String?
   instagramUrl    String?
   createdAt       DateTime          @default(now())
-  category        WorkCategory      @relation(fields: [categoryId], references: [id])
+  category        WorkCategory      @relation(fields: [category_id], references: [id])
   broadcastChannels BroadcastChannel[]
   workRoles       WorkRole[]
   schedules       Schedule[]
@@ -46,6 +46,7 @@ model Work {
   @@map("works")
 }
 
+// 既存のBroadcastStationモデルに新しいリレーションを追加
 model BroadcastStation {
   id           String            @id @default(uuid())
   name         String
@@ -55,6 +56,7 @@ model BroadcastStation {
   createdAt    DateTime          @default(now())
   type         StationType       @relation(fields: [typeId], references: [id])
   channels     BroadcastChannel[]
+  schedules    Schedule[]        // 新規追加
 
   @@map("mst_broadcast_stations")
 }
@@ -181,25 +183,27 @@ model Venue {
 }
 
 model Schedule {
-  id              String              @id @default(uuid())
-  categoryId      String
-  workId          String?
-  seriesId        String?
-  venueId         String
-  title           String
-  startDate       DateTime            @db.Date()
-  endDate         DateTime?           @db.Date()
-  isAllDay        Boolean
-  description     String?
-  officialUrl     String?
-  xUrl            String?
-  instagramUrl    String?
-  createdAt       DateTime            @default(now())
-  category        ScheduleCategory    @relation(fields: [categoryId], references: [id])
-  work            Work?               @relation(fields: [workId], references: [id])
-  venue           Venue               @relation(fields: [venueId], references: [id])
-  performances    SchedulePerformance[]
-  performers      SchedulePerformer[]
+  id                String              @id @default(uuid())
+  category_id        String
+  work_id            String?
+  series_id          String?
+  venue_id           String?             // Nullableに変更
+  broadcastStationId String?            @map("broadcast_station_id") // 新規追加
+  title             String
+  start_date         DateTime            @db.Date()
+  end_date           DateTime?           @db.Date()
+  is_all_day          Boolean
+  description       String?
+  official_url       String?
+  x_url              String?
+  instagram_url      String?
+  created_at         DateTime            @default(now())
+  category          ScheduleCategory    @relation(fields: [category_id], references: [id])
+  work              Work?               @relation(fields: [work_id], references: [id])
+  venue             Venue?              @relation(fields: [venue_id], references: [id])
+  broadcastStation  BroadcastStation?   @relation(fields: [broadcastStationId], references: [id]) // 新規関連
+  performances      SchedulePerformance[]
+  performers        SchedulePerformer[]
 
   @@map("schedules")
 }

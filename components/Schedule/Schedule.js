@@ -16,6 +16,7 @@ export default function Schedule({ schedules = [] }) {
             title: 'アイドリッシュセブン ファンミーティング',
             time: '14:00～',
             location: '東京・渋谷ストリームホール',
+            locationType: '会場',
             description: '十龍之介役として出演',
             link: '#'
         },
@@ -28,6 +29,7 @@ export default function Schedule({ schedules = [] }) {
             title: '佐藤拓也のちょっとやってみて!! 第157回',
             time: '21:00～',
             location: 'ニコニコ生放送・YouTube',
+            locationType: '放送/配信',
             description: 'ゲスト：羽多野渉',
             link: '#'
         },
@@ -40,6 +42,7 @@ export default function Schedule({ schedules = [] }) {
             title: '朗読劇「月の向こう側」',
             time: '13:00～ / 17:00～',
             location: '東京芸術劇場',
+            locationType: '会場',
             description: '主演：健人 役',
             link: '#'
         },
@@ -52,6 +55,7 @@ export default function Schedule({ schedules = [] }) {
             title: 'アニメ「クラシック★スターズ」特番',
             time: '20:00～',
             location: 'ABEMA',
+            locationType: '放送/配信',
             description: '出演：佐藤拓也、小野賢章、花澤香菜',
             link: '#'
         },
@@ -64,6 +68,7 @@ export default function Schedule({ schedules = [] }) {
             title: 'テイルズ オブ フェスティバル 2025',
             time: '12:30～',
             location: '横浜アリーナ',
+            locationType: '会場',
             description: 'アルフェン役として出演',
             link: '#'
         },
@@ -76,6 +81,7 @@ export default function Schedule({ schedules = [] }) {
             title: 'ヴォイスプレイ「Rシリーズ Vol.5」',
             time: '19:00～',
             location: '新宿文化センター',
+            locationType: '会場',
             description: '出演：佐藤拓也、石川界人、内田雄馬',
             link: '#'
         },
@@ -88,6 +94,7 @@ export default function Schedule({ schedules = [] }) {
             title: '佐藤拓也&堀江瞬 アニメみたいに! 第52回',
             time: '20:00～',
             location: 'YouTube Live',
+            locationType: '放送/配信',
             description: 'ゲスト：未定',
             link: '#'
         },
@@ -100,6 +107,7 @@ export default function Schedule({ schedules = [] }) {
             title: '佐藤拓也のちょっとやってみて!! 第158回',
             time: '21:00～',
             location: 'ニコニコ生放送・YouTube',
+            locationType: '放送/配信',
             description: 'ゲスト：石川界人',
             link: '#'
         },
@@ -112,6 +120,7 @@ export default function Schedule({ schedules = [] }) {
             title: '声優アワード2025 授賞式',
             time: '16:00～',
             location: '文化放送メディアプラスホール',
+            locationType: '会場',
             description: 'プレゼンターとして出演',
             link: '#'
         }
@@ -182,6 +191,9 @@ export default function Schedule({ schedules = [] }) {
                         {filteredSchedules.length > 0 ? (
                             filteredSchedules.map(schedule => {
                                 const date = formatDate(schedule.date);
+                                // ロケーションが会場か放送局かによって表示アイコンやスタイルを変更できる
+                                const isBroadcast = schedule.locationType === '放送/配信';
+
                                 return (
                                     <li className="schedule-item" key={schedule.id} data-category={schedule.category}>
                                         <div className="schedule-date">
@@ -195,6 +207,7 @@ export default function Schedule({ schedules = [] }) {
                                             <h3 className="schedule-title">{schedule.title}</h3>
                                             <p className="schedule-info">
                                                 <span className="schedule-time">{schedule.time}</span> / {schedule.location}
+                                                {isBroadcast && <small className="ml-1 text-gray-600">（{schedule.locationType}）</small>}
                                             </p>
                                             <p className="schedule-info">{schedule.description}</p>
                                             <a href={schedule.link} className="schedule-link">詳細はこちら →</a>

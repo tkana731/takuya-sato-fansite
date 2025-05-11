@@ -16,39 +16,67 @@ export default function SchedulesAdmin() {
         const fetchSchedules = async () => {
             try {
                 setDataLoading(true);
+
+                // カテゴリ情報を事前取得してマッピング
+                const { data: categories, error: categoryError } = await supabase
+                    .from('mst_schedule_categories')
+                    .select('id, name, colorCode');
+
+                if (categoryError) throw categoryError;
+
+                // カテゴリIDをキーとした連想配列を作成
+                const categoryMap = {};
+                categories.forEach(cat => {
+                    categoryMap[cat.id] = cat;
+                });
+
+                // スケジュールデータを取得（更新：venue_idまたはbroadcast_station_idの両方を考慮）
                 const { data, error } = await supabase
                     .from('schedules')
                     .select(`
-            id, 
-            title, 
-            start_date,
-            is_all_day,
-            description, 
-            official_url,
-            venue:venue_id (name),
-            category:category_id (name, color_code)
-          `)
-                    .order('start_date', { ascending: true });
+                        id, 
+                        title, 
+                        startDate,
+                        isAllDay,
+                        description, 
+                        officialUrl,
+                        category:categoryId (id, name, colorCode),
+                        venue:venueId (name),
+                        broadcastStation:broadcast_station_id (name)
+                    `)
+                    .order('startDate', { ascending: true });
 
                 if (error) throw error;
 
+                console.log('取得したスケジュール:', data);
+
                 // データを整形
                 const formattedSchedules = data.map(schedule => {
-                    const date = new Date(schedule.start_date);
+                    const date = new Date(schedule.startDate);
                     const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+
+                    // カテゴリ名に基づいて判定
+                    const isBroadcast = schedule.category?.name === '生放送';
+
+                    // カテゴリによってロケーション（会場or放送局）を選択
+                    const location = isBroadcast
+                        ? schedule.broadcastStation?.name
+                        : schedule.venue?.name;
+
                     return {
                         id: schedule.id,
-                        date: schedule.start_date,
+                        date: schedule.startDate,
                         weekday: weekdays[date.getDay()],
                         title: schedule.title,
                         category: schedule.category?.name === 'イベント' ? 'event' :
                             schedule.category?.name === '舞台・朗読' ? 'stage' :
                                 schedule.category?.name === '生放送' ? 'broadcast' : 'other',
                         categoryName: schedule.category?.name || '',
-                        location: schedule.venue?.name || '',
+                        location: location || '未設定',
+                        locationType: isBroadcast ? '放送局/配信' : '会場',
                         description: schedule.description || '',
-                        isAllDay: schedule.is_all_day,
-                        officialUrl: schedule.official_url || '#'
+                        isAllDay: schedule.isAllDay,
+                        officialUrl: schedule.officialUrl || '#'
                     };
                 });
 
@@ -114,7 +142,15 @@ export default function SchedulesAdmin() {
         },
         {
             key: 'location',
-            label: '場所',
+            label: 'ロケーション',
+            render: (item) => {
+                return (
+                    <div>
+                        <span className="text-xs text-gray-600 block">{item.locationType}</span>
+                        {item.location}
+                    </div>
+                );
+            }
         },
         {
             key: 'isAllDay',

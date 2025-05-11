@@ -1,22 +1,25 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import AdminLayout from '../../../components/Admin/AdminLayout';
-import FormBuilder from '../../../components/Admin/FormBuilder';
-import useProtectedRoute from '../../../hooks/useProtectedRoute';
-import { supabase } from '../../../lib/supabase';
+import AdminLayout from '../../../../components/Admin/AdminLayout';
+import FormBuilder from '../../../../components/Admin/FormBuilder';
+import useProtectedRoute from '../../../../hooks/useProtectedRoute';
+import { supabase } from '../../../../lib/supabase';
 
-export default function NewSchedule() {
+export default function EditSchedule() {
     // 管理者のみアクセス可能
     const { loading } = useProtectedRoute(true);
     const router = useRouter();
+    const { id } = router.query;
     const [submitting, setSubmitting] = useState(false);
+    const [scheduleData, setScheduleData] = useState(null);
     const [categories, setCategories] = useState([]);
     const [venues, setVenues] = useState([]);
     const [broadcastStations, setBroadcastStations] = useState([]);
     const [dataLoading, setDataLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [formFields, setFormFields] = useState([]);
+    const [performanceInfo, setPerformanceInfo] = useState('');
 
     // カテゴリIDから種類を判定
     const getCategoryType = (categoryId) => {
@@ -29,22 +32,22 @@ export default function NewSchedule() {
         return categoryName === '生放送';
     };
 
-    // マスタデータの取得
+    // スケジュールデータの取得
     useEffect(() => {
-        const fetchMasterData = async () => {
+        const fetchScheduleData = async () => {
+            if (!id) return;
+
             try {
                 setDataLoading(true);
 
+                // マスターデータを先に取得
                 // カテゴリを取得
                 const { data: categoryData, error: categoryError } = await supabase
                     .from('mst_schedule_categories')
                     .select('id, name, displayOrder')
                     .order('displayOrder', { ascending: true });
 
-                if (categoryError) {
-                    console.error('カテゴリ取得エラー詳細:', categoryError);
-                    throw categoryError;
-                }
+                if (categoryError) throw categoryError;
 
                 // 会場を取得
                 const { data: venueData, error: venueError } = await supabase
@@ -52,10 +55,7 @@ export default function NewSchedule() {
                     .select('id, name, displayOrder')
                     .order('displayOrder', { ascending: true });
 
-                if (venueError) {
-                    console.error('会場取得エラー詳細:', venueError);
-                    throw venueError;
-                }
+                if (venueError) throw venueError;
 
                 // 放送局を取得
                 const { data: stationData, error: stationError } = await supabase
@@ -63,23 +63,77 @@ export default function NewSchedule() {
                     .select('id, name, displayOrder')
                     .order('displayOrder', { ascending: true });
 
-                if (stationError) {
-                    console.error('放送局取得エラー詳細:', stationError);
-                    throw stationError;
-                }
+                if (stationError) throw stationError;
 
                 setCategories(categoryData || []);
                 setVenues(venueData || []);
                 setBroadcastStations(stationData || []);
+
+                // スケジュールデータを取得
+                const { data, error } = await supabase
+                    .from('schedules')
+                    .select(`
+                        id, 
+                        categoryId,
+                        venueId,
+                        broadcast_station_id,
+                        workId,
+                        title,
+                        startDate,
+                        endDate,
+                        isAllDay,
+                        description,
+                        officialUrl,
+                        category:categoryId (name)
+                    `)
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+
+                console.log('スケジュールデータ:', data);
+
+                // パフォーマンスデータを取得
+                const { data: performanceData, error: performanceError } = await supabase
+                    .from('rel_schedule_performances')
+                    .select('display_start_time')
+                    .eq('schedule_id', id)
+                    .order('display_order', { ascending: true });
+
+                if (performanceError) throw performanceError;
+
+                // パフォーマンス情報を文字列にフォーマット
+                const performanceString = performanceData
+                    ? performanceData.map(p => p.display_start_time).join(' / ')
+                    : '';
+
+                // カテゴリを設定
+                const categoryName = data.category ? data.category.name : '';
+                setSelectedCategory(data.categoryId);
+
+                // ロケーションIDを設定（会場または放送局）
+                const isBroadcast = isBroadcastCategory(categoryName);
+                const locationId = isBroadcast ? data.broadcast_station_id : data.venueId;
+
+                // スケジュールデータを設定
+                setScheduleData({
+                    ...data,
+                    locationId: locationId || '',
+                    startDate: data.startDate ? data.startDate.substring(0, 10) : '',
+                    endDate: data.endDate ? data.endDate.substring(0, 10) : '',
+                });
+
+                setPerformanceInfo(performanceString);
             } catch (error) {
-                console.error('マスタデータの取得エラー:', error);
+                console.error('スケジュールデータの取得エラー:', error);
+                alert('スケジュールデータの取得に失敗しました');
             } finally {
                 setDataLoading(false);
             }
         };
 
-        fetchMasterData();
-    }, []);
+        fetchScheduleData();
+    }, [id]);
 
     // フォーム送信
     const handleSubmit = async (values) => {
@@ -93,50 +147,59 @@ export default function NewSchedule() {
             const categoryName = getCategoryType(values.categoryId);
             const isBroadcast = isBroadcastCategory(categoryName);
 
-            // スケジュールデータを登録
+            // スケジュールデータを更新
             const { data, error } = await supabase
                 .from('schedules')
-                .insert([
-                    {
-                        title: values.title,
-                        category_id: values.categoryId,
-                        // カテゴリに応じて会場IDまたは放送局ID
-                        venue_id: !isBroadcast ? values.locationId : null,
-                        broadcast_station_id: isBroadcast ? values.locationId : null,
-                        start_date: startDate.toISOString(),
-                        end_date: endDate?.toISOString() || null,
-                        is_all_day: values.isAllDay || false,
-                        description: values.description,
-                        official_url: values.officialUrl
-                    }
-                ])
+                .update({
+                    title: values.title,
+                    categoryId: values.categoryId,
+                    // カテゴリに応じて会場IDまたは放送局ID
+                    venueId: !isBroadcast ? values.locationId : null,
+                    broadcast_station_id: isBroadcast ? values.locationId : null,
+                    startDate: startDate.toISOString(),
+                    endDate: endDate?.toISOString() || null,
+                    isAllDay: values.isAllDay || false,
+                    description: values.description,
+                    officialUrl: values.officialUrl
+                })
+                .eq('id', id)
                 .select();
 
             if (error) throw error;
 
-            // 公演情報を登録（もしあれば）
-            if (values.performanceInfo && data && data[0]) {
-                const scheduleId = data[0].id;
-                const timeStrings = values.performanceInfo.split('/').map(str => str.trim());
-
-                const performances = timeStrings.map((timeString, index) => ({
-                    schedule_id: scheduleId,
-                    performance_date: startDate.toISOString(),
-                    display_start_time: timeString,
-                    display_order: index + 1
-                }));
-
-                const { error: performanceError } = await supabase
+            // パフォーマンス情報が変更されている場合、いったん削除して再登録
+            if (values.performanceInfo !== performanceInfo) {
+                // 既存のパフォーマンス情報を削除
+                const { error: deleteError } = await supabase
                     .from('rel_schedule_performances')
-                    .insert(performances);
+                    .delete()
+                    .eq('schedule_id', id);
 
-                if (performanceError) throw performanceError;
+                if (deleteError) throw deleteError;
+
+                // 新しいパフォーマンス情報を登録
+                if (values.performanceInfo) {
+                    const timeStrings = values.performanceInfo.split('/').map(str => str.trim());
+
+                    const performances = timeStrings.map((timeString, index) => ({
+                        schedule_id: id,
+                        performance_date: startDate.toISOString(),
+                        display_start_time: timeString,
+                        display_order: index + 1
+                    }));
+
+                    const { error: insertError } = await supabase
+                        .from('rel_schedule_performances')
+                        .insert(performances);
+
+                    if (insertError) throw insertError;
+                }
             }
 
             router.push('/admin/schedules');
         } catch (error) {
-            console.error('スケジュール登録エラー:', error);
-            alert('スケジュールの登録に失敗しました');
+            console.error('スケジュール更新エラー:', error);
+            alert('スケジュールの更新に失敗しました');
         } finally {
             setSubmitting(false);
         }
@@ -150,6 +213,8 @@ export default function NewSchedule() {
 
     // フォームフィールドの更新
     useEffect(() => {
+        if (!selectedCategory) return;
+
         // カテゴリ名の取得
         const categoryName = getCategoryType(selectedCategory);
         const isBroadcast = isBroadcastCategory(categoryName);
@@ -250,6 +315,13 @@ export default function NewSchedule() {
         setFormFields(fields);
     }, [selectedCategory, categories, venues, broadcastStations]);
 
+    // フォームの初期値設定
+    useEffect(() => {
+        if (scheduleData && performanceInfo !== undefined) {
+            scheduleData.performanceInfo = performanceInfo;
+        }
+    }, [scheduleData, performanceInfo]);
+
     if (loading || dataLoading) {
         return (
             <AdminLayout>
@@ -264,21 +336,22 @@ export default function NewSchedule() {
     return (
         <AdminLayout>
             <Head>
-                <title>新規スケジュール追加 | 佐藤拓也ファンサイト 管理画面</title>
+                <title>スケジュール編集 | 佐藤拓也ファンサイト 管理画面</title>
             </Head>
             <div className="py-4">
                 <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-primary">新規スケジュール追加</h1>
-                    <p className="text-gray-600">イベント、舞台、生放送などのスケジュールを追加します</p>
+                    <h1 className="text-2xl font-bold text-primary">スケジュール編集</h1>
+                    <p className="text-gray-600">イベント、舞台、生放送などのスケジュールを編集します</p>
                 </div>
 
-                {/* フォームフィールドが準備できたら表示 */}
-                {formFields.length > 0 && (
+                {/* スケジュールデータとフォームフィールドが準備できたら表示 */}
+                {scheduleData && formFields.length > 0 && (
                     <FormBuilder
                         fields={formFields}
+                        initialValues={scheduleData}
                         onSubmit={handleSubmit}
                         title="スケジュール情報"
-                        submitButtonText="スケジュールを登録"
+                        submitButtonText="スケジュールを更新"
                         cancelHref="/admin/schedules"
                         isSubmitting={submitting}
                     />

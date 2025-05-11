@@ -1,6 +1,19 @@
 // pages/api/schedules/[id].js
 import prisma from '../../../lib/prisma';
 
+// 時間文字列（例: "14:00～"）からHoursとMinutesを抽出
+function parseTimeString(timeString) {
+    // 時間部分を抽出（数字とコロンを含む部分を取得）
+    const timeMatch = timeString.match(/(\d{1,2}):(\d{2})/);
+    if (!timeMatch) return null;
+
+    // 時分を返す
+    return {
+        hours: parseInt(timeMatch[1], 10),
+        minutes: parseInt(timeMatch[2], 10)
+    };
+}
+
 export default async function handler(req, res) {
     const { id } = req.query;
 
@@ -40,7 +53,7 @@ export default async function handler(req, res) {
 
             // パフォーマンス情報を整形
             const performanceInfo = schedule.performances
-                .map(p => p.displayStartTime)
+                .map(p => p.display_start_time)
                 .join(' / ');
 
             // フロントエンド用に整形したデータ
@@ -119,9 +132,9 @@ export default async function handler(req, res) {
             }
 
             // トランザクションでスケジュールとパフォーマンス情報を一括更新
-            const result = await prisma.$transaction(async (prisma) => {
+            const result = await prisma.$transaction(async (tx) => {
                 // スケジュールを更新
-                const schedule = await prisma.schedule.update({
+                const schedule = await tx.schedule.update({
                     where: {
                         id: id
                     },
@@ -129,7 +142,7 @@ export default async function handler(req, res) {
                 });
 
                 // 既存のパフォーマンス情報を削除
-                await prisma.schedulePerformance.deleteMany({
+                await tx.schedulePerformance.deleteMany({
                     where: {
                         schedule_id: id
                     }
@@ -138,18 +151,46 @@ export default async function handler(req, res) {
                 // パフォーマンス情報がある場合は登録
                 if (performanceInfo) {
                     const timeStrings = performanceInfo.split('/').map(str => str.trim());
+                    const startDateObj = new Date(startDate);
 
-                    const performances = timeStrings.map((timeString, index) => ({
-                        schedule_id: schedule.id,
-                        performance_date: new Date(startDate), // ここを修正: performanceDate → performance_date
-                        display_start_time: timeString,
-                        display_order: index + 1
-                    }));
+                    // 各パフォーマンスを個別に登録
+                    for (let index = 0; index < timeStrings.length; index++) {
+                        const timeString = timeStrings[index];
+                        // 時間文字列から時分を抽出
+                        const parsedTime = parseTimeString(timeString);
 
-                    if (performances.length > 0) {
-                        await prisma.schedulePerformance.createMany({
-                            data: performances
-                        });
+                        // 登録データを作成
+                        const performanceData = {
+                            schedule_id: schedule.id,
+                            performance_date: startDateObj,
+                            display_start_time: timeString,
+                            display_order: index + 1
+                        };
+
+                        // パースできた場合は start_time を設定
+                        if (parsedTime) {
+                            // 現在日付のUTC時間を作成し、そこに時間を設定
+                            // この方法ならタイムゾーンの問題を回避できる
+                            await tx.$executeRaw`
+                                INSERT INTO "rel_schedule_performances" 
+                                (id, schedule_id, performance_date, start_time, display_start_time, display_order, created_at)
+                                VALUES 
+                                (
+                                    gen_random_uuid(), 
+                                    ${schedule.id}, 
+                                    ${startDateObj}::date, 
+                                    ${`${parsedTime.hours}:${parsedTime.minutes}`}::time, 
+                                    ${timeString}, 
+                                    ${index + 1}, 
+                                    now()
+                                )
+                            `;
+                        } else {
+                            // 時間が抽出できなかった場合は start_time なしで登録
+                            await tx.schedulePerformance.create({
+                                data: performanceData
+                            });
+                        }
                     }
                 }
 

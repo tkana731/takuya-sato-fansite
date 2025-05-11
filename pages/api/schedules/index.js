@@ -87,7 +87,10 @@ export default async function handler(req, res) {
                 category: schedules[0].category,
                 venue: schedules[0].venue,
                 broadcastStation: schedules[0].broadcastStation,
-                performances: schedules[0].performances.length,
+                performances: schedules[0].performances.length > 0 ? {
+                    display_start_time: schedules[0].performances[0].display_start_time,
+                    start_time: schedules[0].performances[0].start_time
+                } : 'なし',
                 performers: schedules[0].performers.length
             }));
         }
@@ -105,8 +108,9 @@ export default async function handler(req, res) {
                 : (schedule.venue ? schedule.venue.name : '');
 
             // パフォーマンス情報を整形
+            // ここが問題の箇所です - 正しいフィールド名を使用する
             const timeInfo = schedule.performances.length > 0
-                ? schedule.performances.map(p => p.displayStartTime).join(' / ')
+                ? schedule.performances.map(p => p.display_start_time).join(' / ')
                 : 'TBD';
 
             // 出演者情報を整形

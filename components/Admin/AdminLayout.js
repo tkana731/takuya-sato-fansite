@@ -61,8 +61,8 @@ export default function AdminLayout({ children }) {
         { name: 'ダッシュボード', href: '/admin', current: router.pathname === '/admin' },
         { name: 'スケジュール管理', href: '/admin/schedules', current: router.pathname.startsWith('/admin/schedules') },
         { name: '出演作品管理', href: '/admin/works', current: router.pathname.startsWith('/admin/works') },
+        { name: 'キャラクター管理', href: '/admin/characters', current: router.pathname.startsWith('/admin/characters') },
         { name: '放送中コンテンツ管理', href: '/admin/on-air', current: router.pathname.startsWith('/admin/on-air') },
-        { name: '誕生日設定', href: '/admin/birthdays', current: router.pathname.startsWith('/admin/birthdays') },
         { name: '動画管理', href: '/admin/videos', current: router.pathname.startsWith('/admin/videos') },
         { name: 'マスタデータ管理', href: '/admin/masters', current: router.pathname.startsWith('/admin/masters') },
     ];
@@ -90,8 +90,8 @@ export default function AdminLayout({ children }) {
                                 key={item.name}
                                 href={item.href}
                                 className={`${item.current
-                                        ? 'bg-primary-dark text-white'
-                                        : 'text-white hover:bg-primary-light'
+                                    ? 'bg-primary-dark text-white'
+                                    : 'text-white hover:bg-primary-light'
                                     } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
                             >
                                 {item.name}
@@ -149,8 +149,8 @@ export default function AdminLayout({ children }) {
                                         key={item.name}
                                         href={item.href}
                                         className={`${item.current
-                                                ? 'bg-primary-dark text-white'
-                                                : 'text-white hover:bg-primary-light'
+                                            ? 'bg-primary-dark text-white'
+                                            : 'text-white hover:bg-primary-light'
                                             } group flex items-center px-2 py-2 text-base font-medium rounded-md`}
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >

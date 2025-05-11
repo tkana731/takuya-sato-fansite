@@ -15,6 +15,7 @@ export default async function handler(req, res) {
         // 誕生日が今日のキャラクターを検索 (MM/DD形式)
         const formattedBirthday = `${month < 10 ? '0' + month : month}/${day < 10 ? '0' + day : day}`;
 
+        // 誕生日が今日のキャラクターを取得
         const birthdayCharacters = await prisma.role.findMany({
             where: {
                 birthday: formattedBirthday
@@ -23,11 +24,32 @@ export default async function handler(req, res) {
                 id: true,
                 name: true,
                 seriesName: true,
-                birthday: true
+                birthday: true,
+                actor: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            },
+            orderBy: {
+                name: 'asc'
             }
         });
 
-        return res.status(200).json(birthdayCharacters);
+        // 佐藤拓也さん演じる役のみをフィルタリング
+        const filteredCharacters = birthdayCharacters.filter(char =>
+            char.actor && char.actor.name === '佐藤拓也'
+        );
+
+        // 簡略化したデータを返す
+        const result = filteredCharacters.map(char => ({
+            id: char.id,
+            name: char.name,
+            seriesName: char.seriesName || ''
+        }));
+
+        return res.status(200).json(result);
     } catch (error) {
         console.error('誕生日キャラクターの取得エラー:', error);
         return res.status(500).json({ error: '誕生日キャラクターの取得に失敗しました' });

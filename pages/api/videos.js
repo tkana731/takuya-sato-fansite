@@ -28,7 +28,6 @@ export default async function handler(req, res) {
             id: video.id,
             title: video.title,
             date: formattedDate,
-            thumbnailUrl: video.thumbnailUrl,
             videoUrl: video.videoUrl
         });
     } catch (error) {

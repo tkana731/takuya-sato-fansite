@@ -8,7 +8,6 @@ export default function VideoSection({ videos = [] }) {
         id: '1',
         title: '【声優】佐藤拓也の声優としての魅力に迫る！',
         date: '2025.05.08',
-        thumbnailUrl: '/api/placeholder/400/225'
     };
 
     return (
@@ -25,7 +24,7 @@ export default function VideoSection({ videos = [] }) {
                             {/* プレースホルダー画像でNext.js Image コンポーネントを使用 */}
                             <div style={{ position: 'relative', width: '100%', height: '180px' }}>
                                 <Image
-                                    src={fallbackVideo.thumbnailUrl}
+                                    src="/api/placeholder/400/225"
                                     alt="佐藤拓也 最新動画"
                                     fill
                                     style={{ objectFit: 'cover' }}

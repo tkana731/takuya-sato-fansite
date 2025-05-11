@@ -303,14 +303,13 @@ model WorkStaff {
 }
 
 model Video {
-  id          String   @id @default(uuid())
-  workId      String?
-  title       String
-  thumbnailUrl String
-  videoUrl    String
-  publishedAt DateTime @db.Date()
+  id           String   @id @default(uuid())
+  workId       String?  @map("work_id")
+  title        String
+  videoUrl     String   @map("video_url")
+  publishedAt  DateTime @db.Date() @map("published_at")
   created_at   DateTime @default(now())
-  work        Work?    @relation(fields: [workId], references: [id])
+  work         Work?    @relation(fields: [workId], references: [id])
 
   @@map("videos")
 }

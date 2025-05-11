@@ -1,5 +1,5 @@
-// pages/api/schedules.js
-import prisma from '../../lib/prisma';
+// pages/api/schedules/index.js
+import prisma from '../../../lib/prisma';
 
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
@@ -31,19 +31,19 @@ export default async function handler(req, res) {
             };
         }
 
-        // スケジュールを取得
+        // Prismaでスケジュールを取得
         const schedules = await prisma.schedule.findMany({
             where: whereCondition,
             include: {
                 category: true,
                 venue: true,
-                broadcastStation: true, // 放送局情報も取得
+                broadcastStation: true,
                 performances: {
                     orderBy: {
-                        performanceDate: 'asc'
+                        displayOrder: 'asc'
                     }
                 },
-                performers: {
+                schedulePerformers: {
                     include: {
                         performer: true
                     },
@@ -68,6 +68,15 @@ export default async function handler(req, res) {
                 ? (schedule.broadcastStation ? schedule.broadcastStation.name : '')
                 : (schedule.venue ? schedule.venue.name : '');
 
+            // パフォーマンス情報を整形
+            const timeInfo = schedule.performances.length > 0
+                ? schedule.performances.map(p => p.displayStartTime).join(' / ')
+                : 'TBD';
+
+            // 出演者情報を整形
+            const performers = schedule.schedulePerformers.map(p => p.performer.name).join('、');
+            const description = schedule.description || (performers ? `出演：${performers}` : '');
+
             return {
                 id: schedule.id,
                 date: startDate.toISOString().split('T')[0],
@@ -77,15 +86,11 @@ export default async function handler(req, res) {
                         schedule.category.name === '生放送' ? 'broadcast' : 'other',
                 categoryName: schedule.category.name,
                 title: schedule.title,
-                time: schedule.performances.length > 0 ?
-                    schedule.performances.map(p => p.displayStartTime).join(' / ') :
-                    'TBD',
+                time: timeInfo,
                 location: location,
                 locationType: isBroadcast ? '放送/配信' : '会場',
-                description: schedule.description ||
-                    (schedule.performers.length > 0 ?
-                        `出演：${schedule.performers.map(p => p.performer.name).join('、')}` : ''),
-                link: schedule.officialUrl || '#'
+                description: description,
+                link: schedule.official_url || '#'
             };
         });
 

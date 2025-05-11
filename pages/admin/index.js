@@ -82,8 +82,8 @@ export default function AdminDashboard() {
                 // スケジュール - created_atをcreatedAtに変更
                 const { data: recentSchedules, error: scheduleError } = await supabase
                     .from('schedules')
-                    .select('id, title, createdAt') // created_at → createdAt
-                    .order('createdAt', { ascending: false }) // created_at → createdAt
+                    .select('id, title, created_at') // created_at → createdAt
+                    .order('created_at', { ascending: false }) // created_at → createdAt
                     .limit(3);
 
                 if (scheduleError) throw scheduleError;

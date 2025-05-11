@@ -11,7 +11,7 @@ async function main() {
             create: {
                 id: '1',
                 name: 'アニメ',
-                displayOrder: 1,
+                display_order: 1,
             },
         });
 
@@ -21,7 +21,7 @@ async function main() {
             create: {
                 id: '2',
                 name: 'ゲーム',
-                displayOrder: 2,
+                display_order: 2,
             },
         });
 
@@ -31,7 +31,7 @@ async function main() {
             create: {
                 id: '3',
                 name: '吹き替え（映画）',
-                displayOrder: 3,
+                display_order: 3,
             },
         });
 
@@ -41,7 +41,7 @@ async function main() {
             create: {
                 id: '4',
                 name: '吹き替え（ドラマ）',
-                displayOrder: 4,
+                display_order: 4,
             },
         });
 
@@ -51,7 +51,7 @@ async function main() {
             create: {
                 id: '5',
                 name: 'ラジオ',
-                displayOrder: 5,
+                display_order: 5,
             },
         });
 
@@ -61,7 +61,7 @@ async function main() {
             create: {
                 id: '6',
                 name: 'WEB',
-                displayOrder: 6,
+                display_order: 6,
             },
         });
 
@@ -71,7 +71,7 @@ async function main() {
             create: {
                 id: '7',
                 name: 'ナレーション',
-                displayOrder: 7,
+                display_order: 7,
             },
         });
 
@@ -85,7 +85,7 @@ async function main() {
                 colorCode: '#ff8a00',
                 hasPeriod: false,
                 hasPerformances: false,
-                displayOrder: 1,
+                display_order: 1,
             },
         });
 
@@ -98,7 +98,7 @@ async function main() {
                 colorCode: '#8a2be2',
                 hasPeriod: true,
                 hasPerformances: true,
-                displayOrder: 2,
+                display_order: 2,
             },
         });
 
@@ -111,7 +111,7 @@ async function main() {
                 colorCode: '#00b050',
                 hasPeriod: false,
                 hasPerformances: false,
-                displayOrder: 3,
+                display_order: 3,
             },
         });
 
@@ -122,7 +122,7 @@ async function main() {
             create: {
                 id: '1',
                 name: 'TV',
-                displayOrder: 1,
+                display_order: 1,
             },
         });
 
@@ -132,7 +132,7 @@ async function main() {
             create: {
                 id: '2',
                 name: 'ラジオ',
-                displayOrder: 2,
+                display_order: 2,
             },
         });
 
@@ -142,7 +142,7 @@ async function main() {
             create: {
                 id: '3',
                 name: '配信',
-                displayOrder: 3,
+                display_order: 3,
             },
         });
 
@@ -155,7 +155,7 @@ async function main() {
                 name: 'TOKYO MX',
                 typeId: tvType.id,
                 officialUrl: 'https://s.mxtv.jp/',
-                displayOrder: 1,
+                display_order: 1,
             },
         });
 
@@ -167,7 +167,7 @@ async function main() {
                 name: 'BS11',
                 typeId: tvType.id,
                 officialUrl: 'https://www.bs11.jp/',
-                displayOrder: 2,
+                display_order: 2,
             },
         });
 
@@ -179,7 +179,7 @@ async function main() {
                 name: 'AT-X',
                 typeId: tvType.id,
                 officialUrl: 'https://www.at-x.com/',
-                displayOrder: 3,
+                display_order: 3,
             },
         });
 
@@ -191,7 +191,7 @@ async function main() {
                 name: 'ABEMA',
                 typeId: streamingType.id,
                 officialUrl: 'https://abema.tv/',
-                displayOrder: 4,
+                display_order: 4,
             },
         });
 
@@ -203,7 +203,7 @@ async function main() {
                 name: 'dアニメストア',
                 typeId: streamingType.id,
                 officialUrl: 'https://anime.dmkt-sp.jp/',
-                displayOrder: 5,
+                display_order: 5,
             },
         });
 
@@ -215,7 +215,7 @@ async function main() {
                 name: 'ニコニコ生放送',
                 typeId: streamingType.id,
                 officialUrl: 'https://live.nicovideo.jp/',
-                displayOrder: 6,
+                display_order: 6,
             },
         });
 
@@ -227,7 +227,7 @@ async function main() {
                 name: 'YouTube',
                 typeId: streamingType.id,
                 officialUrl: 'https://www.youtube.com/',
-                displayOrder: 7,
+                display_order: 7,
             },
         });
 
@@ -239,19 +239,19 @@ async function main() {
                 name: '文化放送',
                 typeId: radioType.id,
                 officialUrl: 'https://www.joqr.co.jp/',
-                displayOrder: 8,
+                display_order: 8,
             },
         });
 
         // 曜日の作成
         const weekdays = [
-            { id: '1', name: '月曜日', shortName: '月', code: 'mon', displayOrder: 1 },
-            { id: '2', name: '火曜日', shortName: '火', code: 'tue', displayOrder: 2 },
-            { id: '3', name: '水曜日', shortName: '水', code: 'wed', displayOrder: 3 },
-            { id: '4', name: '木曜日', shortName: '木', code: 'thu', displayOrder: 4 },
-            { id: '5', name: '金曜日', shortName: '金', code: 'fri', displayOrder: 5 },
-            { id: '6', name: '土曜日', shortName: '土', code: 'sat', displayOrder: 6 },
-            { id: '7', name: '日曜日', shortName: '日', code: 'sun', displayOrder: 7 },
+            { id: '1', name: '月曜日', shortName: '月', code: 'mon', display_order: 1 },
+            { id: '2', name: '火曜日', shortName: '火', code: 'tue', display_order: 2 },
+            { id: '3', name: '水曜日', shortName: '水', code: 'wed', display_order: 3 },
+            { id: '4', name: '木曜日', shortName: '木', code: 'thu', display_order: 4 },
+            { id: '5', name: '金曜日', shortName: '金', code: 'fri', display_order: 5 },
+            { id: '6', name: '土曜日', shortName: '土', code: 'sat', display_order: 6 },
+            { id: '7', name: '日曜日', shortName: '日', code: 'sun', display_order: 7 },
         ];
 
         for (const weekday of weekdays) {
@@ -298,7 +298,7 @@ async function main() {
                 name: '東京都',
                 region: '関東',
                 code: '13',
-                displayOrder: 13,
+                display_order: 13,
             },
         });
 
@@ -315,7 +315,7 @@ async function main() {
                 capacity: '約700名',
                 officialUrl: 'https://stream-hall.jp/',
                 googleMapsUrl: 'https://goo.gl/maps/6JZqQZ2Z8Z2Z2Z2Z2',
-                displayOrder: 1,
+                display_order: 1,
             },
         });
 
@@ -331,7 +331,7 @@ async function main() {
                 capacity: '1,999名',
                 officialUrl: 'https://www.geigeki.jp/',
                 googleMapsUrl: 'https://goo.gl/maps/1JZqQZ2Z8Z2Z2Z2Z2',
-                displayOrder: 2,
+                display_order: 2,
             },
         });
 
@@ -347,7 +347,7 @@ async function main() {
                 capacity: '約17,000名',
                 officialUrl: 'https://www.yokohama-arena.co.jp/',
                 googleMapsUrl: 'https://goo.gl/maps/2JZqQZ2Z8Z2Z2Z2Z2',
-                displayOrder: 3,
+                display_order: 3,
             },
         });
 
@@ -361,7 +361,7 @@ async function main() {
                 description: 'アイドル育成ゲーム「アイドリッシュセブン」のメディアミックス作品',
                 officialUrl: 'https://idolish7.com/',
                 xUrl: 'https://twitter.com/iD7Mng_Ogami',
-                displayOrder: 1,
+                display_order: 1,
             },
         });
 
@@ -374,7 +374,7 @@ async function main() {
                 description: 'ブラウザゲーム「刀剣乱舞-ONLINE-」のメディアミックス作品',
                 officialUrl: 'https://touken-ranbu.jp/',
                 xUrl: 'https://twitter.com/tkrb_staff',
-                displayOrder: 2,
+                display_order: 2,
             },
         });
 
@@ -450,7 +450,7 @@ async function main() {
                 work_id: idolish7Anime.id,
                 sequenceNumber: 3,
                 subtitle: 'Third BEAT!',
-                displayOrder: 1,
+                display_order: 1,
             },
         });
 
@@ -464,7 +464,7 @@ async function main() {
                     work_id: idolish7Anime.id,
                     roleId: '1', // 十龍之介
                     isMainRole: true,
-                    displayOrder: 1,
+                    display_order: 1,
                 },
             });
         }
@@ -528,12 +528,12 @@ async function main() {
             update: {},
             create: {
                 id: '1',
-                scheduleId: schedule1.id,
-                performanceDate: scheduleDate1,
+                schedule_id: schedule1.id,
+                performance_date: scheduleDate1,
                 displayStartTime: '14:00～',
                 displayEndTime: '16:30',
                 description: '',
-                displayOrder: 1,
+                display_order: 1,
             },
         });
 
@@ -543,10 +543,10 @@ async function main() {
             update: {},
             create: {
                 id: '1',
-                scheduleId: schedule1.id,
+                schedule_id: schedule1.id,
                 performerId: takuyaSatoPerformer.id,
                 roleDescription: '十龍之介役',
-                displayOrder: 1,
+                display_order: 1,
             },
         });
 

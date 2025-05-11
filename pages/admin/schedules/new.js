@@ -5,6 +5,8 @@ import AdminLayout from '../../../components/Admin/AdminLayout';
 import FormBuilder from '../../../components/Admin/FormBuilder';
 import useProtectedRoute from '../../../hooks/useProtectedRoute';
 import { supabase } from '../../../lib/supabase';
+import LocationModal from '../../../components/Admin/LocationModal';
+import axios from 'axios';
 
 export default function NewSchedule() {
     // 管理者のみアクセス可能
@@ -17,6 +19,11 @@ export default function NewSchedule() {
     const [dataLoading, setDataLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [formFields, setFormFields] = useState([]);
+
+    // モーダル関連の状態
+    const [showLocationModal, setShowLocationModal] = useState(false);
+    const [locationType, setLocationType] = useState(''); // 'venue' or 'broadcast'
+    const [reloadMasterData, setReloadMasterData] = useState(0); // マスタデータを再取得するためのトリガー
 
     // カテゴリIDから種類を判定
     const getCategoryType = (categoryId) => {
@@ -38,8 +45,8 @@ export default function NewSchedule() {
                 // カテゴリを取得
                 const { data: categoryData, error: categoryError } = await supabase
                     .from('mst_schedule_categories')
-                    .select('id, name, displayOrder')
-                    .order('displayOrder', { ascending: true });
+                    .select('id, name, display_order')
+                    .order('display_order', { ascending: true });
 
                 if (categoryError) {
                     console.error('カテゴリ取得エラー詳細:', categoryError);
@@ -49,8 +56,8 @@ export default function NewSchedule() {
                 // 会場を取得
                 const { data: venueData, error: venueError } = await supabase
                     .from('mst_venues')
-                    .select('id, name, displayOrder')
-                    .order('displayOrder', { ascending: true });
+                    .select('id, name, display_order')
+                    .order('display_order', { ascending: true });
 
                 if (venueError) {
                     console.error('会場取得エラー詳細:', venueError);
@@ -60,8 +67,8 @@ export default function NewSchedule() {
                 // 放送局を取得
                 const { data: stationData, error: stationError } = await supabase
                     .from('mst_broadcast_stations')
-                    .select('id, name, displayOrder')
-                    .order('displayOrder', { ascending: true });
+                    .select('id, name, display_order')
+                    .order('display_order', { ascending: true });
 
                 if (stationError) {
                     console.error('放送局取得エラー詳細:', stationError);
@@ -79,7 +86,7 @@ export default function NewSchedule() {
         };
 
         fetchMasterData();
-    }, []);
+    }, [reloadMasterData]); // reloadMasterDataが変わるたびに再取得
 
     // フォーム送信
     const handleSubmit = async (values) => {
@@ -93,50 +100,28 @@ export default function NewSchedule() {
             const categoryName = getCategoryType(values.categoryId);
             const isBroadcast = isBroadcastCategory(categoryName);
 
-            // スケジュールデータを登録
-            const { data, error } = await supabase
-                .from('schedules')
-                .insert([
-                    {
-                        title: values.title,
-                        category_id: values.categoryId,
-                        // カテゴリに応じて会場IDまたは放送局ID
-                        venue_id: !isBroadcast ? values.locationId : null,
-                        broadcast_station_id: isBroadcast ? values.locationId : null,
-                        start_date: startDate.toISOString(),
-                        end_date: endDate?.toISOString() || null,
-                        is_all_day: values.isAllDay || false,
-                        description: values.description,
-                        official_url: values.officialUrl
-                    }
-                ])
-                .select();
+            // スケジュールデータを作成（APIを使用）
+            const response = await axios.post('/api/schedules/create', {
+                title: values.title,
+                categoryId: values.categoryId,
+                locationId: values.locationId,
+                isLocationBroadcast: isBroadcast,
+                startDate: startDate,
+                endDate: endDate,
+                isAllDay: values.isAllDay || false,
+                description: values.description,
+                officialUrl: values.officialUrl,
+                performanceInfo: values.performanceInfo
+            });
 
-            if (error) throw error;
-
-            // 公演情報を登録（もしあれば）
-            if (values.performanceInfo && data && data[0]) {
-                const scheduleId = data[0].id;
-                const timeStrings = values.performanceInfo.split('/').map(str => str.trim());
-
-                const performances = timeStrings.map((timeString, index) => ({
-                    schedule_id: scheduleId,
-                    performance_date: startDate.toISOString(),
-                    display_start_time: timeString,
-                    display_order: index + 1
-                }));
-
-                const { error: performanceError } = await supabase
-                    .from('rel_schedule_performances')
-                    .insert(performances);
-
-                if (performanceError) throw performanceError;
+            if (!response.data.success) {
+                throw new Error(response.data.message);
             }
 
             router.push('/admin/schedules');
         } catch (error) {
             console.error('スケジュール登録エラー:', error);
-            alert('スケジュールの登録に失敗しました');
+            alert('スケジュールの登録に失敗しました: ' + (error.response?.data?.message || error.message));
         } finally {
             setSubmitting(false);
         }
@@ -148,6 +133,29 @@ export default function NewSchedule() {
         setSelectedCategory(categoryId);
     };
 
+    // ロケーション選択時の処理
+    const handleLocationChange = (e) => {
+        const value = e.target.value;
+        if (value === 'new') {
+            // カテゴリから種類を判定
+            const categoryName = getCategoryType(selectedCategory);
+            const isBroadcast = isBroadcastCategory(categoryName);
+
+            // モーダルを表示
+            setLocationType(isBroadcast ? 'broadcast' : 'venue');
+            setShowLocationModal(true);
+        }
+    };
+
+    // 新規ロケーション追加後の処理
+    const handleLocationAdded = (newLocation) => {
+        // モーダルを閉じる
+        setShowLocationModal(false);
+
+        // マスタデータを再取得するためにトリガーを更新
+        setReloadMasterData(prev => prev + 1);
+    };
+
     // フォームフィールドの更新
     useEffect(() => {
         // カテゴリ名の取得
@@ -155,15 +163,27 @@ export default function NewSchedule() {
         const isBroadcast = isBroadcastCategory(categoryName);
 
         // ロケーションオプションの設定
-        const locationOptions = isBroadcast
-            ? broadcastStations.map(station => ({
+        let locationOptions = [];
+
+        if (isBroadcast) {
+            // 放送局のオプション + 新規追加オプション
+            locationOptions = broadcastStations.map(station => ({
                 value: station.id,
                 label: station.name,
-            }))
-            : venues.map(venue => ({
+            }));
+        } else {
+            // 会場のオプション + 新規追加オプション
+            locationOptions = venues.map(venue => ({
                 value: venue.id,
                 label: venue.name,
             }));
+        }
+
+        // 新規追加オプションを追加
+        locationOptions.push({
+            value: 'new',
+            label: '+ 新規追加',
+        });
 
         // ロケーションフィールドのラベル設定
         const locationLabel = isBroadcast ? '放送局/配信サイト' : '会場';
@@ -198,6 +218,7 @@ export default function NewSchedule() {
                 options: locationOptions,
                 span: 'sm:col-span-3',
                 placeholder: isBroadcast ? '放送局/配信サイトを選択' : '会場を選択',
+                onChange: handleLocationChange,
             },
             {
                 name: 'startDate',
@@ -281,6 +302,15 @@ export default function NewSchedule() {
                         submitButtonText="スケジュールを登録"
                         cancelHref="/admin/schedules"
                         isSubmitting={submitting}
+                    />
+                )}
+
+                {/* 新規ロケーション追加用モーダル */}
+                {showLocationModal && (
+                    <LocationModal
+                        type={locationType}
+                        onClose={() => setShowLocationModal(false)}
+                        onLocationAdded={handleLocationAdded}
                     />
                 )}
             </div>

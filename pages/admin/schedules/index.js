@@ -36,15 +36,15 @@ export default function SchedulesAdmin() {
                     .select(`
                         id, 
                         title, 
-                        startDate,
-                        isAllDay,
+                        start_date,
+                        is_all_day,
                         description, 
-                        officialUrl,
-                        category:categoryId (id, name, colorCode),
-                        venue:venueId (name),
+                        official_url,
+                        category:category_id (id, name, colorCode),
+                        venue:venue_id (name),
                         broadcastStation:broadcast_station_id (name)
                     `)
-                    .order('startDate', { ascending: true });
+                    .order('start_date', { ascending: true });
 
                 if (error) throw error;
 

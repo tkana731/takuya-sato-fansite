@@ -15,7 +15,7 @@ datasource db {
 model WorkCategory {
   id           String   @id @default(uuid())
   name         String
-  displayOrder Int
+  display_order Int
   createdAt    DateTime @default(now())
   works        Work[]
 
@@ -52,7 +52,7 @@ model BroadcastStation {
   name         String
   typeId       String
   officialUrl  String?
-  displayOrder Int
+  display_order Int
   createdAt    DateTime          @default(now())
   type         StationType       @relation(fields: [typeId], references: [id])
   channels     BroadcastChannel[]
@@ -64,7 +64,7 @@ model BroadcastStation {
 model StationType {
   id           String             @id @default(uuid())
   name         String
-  displayOrder Int
+  display_order Int
   createdAt    DateTime           @default(now())
   stations     BroadcastStation[]
 
@@ -76,7 +76,7 @@ model Weekday {
   name         String
   shortName    String
   code         String
-  displayOrder Int
+  display_order Int
   createdAt    DateTime           @default(now())
   channels     BroadcastChannel[]
 
@@ -132,7 +132,7 @@ model WorkRole {
   workId      String
   roleId      String
   isMainRole  Boolean
-  displayOrder Int
+  display_order Int
   createdAt   DateTime @default(now())
   work        Work     @relation(fields: [workId], references: [id])
   role        Role     @relation(fields: [roleId], references: [id])
@@ -146,7 +146,7 @@ model ScheduleCategory {
   colorCode    String
   hasPeriod    Boolean
   hasPerformances Boolean
-  displayOrder Int
+  display_order Int
   createdAt    DateTime   @default(now())
   schedules    Schedule[]
 
@@ -158,7 +158,7 @@ model Prefecture {
   name         String
   region       String
   code         String
-  displayOrder Int
+  display_order Int
   createdAt    DateTime @default(now())
   venues       Venue[]
 
@@ -174,7 +174,7 @@ model Venue {
   capacity     String?
   officialUrl  String?
   googleMapsUrl String?
-  displayOrder Int
+  display_order Int
   createdAt    DateTime   @default(now())
   prefecture   Prefecture @relation(fields: [prefectureId], references: [id])
   schedules    Schedule[]
@@ -188,7 +188,7 @@ model Schedule {
   work_id            String?
   series_id          String?
   venue_id           String?             // Nullableに変更
-  broadcastStationId String?            @map("broadcast_station_id") // 新規追加
+  broadcast_station_id String?            @map("broadcast_station_id") // 新規追加
   title             String
   start_date         DateTime            @db.Date()
   end_date           DateTime?           @db.Date()
@@ -201,7 +201,7 @@ model Schedule {
   category          ScheduleCategory    @relation(fields: [category_id], references: [id])
   work              Work?               @relation(fields: [work_id], references: [id])
   venue             Venue?              @relation(fields: [venue_id], references: [id])
-  broadcastStation  BroadcastStation?   @relation(fields: [broadcastStationId], references: [id]) // 新規関連
+  broadcastStation  BroadcastStation?   @relation(fields: [broadcast_station_id], references: [id]) // 新規関連
   performances      SchedulePerformance[]
   performers        SchedulePerformer[]
 
@@ -210,17 +210,17 @@ model Schedule {
 
 model SchedulePerformance {
   id              String   @id @default(uuid())
-  scheduleId      String
-  performanceDate DateTime @db.Date()
+  schedule_id      String
+  performance_date DateTime @db.Date()
   startTime       DateTime? @db.Time()
   endTime         DateTime? @db.Time()
   displayStartTime String?
   displayEndTime  String?
   subtitle        String?
   description     String?
-  displayOrder    Int
+  display_order    Int
   createdAt       DateTime @default(now())
-  schedule        Schedule @relation(fields: [scheduleId], references: [id])
+  schedule        Schedule @relation(fields: [schedule_id], references: [id])
 
   @@map("rel_schedule_performances")
 }
@@ -244,7 +244,7 @@ model WorkPerformer {
   workId         String
   performerId    String
   roleDescription String?
-  displayOrder   Int
+  display_order   Int
   createdAt      DateTime  @default(now())
   work           Work      @relation(fields: [workId], references: [id])
   performer      Performer @relation(fields: [performerId], references: [id])
@@ -254,12 +254,12 @@ model WorkPerformer {
 
 model SchedulePerformer {
   id             String    @id @default(uuid())
-  scheduleId     String
+  schedule_id     String
   performerId    String
   roleDescription String?
-  displayOrder   Int
+  display_order   Int
   createdAt      DateTime  @default(now())
-  schedule       Schedule  @relation(fields: [scheduleId], references: [id])
+  schedule       Schedule  @relation(fields: [schedule_id], references: [id])
   performer      Performer @relation(fields: [performerId], references: [id])
 
   @@map("rel_schedule_performers")
@@ -280,7 +280,7 @@ model Staff {
 model StaffRole {
   id           String      @id @default(uuid())
   name         String
-  displayOrder Int
+  display_order Int
   createdAt    DateTime    @default(now())
   workStaff    WorkStaff[]
 
@@ -293,7 +293,7 @@ model WorkStaff {
   staffId     String
   staffRoleId String
   description String?
-  displayOrder Int
+  display_order Int
   createdAt   DateTime  @default(now())
   work        Work      @relation(fields: [workId], references: [id])
   staff       Staff     @relation(fields: [staffId], references: [id])
@@ -322,7 +322,7 @@ model Series {
   officialUrl  String?
   xUrl         String?
   instagramUrl String?
-  displayOrder Int
+  display_order Int
   createdAt    DateTime    @default(now())
   workSeries   WorkSeries[]
 
@@ -335,7 +335,7 @@ model WorkSeries {
   workId         String
   sequenceNumber Int?
   subtitle       String?
-  displayOrder   Int
+  display_order   Int
   createdAt      DateTime @default(now())
   series         Series   @relation(fields: [seriesId], references: [id])
   work           Work     @relation(fields: [workId], references: [id])
@@ -346,7 +346,7 @@ model WorkSeries {
 model WorkRelationType {
   id           String        @id @default(uuid())
   name         String
-  displayOrder Int
+  display_order Int
   createdAt    DateTime      @default(now())
   relatedWorks RelatedWork[]
 
@@ -359,7 +359,7 @@ model RelatedWork {
   childWorkId    String
   relationTypeId String
   description    String?
-  displayOrder   Int
+  display_order   Int
   createdAt      DateTime        @default(now())
   parentWork     Work            @relation("ParentWork", fields: [parentWorkId], references: [id])
   childWork      Work            @relation("ChildWork", fields: [childWorkId], references: [id])

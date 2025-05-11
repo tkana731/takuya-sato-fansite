@@ -544,7 +544,7 @@ async function main() {
             create: {
                 id: '1',
                 schedule_id: schedule1.id,
-                performerId: takuyaSatoPerformer.id,
+                performer_id: takuyaSatoPerformer.id,
                 roleDescription: '十龍之介役',
                 display_order: 1,
             },

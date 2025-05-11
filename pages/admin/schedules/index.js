@@ -94,6 +94,24 @@ export default function SchedulesAdmin() {
     // スケジュール削除
     const handleDelete = async (id) => {
         try {
+            // トランザクションで関連するデータを削除
+            // まず、関連するパフォーマンス情報を削除
+            const { error: performanceError } = await supabase
+                .from('rel_schedule_performances')
+                .delete()
+                .eq('schedule_id', id);
+
+            if (performanceError) throw performanceError;
+
+            // 次に、関連する出演者情報を削除（もし存在すれば）
+            const { error: performerError } = await supabase
+                .from('rel_schedule_performers')
+                .delete()
+                .eq('schedule_id', id);
+
+            if (performerError) throw performerError;
+
+            // 最後にスケジュール自体を削除
             const { error } = await supabase
                 .from('schedules')
                 .delete()

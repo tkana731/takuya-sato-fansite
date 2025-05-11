@@ -59,8 +59,8 @@ export default async function handler(req, res) {
 
                 const performances = timeStrings.map((timeString, index) => ({
                     schedule_id: schedule.id,
-                    performanceDate: new Date(startDate), // performance_date → performanceDate
-                    displayStartTime: timeString,
+                    performance_date: new Date(startDate), // ここを修正: performanceDate → performance_date
+                    display_start_time: timeString,
                     display_order: index + 1
                 }));
 

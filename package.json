@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "prisma generate && next build",
+    "build": "PRISMA_GENERATE_DATAPROXY=false prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:seed": "npx prisma db seed",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "PRISMA_GENERATE_DATAPROXY=false prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.7.0",
@@ -16,6 +16,7 @@
     "axios": "^1.9.0",
     "date-fns": "^4.1.0",
     "next": "15.3.2",
+    "prisma": "^6.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0"
@@ -27,7 +28,6 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "postcss": "^8.5.3",
-    "prisma": "^6.7.0",
     "tailwindcss": "^3.3.3"
   },
   "prisma": {

@@ -15,6 +15,13 @@ export default function Home() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [dataFetchStatus, setDataFetchStatus] = useState({
+    birthdays: false,
+    onAir: false,
+    schedules: false,
+    works: false,
+    videos: false
+  });
 
   // データのフェッチを実行
   useEffect(() => {
@@ -23,34 +30,69 @@ export default function Home() {
         setLoading(true);
 
         // 誕生日キャラクターの取得
-        const birthdaysRes = await fetch('/api/birthdays');
-        if (!birthdaysRes.ok) throw new Error('誕生日データの取得に失敗しました');
-        const birthdaysData = await birthdaysRes.json();
-        setBirthdays(birthdaysData);
+        try {
+          const birthdaysRes = await fetch('/api/birthdays');
+          if (!birthdaysRes.ok) throw new Error(`誕生日データの取得に失敗しました: ${birthdaysRes.status}`);
+          const birthdaysData = await birthdaysRes.json();
+          console.log("誕生日データ:", birthdaysData);
+          setBirthdays(birthdaysData);
+          setDataFetchStatus(prev => ({ ...prev, birthdays: true }));
+        } catch (err) {
+          console.error('誕生日データの取得エラー:', err);
+          setDataFetchStatus(prev => ({ ...prev, birthdays: false }));
+        }
 
         // 放送中コンテンツの取得
-        const onAirRes = await fetch('/api/on-air');
-        if (!onAirRes.ok) throw new Error('放送中コンテンツデータの取得に失敗しました');
-        const onAirData = await onAirRes.json();
-        setOnAirContent(onAirData);
+        try {
+          const onAirRes = await fetch('/api/on-air');
+          if (!onAirRes.ok) throw new Error(`放送中コンテンツデータの取得に失敗しました: ${onAirRes.status}`);
+          const onAirData = await onAirRes.json();
+          console.log("放送中コンテンツデータ:", onAirData);
+          setOnAirContent(onAirData);
+          setDataFetchStatus(prev => ({ ...prev, onAir: true }));
+        } catch (err) {
+          console.error('放送中コンテンツデータの取得エラー:', err);
+          setDataFetchStatus(prev => ({ ...prev, onAir: false }));
+        }
 
         // スケジュールの取得
-        const schedulesRes = await fetch('/api/schedules');
-        if (!schedulesRes.ok) throw new Error('スケジュールデータの取得に失敗しました');
-        const schedulesData = await schedulesRes.json();
-        setSchedules(schedulesData);
+        try {
+          const schedulesRes = await fetch('/api/schedules');
+          if (!schedulesRes.ok) throw new Error(`スケジュールデータの取得に失敗しました: ${schedulesRes.status}`);
+          const schedulesData = await schedulesRes.json();
+          console.log("スケジュールデータ:", schedulesData);
+          setSchedules(schedulesData);
+          setDataFetchStatus(prev => ({ ...prev, schedules: true }));
+        } catch (err) {
+          console.error('スケジュールデータの取得エラー:', err);
+          setDataFetchStatus(prev => ({ ...prev, schedules: false }));
+        }
 
         // 作品データの取得
-        const worksRes = await fetch('/api/works');
-        if (!worksRes.ok) throw new Error('作品データの取得に失敗しました');
-        const worksData = await worksRes.json();
-        setWorks(worksData);
+        try {
+          const worksRes = await fetch('/api/works');
+          if (!worksRes.ok) throw new Error(`作品データの取得に失敗しました: ${worksRes.status}`);
+          const worksData = await worksRes.json();
+          console.log("作品データ:", worksData);
+          setWorks(worksData);
+          setDataFetchStatus(prev => ({ ...prev, works: true }));
+        } catch (err) {
+          console.error('作品データの取得エラー:', err);
+          setDataFetchStatus(prev => ({ ...prev, works: false }));
+        }
 
         // 動画データの取得
-        const videosRes = await fetch('/api/videos');
-        if (!videosRes.ok) throw new Error('動画データの取得に失敗しました');
-        const videosData = await videosRes.json();
-        setVideos(videosData);
+        try {
+          const videosRes = await fetch('/api/videos');
+          if (!videosRes.ok) throw new Error(`動画データの取得に失敗しました: ${videosRes.status}`);
+          const videosData = await videosRes.json();
+          console.log("動画データ:", videosData);
+          setVideos(videosData);
+          setDataFetchStatus(prev => ({ ...prev, videos: true }));
+        } catch (err) {
+          console.error('動画データの取得エラー:', err);
+          setDataFetchStatus(prev => ({ ...prev, videos: false }));
+        }
 
         setLoading(false);
       } catch (err) {
@@ -63,10 +105,14 @@ export default function Home() {
     fetchData();
   }, []);
 
+  // データ取得状況をコンソールに表示
+  useEffect(() => {
+    console.log("データ取得状況:", dataFetchStatus);
+  }, [dataFetchStatus]);
+
   // エラー表示
   if (error) {
     console.warn('データ取得エラーがありますが、フォールバックデータを使用して表示します:', error);
-    // エラーがあってもフォールバックデータでレンダリングするため、ここでは何も表示しない
   }
 
   return (

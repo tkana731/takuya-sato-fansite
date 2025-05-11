@@ -1,12 +1,47 @@
 // components/Schedule/Schedule.js
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function Schedule({ schedules = [] }) {
     const [activeFilter, setActiveFilter] = useState('all');
+    const [processedSchedules, setProcessedSchedules] = useState([]);
 
-    // APIから取得したデータがない場合のフォールバックデータ
-    const fallbackSchedules = schedules.length ? schedules : [
+    // スケジュールデータ処理
+    useEffect(() => {
+        // APIから受け取ったデータをチェック
+        console.log("APIから受け取ったスケジュールデータ:", schedules);
+
+        // データが配列でない場合や、エラーを含む場合の対処
+        if (!Array.isArray(schedules)) {
+            console.error("スケジュールデータが正しい形式ではありません:", schedules);
+            setProcessedSchedules([]);
+            return;
+        }
+
+        // 有効なスケジュールデータを設定
+        setProcessedSchedules(schedules);
+    }, [schedules]);
+
+    // フィルタリング関数
+    const filterSchedules = (schedules) => {
+        if (activeFilter === 'all') {
+            return schedules;
+        }
+        return schedules.filter(schedule => schedule.category === activeFilter);
+    };
+
+    // 日付のフォーマット
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return {
+            year: date.getFullYear(),
+            month: date.getMonth() + 1,
+            day: date.getDate()
+        };
+    };
+
+    // APIデータがなければフォールバックデータを使用
+    const fallbackSchedules = processedSchedules.length > 0 ? processedSchedules : [
         {
             id: '1',
             date: '2025-05-10',
@@ -125,24 +160,6 @@ export default function Schedule({ schedules = [] }) {
             link: '#'
         }
     ];
-
-    // フィルタリング関数
-    const filterSchedules = (schedules) => {
-        if (activeFilter === 'all') {
-            return schedules;
-        }
-        return schedules.filter(schedule => schedule.category === activeFilter);
-    };
-
-    // 日付のフォーマット
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return {
-            year: date.getFullYear(),
-            month: date.getMonth() + 1,
-            day: date.getDate()
-        };
-    };
 
     // フィルタリングされたスケジュール
     const filteredSchedules = filterSchedules(fallbackSchedules);

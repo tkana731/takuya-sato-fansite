@@ -79,29 +79,29 @@ export default function AdminDashboard() {
                 // 最近追加されたレコードを取得する例
                 // 実際のアプリケーションでは、アクティビティログテーブルを用意するのが理想的
 
-                // スケジュール - created_atをcreatedAtに変更
+                // スケジュール
                 const { data: recentSchedules, error: scheduleError } = await supabase
                     .from('schedules')
-                    .select('id, title, created_at') // created_at → createdAt
-                    .order('created_at', { ascending: false }) // created_at → createdAt
+                    .select('id, title, created_at') // created_at
+                    .order('created_at', { ascending: false }) // created_at
                     .limit(3);
 
                 if (scheduleError) throw scheduleError;
 
-                // 作品 - created_atをcreatedAtに変更
+                // 作品
                 const { data: recentWorks, error: worksError } = await supabase
                     .from('works')
-                    .select('id, title, createdAt') // created_at → createdAt
-                    .order('createdAt', { ascending: false }) // created_at → createdAt
+                    .select('id, title, created_at')
+                    .order('created_at', { ascending: false })
                     .limit(3);
 
                 if (worksError) throw worksError;
 
-                // 動画 - created_atをcreatedAtに変更
+                // 動画
                 const { data: recentVideos, error: videosError } = await supabase
                     .from('videos')
-                    .select('id, title, createdAt') // created_at → createdAt
-                    .order('createdAt', { ascending: false }) // created_at → createdAt
+                    .select('id, title, created_at')
+                    .order('created_at', { ascending: false })
                     .limit(3);
 
                 if (videosError) throw videosError;

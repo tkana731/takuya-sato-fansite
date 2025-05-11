@@ -1,3 +1,5 @@
+// pages/index.js
+import { useEffect, useState } from 'react';
 import Layout from '../components/Layout/Layout';
 import Birthday from '../components/Birthday/Birthday';
 import OnAir from '../components/OnAir/OnAir';
@@ -5,7 +7,6 @@ import Schedule from '../components/Schedule/Schedule';
 import Works from '../components/Works/Works';
 import VideoSection from '../components/Video/VideoSection';
 import Links from '../components/Links/Links';
-import { useEffect, useState } from 'react';
 
 export default function Home() {
   const [birthdays, setBirthdays] = useState([]);
@@ -14,27 +15,14 @@ export default function Home() {
   const [works, setWorks] = useState([]);
   const [videos, setVideos] = useState([]);
 
+  // データのフェッチを試みる (API完成後に実装)
   useEffect(() => {
-    // データのフェッチ処理
-    const fetchData = async () => {
-      try {
-        // 各種APIからデータを取得
-        const birthdaysRes = await fetch('/api/birthdays');
-        const birthdaysData = await birthdaysRes.json();
-        setBirthdays(birthdaysData);
-
-        // 同様に他のデータもフェッチ
-        // ...
-      } catch (error) {
-        console.error('データの取得に失敗しました', error);
-      }
-    };
-
-    fetchData();
+    // ここでAPIからデータを取得する処理を書く
+    // APIが未完成の場合、各コンポーネントのフォールバックデータが使用される
   }, []);
 
   return (
-    <Layout>
+    <Layout title="佐藤拓也ファンサイト - 声優・佐藤拓也さんの出演作品、スケジュール情報など">
       <Birthday characters={birthdays} />
       <OnAir content={onAirContent} />
       <Schedule schedules={schedules} />

@@ -22,7 +22,7 @@ export default function Schedule({ schedules = [] }) {
         // データが配列の場合（旧形式または変換前）
         else if (Array.isArray(schedules)) {
             setProcessedSchedules(schedules);
-            // 旧形式の場合は期間は表示しない（フォールバックで表示される）
+            // 期間情報がない場合は設定しない
             setSchedulePeriod('');
         }
         // データが無効な場合
@@ -51,136 +51,11 @@ export default function Schedule({ schedules = [] }) {
         };
     };
 
-    // APIデータがなければフォールバックデータを使用
-    const fallbackSchedules = processedSchedules.length > 0 ? processedSchedules : [
-        {
-            id: '1',
-            date: '2025-05-10',
-            weekday: '土',
-            category: 'event',
-            categoryName: 'イベント',
-            title: 'アイドリッシュセブン ファンミーティング',
-            time: '14:00～',
-            location: '東京・渋谷ストリームホール',
-            locationType: '会場',
-            description: '十龍之介役として出演',
-            link: '#'
-        },
-        {
-            id: '2',
-            date: '2025-05-15',
-            weekday: '木',
-            category: 'broadcast',
-            categoryName: '生放送',
-            title: '佐藤拓也のちょっとやってみて!! 第157回',
-            time: '21:00～',
-            location: 'ニコニコ生放送・YouTube',
-            locationType: '放送/配信',
-            description: 'ゲスト：羽多野渉',
-            link: '#'
-        },
-        {
-            id: '3',
-            date: '2025-05-18',
-            weekday: '日',
-            category: 'stage',
-            categoryName: '舞台・朗読',
-            title: '朗読劇「月の向こう側」',
-            time: '13:00～ / 17:00～',
-            location: '東京芸術劇場',
-            locationType: '会場',
-            description: '主演：健人 役',
-            link: '#'
-        },
-        {
-            id: '4',
-            date: '2025-05-21',
-            weekday: '水',
-            category: 'broadcast',
-            categoryName: '生放送',
-            title: 'アニメ「クラシック★スターズ」特番',
-            time: '20:00～',
-            location: 'ABEMA',
-            locationType: '放送/配信',
-            description: '出演：佐藤拓也、小野賢章、花澤香菜',
-            link: '#'
-        },
-        {
-            id: '5',
-            date: '2025-05-25',
-            weekday: '日',
-            category: 'event',
-            categoryName: 'イベント',
-            title: 'テイルズ オブ フェスティバル 2025',
-            time: '12:30～',
-            location: '横浜アリーナ',
-            locationType: '会場',
-            description: 'アルフェン役として出演',
-            link: '#'
-        },
-        {
-            id: '6',
-            date: '2025-05-29',
-            weekday: '木',
-            category: 'stage',
-            categoryName: '舞台・朗読',
-            title: 'ヴォイスプレイ「Rシリーズ Vol.5」',
-            time: '19:00～',
-            location: '新宿文化センター',
-            locationType: '会場',
-            description: '出演：佐藤拓也、石川界人、内田雄馬',
-            link: '#'
-        },
-        {
-            id: '7',
-            date: '2025-05-31',
-            weekday: '土',
-            category: 'broadcast',
-            categoryName: '生放送',
-            title: '佐藤拓也&堀江瞬 アニメみたいに! 第52回',
-            time: '20:00～',
-            location: 'YouTube Live',
-            locationType: '放送/配信',
-            description: 'ゲスト：未定',
-            link: '#'
-        },
-        {
-            id: '8',
-            date: '2025-06-03',
-            weekday: '火',
-            category: 'broadcast',
-            categoryName: '生放送',
-            title: '佐藤拓也のちょっとやってみて!! 第158回',
-            time: '21:00～',
-            location: 'ニコニコ生放送・YouTube',
-            locationType: '放送/配信',
-            description: 'ゲスト：石川界人',
-            link: '#'
-        },
-        {
-            id: '9',
-            date: '2025-06-08',
-            weekday: '日',
-            category: 'event',
-            categoryName: 'イベント',
-            title: '声優アワード2025 授賞式',
-            time: '16:00～',
-            location: '文化放送メディアプラスホール',
-            locationType: '会場',
-            description: 'プレゼンターとして出演',
-            link: '#'
-        }
-    ];
-
-    // フォールバックの期間設定（APIから取得できなかった場合）
-    useEffect(() => {
-        if (!schedulePeriod && processedSchedules.length === 0) {
-            setSchedulePeriod('2025.05.10 - 2025.06.10');
-        }
-    }, [schedulePeriod, processedSchedules]);
+    // APIデータからスケジュールを取得
+    const apiSchedules = processedSchedules;
 
     // フィルタリングされたスケジュール
-    const filteredSchedules = filterSchedules(fallbackSchedules);
+    const filteredSchedules = filterSchedules(apiSchedules);
 
     return (
         <section className="schedule-section" id="schedule">

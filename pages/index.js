@@ -57,7 +57,16 @@ export default function Home() {
 
         // スケジュールの取得
         try {
-          const schedulesRes = await fetch('/api/schedules');
+          // 現在の日付から30日間の範囲を指定してスケジュールを取得
+          const today = new Date();
+          const thirtyDaysLater = new Date();
+          thirtyDaysLater.setDate(today.getDate() + 30);
+
+          // ISO形式に変換して日付パラメータを作成
+          const fromParam = today.toISOString().split('T')[0];
+          const toParam = thirtyDaysLater.toISOString().split('T')[0];
+
+          const schedulesRes = await fetch(`/api/schedules?from=${fromParam}&to=${toParam}`);
           if (!schedulesRes.ok) throw new Error(`スケジュールデータの取得に失敗しました: ${schedulesRes.status}`);
           const schedulesData = await schedulesRes.json();
           console.log("スケジュールデータ:", schedulesData);

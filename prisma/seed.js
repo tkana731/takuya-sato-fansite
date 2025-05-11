@@ -309,7 +309,7 @@ async function main() {
             create: {
                 id: '1',
                 name: '渋谷ストリームホール',
-                postalCode: '150-0002',
+                postal_code: '150-0002',
                 prefectureId: tokyo.id,
                 address: '東京都渋谷区渋谷3-21-3',
                 capacity: '約700名',
@@ -325,7 +325,7 @@ async function main() {
             create: {
                 id: '2',
                 name: '東京芸術劇場',
-                postalCode: '171-0021',
+                postal_code: '171-0021',
                 prefectureId: tokyo.id,
                 address: '東京都豊島区西池袋1-8-1',
                 capacity: '1,999名',
@@ -341,7 +341,7 @@ async function main() {
             create: {
                 id: '3',
                 name: '横浜アリーナ',
-                postalCode: '222-0033',
+                postal_code: '222-0033',
                 prefectureId: tokyo.id, // 厳密には神奈川県だが、サンプルのためtokyo.idを利用
                 address: '神奈川県横浜市港北区新横浜3-10',
                 capacity: '約17,000名',

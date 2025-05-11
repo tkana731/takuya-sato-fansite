@@ -168,15 +168,15 @@ model Prefecture {
 model Venue {
   id           String     @id @default(uuid())
   name         String
-  postalCode   String?
-  prefectureId String
+  postal_code   String?
+  prefecture_id String
   address      String?
   capacity     String?
-  officialUrl  String?
-  googleMapsUrl String?
+  official_url  String?
+  google_maps_url String?
   display_order Int
   created_at    DateTime   @default(now())
-  prefecture   Prefecture @relation(fields: [prefectureId], references: [id])
+  prefecture   Prefecture @relation(fields: [prefecture_id], references: [id])
   schedules    Schedule[]
 
   @@map("mst_venues")

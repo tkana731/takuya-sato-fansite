@@ -14,17 +14,21 @@ export default async function handler(req, res) {
         const oneMonthLater = new Date();
         oneMonthLater.setMonth(today.getMonth() + 1);
 
+        // 検索期間の設定
+        const fromDate = from ? new Date(from) : today;
+        const toDate = to ? new Date(to) : oneMonthLater;
+
         // デバッグ用
         console.log("スケジュールAPI: 検索期間", {
-            from: from ? new Date(from) : today,
-            to: to ? new Date(to) : oneMonthLater
+            from: fromDate,
+            to: toDate
         });
 
         // クエリー条件の構築
         let whereCondition = {
             start_date: {
-                gte: from ? new Date(from) : today,
-                lte: to ? new Date(to) : oneMonthLater
+                gte: fromDate,
+                lte: toDate
             }
         };
 
@@ -133,9 +137,27 @@ export default async function handler(req, res) {
             };
         });
 
-        console.log(`スケジュールAPI: ${formattedSchedules.length}件のフォーマット済みスケジュールを返します`);
+        // 検索期間のフォーマット
+        const formatDateForDisplay = (date) => {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}.${month}.${day}`;
+        };
 
-        return res.status(200).json(formattedSchedules);
+        // レスポンス形式を変更し、期間情報を含める
+        const response = {
+            period: {
+                from: formatDateForDisplay(fromDate),
+                to: formatDateForDisplay(toDate),
+                formatted: `${formatDateForDisplay(fromDate)} - ${formatDateForDisplay(toDate)}`
+            },
+            schedules: formattedSchedules
+        };
+
+        console.log(`スケジュールAPI: 期間情報を含めて${formattedSchedules.length}件のフォーマット済みスケジュールを返します`);
+
+        return res.status(200).json(response);
     } catch (error) {
         console.error('スケジュールの取得エラー:', error);
         return res.status(500).json({

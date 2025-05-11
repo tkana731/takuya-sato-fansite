@@ -5,21 +5,32 @@ import Link from 'next/link';
 export default function Schedule({ schedules = [] }) {
     const [activeFilter, setActiveFilter] = useState('all');
     const [processedSchedules, setProcessedSchedules] = useState([]);
+    const [schedulePeriod, setSchedulePeriod] = useState('');
 
     // スケジュールデータ処理
     useEffect(() => {
         // APIから受け取ったデータをチェック
         console.log("APIから受け取ったスケジュールデータ:", schedules);
 
-        // データが配列でない場合や、エラーを含む場合の対処
-        if (!Array.isArray(schedules)) {
+        // データがオブジェクト形式の場合（APIから期間情報付きで返ってきた場合）
+        if (schedules && schedules.period && schedules.schedules) {
+            // 期間情報を設定
+            setSchedulePeriod(schedules.period.formatted);
+            // スケジュールリストを設定
+            setProcessedSchedules(schedules.schedules);
+        }
+        // データが配列の場合（旧形式または変換前）
+        else if (Array.isArray(schedules)) {
+            setProcessedSchedules(schedules);
+            // 旧形式の場合は期間は表示しない（フォールバックで表示される）
+            setSchedulePeriod('');
+        }
+        // データが無効な場合
+        else {
             console.error("スケジュールデータが正しい形式ではありません:", schedules);
             setProcessedSchedules([]);
-            return;
+            setSchedulePeriod('');
         }
-
-        // 有効なスケジュールデータを設定
-        setProcessedSchedules(schedules);
     }, [schedules]);
 
     // フィルタリング関数
@@ -161,6 +172,13 @@ export default function Schedule({ schedules = [] }) {
         }
     ];
 
+    // フォールバックの期間設定（APIから取得できなかった場合）
+    useEffect(() => {
+        if (!schedulePeriod && processedSchedules.length === 0) {
+            setSchedulePeriod('2025.05.10 - 2025.06.10');
+        }
+    }, [schedulePeriod, processedSchedules]);
+
     // フィルタリングされたスケジュール
     const filteredSchedules = filterSchedules(fallbackSchedules);
 
@@ -174,7 +192,7 @@ export default function Schedule({ schedules = [] }) {
                 </div>
                 <div className="schedule-container">
                     <div className="schedule-header">
-                        <h3 className="schedule-period">2025.05.10 - 2025.06.10</h3>
+                        <h3 className="schedule-period">{schedulePeriod}</h3>
                     </div>
 
                     <div className="schedule-tabs">

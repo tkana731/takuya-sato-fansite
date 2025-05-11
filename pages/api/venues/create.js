@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         // 最大の表示順を取得
         const maxOrderVenue = await prisma.venue.findFirst({
             orderBy: {
-                displayOrder: 'desc'
+                display_order: 'desc'
             }
         });
 
@@ -28,13 +28,13 @@ export default async function handler(req, res) {
         const newVenue = await prisma.venue.create({
             data: {
                 name,
-                postalCode: postalCode || null,
-                prefectureId,
+                postal_code: postalCode || null,
+                prefecture_id: prefectureId || null,
                 address: address || null,
                 capacity: capacity || null,
-                officialUrl: officialUrl || null,
-                googleMapsUrl: googleMapsUrl || null,
-                displayOrder: nextOrder
+                official_url: officialUrl || null,
+                google_maps_url: googleMapsUrl || null,
+                display_order: nextOrder
             }
         });
 

@@ -1,18 +1,9 @@
 // components/Birthday/Birthday.js
 export default function Birthday({ characters = [] }) {
-    // APIから取得したデータがない場合のフォールバックデータ
-    const fallbackCharacters = characters.length ? characters : [
-        {
-            id: '1',
-            name: '十龍之介',
-            seriesName: 'IDOLiSH7'
-        },
-        {
-            id: '2',
-            name: '燭台切光忠',
-            seriesName: '刀剣乱舞'
-        }
-    ];
+    // 誕生日キャラクターがいない場合はコンポーネント自体を表示しない
+    if (characters.length === 0) {
+        return null;
+    }
 
     return (
         <section className="birthday-section" id="birthday">
@@ -22,7 +13,7 @@ export default function Birthday({ characters = [] }) {
                     <p className="section-subtitle">今日が誕生日のキャラクター</p>
                 </div>
                 <div className="birthday-cards">
-                    {fallbackCharacters.map(character => (
+                    {characters.map(character => (
                         <div className="birthday-card" key={character.id}>
                             <div className="birthday-content">
                                 <h3 className="birthday-title">{character.name}</h3>

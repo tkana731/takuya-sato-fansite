@@ -29,81 +29,76 @@ export default function Home() {
       try {
         setLoading(true);
 
+        // データ取得用の関数
+        const fetchDataWithTimeout = async (url, dataType, timeout = 10000) => {
+          try {
+            // タイムアウト処理を追加
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) throw new Error(`${dataType}データの取得に失敗しました: ${response.status}`);
+            const data = await response.json();
+            console.log(`${dataType}データ:`, data);
+            return { success: true, data };
+          } catch (err) {
+            console.error(`${dataType}データの取得エラー:`, err);
+            return { success: false, error: err.message };
+          }
+        };
+
         // 誕生日キャラクターの取得
-        try {
-          const birthdaysRes = await fetch('/api/birthdays');
-          if (!birthdaysRes.ok) throw new Error(`誕生日データの取得に失敗しました: ${birthdaysRes.status}`);
-          const birthdaysData = await birthdaysRes.json();
-          console.log("誕生日データ:", birthdaysData);
-          setBirthdays(birthdaysData);
-          setDataFetchStatus(prev => ({ ...prev, birthdays: true }));
-        } catch (err) {
-          console.error('誕生日データの取得エラー:', err);
-          setDataFetchStatus(prev => ({ ...prev, birthdays: false }));
+        const birthdaysResult = await fetchDataWithTimeout('/api/birthdays', '誕生日');
+        if (birthdaysResult.success) {
+          setBirthdays(birthdaysResult.data);
         }
+        setDataFetchStatus(prev => ({ ...prev, birthdays: true }));
 
         // 放送中コンテンツの取得
-        try {
-          const onAirRes = await fetch('/api/on-air');
-          if (!onAirRes.ok) throw new Error(`放送中コンテンツデータの取得に失敗しました: ${onAirRes.status}`);
-          const onAirData = await onAirRes.json();
-          console.log("放送中コンテンツデータ:", onAirData);
-          setOnAirContent(onAirData);
-          setDataFetchStatus(prev => ({ ...prev, onAir: true }));
-        } catch (err) {
-          console.error('放送中コンテンツデータの取得エラー:', err);
-          setDataFetchStatus(prev => ({ ...prev, onAir: false }));
+        const onAirResult = await fetchDataWithTimeout('/api/on-air', '放送中コンテンツ');
+        if (onAirResult.success) {
+          setOnAirContent(onAirResult.data);
         }
+        setDataFetchStatus(prev => ({ ...prev, onAir: true }));
 
         // スケジュールの取得
-        try {
-          // 現在の日付から30日間の範囲を指定してスケジュールを取得
-          const today = new Date();
-          const thirtyDaysLater = new Date();
-          thirtyDaysLater.setDate(today.getDate() + 30);
+        const today = new Date();
+        const thirtyDaysLater = new Date();
+        thirtyDaysLater.setDate(today.getDate() + 30);
 
-          // ISO形式に変換して日付パラメータを作成
-          const fromParam = today.toISOString().split('T')[0];
-          const toParam = thirtyDaysLater.toISOString().split('T')[0];
+        // ISO形式に変換して日付パラメータを作成
+        const fromParam = today.toISOString().split('T')[0];
+        const toParam = thirtyDaysLater.toISOString().split('T')[0];
 
-          const schedulesRes = await fetch(`/api/schedules?from=${fromParam}&to=${toParam}`);
-          if (!schedulesRes.ok) throw new Error(`スケジュールデータの取得に失敗しました: ${schedulesRes.status}`);
-          const schedulesData = await schedulesRes.json();
-          console.log("スケジュールデータ:", schedulesData);
-          setSchedules(schedulesData);
-          setDataFetchStatus(prev => ({ ...prev, schedules: true }));
-        } catch (err) {
-          console.error('スケジュールデータの取得エラー:', err);
-          setDataFetchStatus(prev => ({ ...prev, schedules: false }));
+        const schedulesResult = await fetchDataWithTimeout(
+          `/api/schedules?from=${fromParam}&to=${toParam}`,
+          'スケジュール'
+        );
+        if (schedulesResult.success) {
+          setSchedules(schedulesResult.data);
         }
+        setDataFetchStatus(prev => ({ ...prev, schedules: true }));
 
         // 作品データの取得
-        try {
-          const worksRes = await fetch('/api/works');
-          if (!worksRes.ok) throw new Error(`作品データの取得に失敗しました: ${worksRes.status}`);
-          const worksData = await worksRes.json();
-          console.log("作品データ:", worksData);
-          setWorks(worksData);
-          setDataFetchStatus(prev => ({ ...prev, works: true }));
-        } catch (err) {
-          console.error('作品データの取得エラー:', err);
-          setDataFetchStatus(prev => ({ ...prev, works: false }));
+        const worksResult = await fetchDataWithTimeout('/api/works', '作品');
+        if (worksResult.success) {
+          setWorks(worksResult.data);
         }
+        setDataFetchStatus(prev => ({ ...prev, works: true }));
 
         // 動画データの取得
-        try {
-          const videosRes = await fetch('/api/videos');
-          if (!videosRes.ok) throw new Error(`動画データの取得に失敗しました: ${videosRes.status}`);
-          const videosData = await videosRes.json();
-          console.log("動画データ:", videosData);
-          setVideos(videosData);
-          setDataFetchStatus(prev => ({ ...prev, videos: true }));
-        } catch (err) {
-          console.error('動画データの取得エラー:', err);
-          setDataFetchStatus(prev => ({ ...prev, videos: false }));
+        const videosResult = await fetchDataWithTimeout('/api/videos', '動画');
+        if (videosResult.success) {
+          setVideos(videosResult.data);
         }
+        setDataFetchStatus(prev => ({ ...prev, videos: true }));
 
-        setLoading(false);
+        // すべてのデータ取得が完了するか、5秒経過したらローディングを終了
+        setTimeout(() => {
+          setLoading(false);
+        }, 5000);
       } catch (err) {
         console.error('データの取得エラー:', err);
         setError(err.message);
@@ -112,11 +107,27 @@ export default function Home() {
     };
 
     fetchData();
+
+    // いかなる場合も10秒後にはローディングを強制終了
+    const forceLoadingTimeout = setTimeout(() => {
+      if (loading) {
+        console.log('タイムアウトによりローディングを強制終了します');
+        setLoading(false);
+      }
+    }, 10000);
+
+    return () => clearTimeout(forceLoadingTimeout);
   }, []);
 
   // データ取得状況をコンソールに表示
   useEffect(() => {
     console.log("データ取得状況:", dataFetchStatus);
+
+    // すべてのデータ取得が完了したらローディングを終了
+    const allDataFetched = Object.values(dataFetchStatus).every(status => status === true);
+    if (allDataFetched) {
+      setLoading(false);
+    }
   }, [dataFetchStatus]);
 
   // エラー表示

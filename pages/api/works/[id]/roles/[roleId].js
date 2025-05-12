@@ -1,5 +1,5 @@
 // pages/api/works/[id]/roles/[roleId].js
-import prisma from '../../../../../lib/prisma';
+import { supabase } from '../../../../../lib/supabase';
 
 export default async function handler(req, res) {
     const { id, roleId } = req.query;
@@ -15,11 +15,12 @@ export default async function handler(req, res) {
     if (req.method === 'DELETE') {
         try {
             // 役割情報を削除
-            await prisma.workRole.delete({
-                where: {
-                    id: roleId
-                }
-            });
+            const { error } = await supabase
+                .from('rel_work_roles')
+                .delete()
+                .eq('id', roleId);
+
+            if (error) throw error;
 
             return res.status(200).json({
                 success: true,

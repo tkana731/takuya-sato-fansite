@@ -1,5 +1,5 @@
 // pages/api/works/create.js
-import prisma from '../../../lib/prisma';
+import { supabase } from '../../../lib/supabase';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -18,19 +18,29 @@ export default async function handler(req, res) {
 
     try {
         // 作品データを作成
-        const newWork = await prisma.work.create({
-            data: {
+        const { data: newWork, error } = await supabase
+            .from('works')
+            .insert([{
                 title,
                 category_id: categoryId,
                 year: year ? parseInt(year) : null,
                 description: description || null,
-                officialUrl: officialUrl || null
-            }
-        });
+                official_url: officialUrl || null
+            }])
+            .select();
+
+        if (error) {
+            console.error('作品登録エラー:', error);
+            throw error;
+        }
+
+        if (!newWork || newWork.length === 0) {
+            throw new Error('作品の登録に失敗しました');
+        }
 
         return res.status(201).json({
             success: true,
-            data: newWork,
+            data: newWork[0],
             message: '作品が正常に登録されました'
         });
     } catch (error) {

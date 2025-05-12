@@ -1,5 +1,5 @@
 // pages/api/schedules/[id].js
-import prisma from '../../../lib/prisma';
+import { supabase } from '../../../lib/supabase';
 
 // 時間文字列（例: "14:00～"）からHoursとMinutesを抽出
 function parseTimeString(timeString) {
@@ -27,22 +27,41 @@ export default async function handler(req, res) {
     // GET: スケジュール取得
     if (req.method === 'GET') {
         try {
+            console.log(`スケジュール取得: ID=${id}`);
+
             // スケジュールデータを取得
-            const schedule = await prisma.schedule.findUnique({
-                where: {
-                    id: id
-                },
-                include: {
-                    category: true,
-                    venue: true,
-                    broadcastStation: true,
-                    performances: {
-                        orderBy: {
-                            display_order: 'asc'
-                        }
-                    }
-                }
-            });
+            const { data: schedule, error } = await supabase
+                .from('schedules')
+                .select(`
+                    id,
+                    title,
+                    category_id,
+                    venue_id,
+                    broadcast_station_id,
+                    start_date,
+                    end_date,
+                    is_all_day,
+                    description,
+                    official_url,
+                    category:category_id (id, name),
+                    venue:venue_id (id, name),
+                    broadcastStation:broadcast_station_id (id, name),
+                    performances:rel_schedule_performances (
+                        id,
+                        performance_date,
+                        start_time,
+                        display_start_time,
+                        display_end_time,
+                        display_order
+                    )
+                `)
+                .eq('id', id)
+                .single();
+
+            if (error) {
+                console.error('スケジュール取得エラー:', error);
+                throw error;
+            }
 
             if (!schedule) {
                 return res.status(404).json({
@@ -51,8 +70,11 @@ export default async function handler(req, res) {
                 });
             }
 
+            console.log(`スケジュール取得成功: タイトル=${schedule.title}`);
+
             // パフォーマンス情報を整形
             const performanceInfo = schedule.performances
+                .sort((a, b) => a.display_order - b.display_order)
                 .map(p => p.display_start_time)
                 .join(' / ');
 
@@ -66,11 +88,11 @@ export default async function handler(req, res) {
                 venue: schedule.venue,
                 broadcastStationId: schedule.broadcast_station_id,
                 broadcastStation: schedule.broadcastStation,
-                startDate: schedule.start_date.toISOString(),
-                endDate: schedule.end_date ? schedule.end_date.toISOString() : null,
+                startDate: schedule.start_date,
+                endDate: schedule.end_date,
                 isAllDay: schedule.is_all_day,
                 description: schedule.description,
-                officialUrl: schedule.officialUrl,
+                officialUrl: schedule.official_url,
                 performanceInfo
             };
 
@@ -83,7 +105,8 @@ export default async function handler(req, res) {
             return res.status(500).json({
                 success: false,
                 message: 'スケジュールの取得に失敗しました',
-                error: error.message
+                error: error.message,
+                details: error.details || error.stack
             });
         }
     }
@@ -111,15 +134,17 @@ export default async function handler(req, res) {
         }
 
         try {
+            console.log(`スケジュール更新: ID=${id}, タイトル=${title}`);
+
             // スケジュールデータを更新
             const scheduleData = {
                 title,
                 category_id: categoryId,
-                start_date: new Date(startDate),
-                end_date: endDate ? new Date(endDate) : null,
+                start_date: new Date(startDate).toISOString(),
+                end_date: endDate ? new Date(endDate).toISOString() : null,
                 is_all_day: isAllDay || false,
                 description: description || null,
-                officialUrl: officialUrl || null
+                official_url: officialUrl || null
             };
 
             // カテゴリに応じてロケーションフィールドを設定
@@ -131,75 +156,78 @@ export default async function handler(req, res) {
                 scheduleData.broadcast_station_id = null;
             }
 
-            // トランザクションでスケジュールとパフォーマンス情報を一括更新
-            const result = await prisma.$transaction(async (tx) => {
-                // スケジュールを更新
-                const schedule = await tx.schedule.update({
-                    where: {
-                        id: id
-                    },
-                    data: scheduleData
-                });
+            // スケジュールを更新
+            const { data: updatedSchedule, error: scheduleError } = await supabase
+                .from('schedules')
+                .update(scheduleData)
+                .eq('id', id)
+                .select()
+                .single();
 
-                // 既存のパフォーマンス情報を削除
-                await tx.schedulePerformance.deleteMany({
-                    where: {
-                        schedule_id: id
+            if (scheduleError) {
+                console.error('スケジュール更新エラー:', scheduleError);
+                throw scheduleError;
+            }
+
+            console.log(`スケジュールを更新しました: ID=${id}`);
+
+            // 既存のパフォーマンス情報を削除
+            const { error: deleteError } = await supabase
+                .from('rel_schedule_performances')
+                .delete()
+                .eq('schedule_id', id);
+
+            if (deleteError) {
+                console.error('パフォーマンス削除エラー:', deleteError);
+                throw deleteError;
+            }
+
+            console.log('既存のパフォーマンス情報を削除しました');
+
+            // パフォーマンス情報がある場合は登録
+            if (performanceInfo) {
+                const timeStrings = performanceInfo.split('/').map(str => str.trim());
+                const startDateObj = new Date(startDate);
+
+                console.log(`新しいパフォーマンス情報を登録: ${timeStrings.length}件`);
+
+                // 各パフォーマンスを個別に登録
+                for (let index = 0; index < timeStrings.length; index++) {
+                    const timeString = timeStrings[index];
+                    // 時間文字列から時分を抽出
+                    const parsedTime = parseTimeString(timeString);
+
+                    // 登録データを作成
+                    const performanceData = {
+                        schedule_id: id,
+                        performance_date: startDateObj.toISOString().split('T')[0],
+                        display_start_time: timeString,
+                        display_order: index + 1
+                    };
+
+                    // パースできた場合は start_time を設定
+                    if (parsedTime) {
+                        const timeStr = `${parsedTime.hours.toString().padStart(2, '0')}:${parsedTime.minutes.toString().padStart(2, '0')}:00`;
+                        performanceData.start_time = timeStr;
                     }
-                });
 
-                // パフォーマンス情報がある場合は登録
-                if (performanceInfo) {
-                    const timeStrings = performanceInfo.split('/').map(str => str.trim());
-                    const startDateObj = new Date(startDate);
+                    const { data: newPerformance, error: performanceError } = await supabase
+                        .from('rel_schedule_performances')
+                        .insert([performanceData])
+                        .select();
 
-                    // 各パフォーマンスを個別に登録
-                    for (let index = 0; index < timeStrings.length; index++) {
-                        const timeString = timeStrings[index];
-                        // 時間文字列から時分を抽出
-                        const parsedTime = parseTimeString(timeString);
-
-                        // 登録データを作成
-                        const performanceData = {
-                            schedule_id: schedule.id,
-                            performance_date: startDateObj,
-                            display_start_time: timeString,
-                            display_order: index + 1
-                        };
-
-                        // パースできた場合は start_time を設定
-                        if (parsedTime) {
-                            // 現在日付のUTC時間を作成し、そこに時間を設定
-                            // この方法ならタイムゾーンの問題を回避できる
-                            await tx.$executeRaw`
-                                INSERT INTO "rel_schedule_performances" 
-                                (id, schedule_id, performance_date, start_time, display_start_time, display_order, created_at)
-                                VALUES 
-                                (
-                                    gen_random_uuid(), 
-                                    ${schedule.id}, 
-                                    ${startDateObj}::date, 
-                                    ${`${parsedTime.hours}:${parsedTime.minutes}`}::time, 
-                                    ${timeString}, 
-                                    ${index + 1}, 
-                                    now()
-                                )
-                            `;
-                        } else {
-                            // 時間が抽出できなかった場合は start_time なしで登録
-                            await tx.schedulePerformance.create({
-                                data: performanceData
-                            });
-                        }
+                    if (performanceError) {
+                        console.error(`パフォーマンス登録エラー (${index + 1}/${timeStrings.length}):`, performanceError);
+                        // エラーがあっても続行する
+                    } else {
+                        console.log(`パフォーマンスを登録しました (${index + 1}/${timeStrings.length}): ID=${newPerformance?.[0]?.id}`);
                     }
                 }
-
-                return schedule;
-            });
+            }
 
             return res.status(200).json({
                 success: true,
-                data: result,
+                data: updatedSchedule,
                 message: 'スケジュールが正常に更新されました'
             });
         } catch (error) {
@@ -207,29 +235,41 @@ export default async function handler(req, res) {
             return res.status(500).json({
                 success: false,
                 message: 'スケジュールの更新に失敗しました',
-                error: error.message
+                error: error.message,
+                details: error.details || error.stack
             });
         }
     }
     // DELETE: スケジュール削除
     else if (req.method === 'DELETE') {
         try {
-            // トランザクションでスケジュールとパフォーマンス情報を一括削除
-            await prisma.$transaction(async (prisma) => {
-                // 関連するパフォーマンス情報を削除
-                await prisma.schedulePerformance.deleteMany({
-                    where: {
-                        schedule_id: id
-                    }
-                });
+            console.log(`スケジュール削除: ID=${id}`);
 
-                // スケジュールを削除
-                await prisma.schedule.delete({
-                    where: {
-                        id: id
-                    }
-                });
-            });
+            // 関連するパフォーマンス情報を削除
+            const { error: performancesError } = await supabase
+                .from('rel_schedule_performances')
+                .delete()
+                .eq('schedule_id', id);
+
+            if (performancesError) {
+                console.error('パフォーマンス削除エラー:', performancesError);
+                throw performancesError;
+            }
+
+            console.log('関連するパフォーマンス情報を削除しました');
+
+            // スケジュールを削除
+            const { error: scheduleError } = await supabase
+                .from('schedules')
+                .delete()
+                .eq('id', id);
+
+            if (scheduleError) {
+                console.error('スケジュール削除エラー:', scheduleError);
+                throw scheduleError;
+            }
+
+            console.log(`スケジュールを削除しました: ID=${id}`);
 
             return res.status(200).json({
                 success: true,
@@ -240,7 +280,8 @@ export default async function handler(req, res) {
             return res.status(500).json({
                 success: false,
                 message: 'スケジュールの削除に失敗しました',
-                error: error.message
+                error: error.message,
+                details: error.details || error.stack
             });
         }
     } else {

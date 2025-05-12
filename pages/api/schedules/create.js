@@ -1,5 +1,5 @@
 // pages/api/schedules/create.js
-import prisma from '../../../lib/prisma';
+import { supabase } from '../../../lib/supabase';
 
 // 時間文字列（例: "14:00～"）からHoursとMinutesを抽出
 function parseTimeString(timeString) {
@@ -41,82 +41,91 @@ export default async function handler(req, res) {
     }
 
     try {
+        console.log('スケジュール作成リクエスト:', {
+            title,
+            categoryId,
+            isLocationBroadcast: isLocationBroadcast ? 'true' : 'false',
+            startDate
+        });
+
         // スケジュールデータを作成
         const scheduleData = {
             title,
             category_id: categoryId,
-            start_date: new Date(startDate),
-            end_date: endDate ? new Date(endDate) : null,
+            start_date: new Date(startDate).toISOString(),
+            end_date: endDate ? new Date(endDate).toISOString() : null,
             is_all_day: isAllDay || false,
             description: description || null,
-            officialUrl: officialUrl || null
+            official_url: officialUrl || null
         };
 
         // カテゴリに応じてロケーションフィールドを設定
         if (isLocationBroadcast) {
             scheduleData.broadcast_station_id = locationId;
+            scheduleData.venue_id = null;
         } else {
             scheduleData.venue_id = locationId;
+            scheduleData.broadcast_station_id = null;
         }
 
-        // トランザクションでスケジュールとパフォーマンス情報を一括登録
-        const result = await prisma.$transaction(async (tx) => {
-            // スケジュールを登録
-            const schedule = await tx.schedule.create({
-                data: scheduleData
-            });
+        // トランザクションの代わりにSupabaseでスケジュールを作成
+        const { data: newSchedule, error: scheduleError } = await supabase
+            .from('schedules')
+            .insert([scheduleData])
+            .select()
+            .single();
 
-            // パフォーマンス情報がある場合は登録
-            if (performanceInfo) {
-                const timeStrings = performanceInfo.split('/').map(str => str.trim());
-                const startDateObj = new Date(startDate);
+        if (scheduleError) {
+            console.error('スケジュール作成エラー:', scheduleError);
+            throw scheduleError;
+        }
 
-                // 各パフォーマンスを個別に登録
-                for (let index = 0; index < timeStrings.length; index++) {
-                    const timeString = timeStrings[index];
-                    // 時間文字列から時分を抽出
-                    const parsedTime = parseTimeString(timeString);
+        console.log(`スケジュールを作成しました: ID=${newSchedule.id}`);
 
-                    // 登録データを作成
-                    const performanceData = {
-                        schedule_id: schedule.id,
-                        performance_date: startDateObj,
-                        display_start_time: timeString,
-                        display_order: index + 1
-                    };
+        // パフォーマンス情報がある場合は登録
+        if (performanceInfo && newSchedule) {
+            const timeStrings = performanceInfo.split('/').map(str => str.trim());
+            const startDateObj = new Date(startDate);
 
-                    // パースできた場合は start_time を設定
-                    if (parsedTime) {
-                        // SQL文を直接実行して time 型としてデータを挿入
-                        await tx.$executeRaw`
-                            INSERT INTO "rel_schedule_performances" 
-                            (id, schedule_id, performance_date, start_time, display_start_time, display_order, created_at)
-                            VALUES 
-                            (
-                                gen_random_uuid(), 
-                                ${schedule.id}, 
-                                ${startDateObj}::date, 
-                                ${`${parsedTime.hours}:${parsedTime.minutes}`}::time, 
-                                ${timeString}, 
-                                ${index + 1}, 
-                                now()
-                            )
-                        `;
-                    } else {
-                        // 時間が抽出できなかった場合は start_time なしで登録
-                        await tx.schedulePerformance.create({
-                            data: performanceData
-                        });
-                    }
+            console.log(`パフォーマンス情報を処理: ${timeStrings.length}件`);
+
+            // 各パフォーマンスを個別に登録
+            for (let index = 0; index < timeStrings.length; index++) {
+                const timeString = timeStrings[index];
+                // 時間文字列から時分を抽出
+                const parsedTime = parseTimeString(timeString);
+
+                // 登録データを作成
+                const performanceData = {
+                    schedule_id: newSchedule.id,
+                    performance_date: startDateObj.toISOString().split('T')[0],
+                    display_start_time: timeString,
+                    display_order: index + 1
+                };
+
+                // パースできた場合は start_time を設定
+                if (parsedTime) {
+                    const timeStr = `${parsedTime.hours.toString().padStart(2, '0')}:${parsedTime.minutes.toString().padStart(2, '0')}:00`;
+                    performanceData.start_time = timeStr;
+                }
+
+                const { data: newPerformance, error: performanceError } = await supabase
+                    .from('rel_schedule_performances')
+                    .insert([performanceData])
+                    .select();
+
+                if (performanceError) {
+                    console.error(`パフォーマンス登録エラー (${index + 1}/${timeStrings.length}):`, performanceError);
+                    // エラーがあっても続行する
+                } else {
+                    console.log(`パフォーマンスを登録しました (${index + 1}/${timeStrings.length}): ID=${newPerformance?.[0]?.id}`);
                 }
             }
-
-            return schedule;
-        });
+        }
 
         return res.status(201).json({
             success: true,
-            data: result,
+            data: newSchedule,
             message: 'スケジュールが正常に登録されました'
         });
     } catch (error) {
@@ -124,7 +133,8 @@ export default async function handler(req, res) {
         return res.status(500).json({
             success: false,
             message: 'スケジュールの登録に失敗しました',
-            error: error.message
+            error: error.message,
+            details: error.details || error.stack
         });
     }
 }

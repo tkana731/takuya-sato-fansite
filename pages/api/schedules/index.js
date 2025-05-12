@@ -1,5 +1,5 @@
 // pages/api/schedules/index.js
-import prisma from '../../../lib/prisma';
+import { supabase } from '../../../lib/supabase';
 
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
@@ -22,79 +22,80 @@ export default async function handler(req, res) {
         const fromDateStr = fromDate.toISOString().split('T')[0];
         const toDateStr = toDate.toISOString().split('T')[0];
 
-        // デバッグ用
         console.log("スケジュールAPI: 検索期間", {
             from: fromDateStr,
             to: toDateStr
         });
 
-        // クエリー条件の構築 - 文字列で日付範囲を指定
-        let whereCondition = {
-            start_date: {
-                gte: new Date(fromDateStr),
-                lte: new Date(toDateStr + 'T23:59:59.999Z')
-            }
-        };
+        // 基本クエリを構築
+        let query = supabase
+            .from('schedules')
+            .select(`
+                id,
+                title,
+                start_date,
+                end_date,
+                is_all_day,
+                description,
+                official_url,
+                category:category_id (id, name, color_code),
+                venue:venue_id (id, name),
+                broadcastStation:broadcast_station_id (id, name),
+                performances:rel_schedule_performances (
+                    id,
+                    performance_date,
+                    display_start_time,
+                    display_end_time,
+                    subtitle,
+                    description,
+                    display_order
+                ),
+                performers:rel_schedule_performers (
+                    id,
+                    role_description,
+                    display_order,
+                    performer:performer_id (id, name, is_takuya_sato)
+                )
+            `)
+            .gte('start_date', fromDateStr)
+            .lte('start_date', toDateStr + 'T23:59:59.999Z')
+            .order('start_date', { ascending: true });
 
         // カテゴリーが指定されている場合は条件に追加
         if (category && category !== 'all') {
-            const categoryNameMap = {
+            const categoryMapping = {
                 'event': 'イベント',
                 'stage': '舞台・朗読',
                 'broadcast': '生放送'
             };
 
-            const categoryName = categoryNameMap[category];
+            if (categoryMapping[category]) {
+                // カテゴリIDを取得するサブクエリ
+                const { data: categoryData } = await supabase
+                    .from('mst_schedule_categories')
+                    .select('id')
+                    .eq('name', categoryMapping[category])
+                    .single();
 
-            if (categoryName) {
-                whereCondition.category = {
-                    name: categoryName
-                };
-            }
-        }
-
-        console.log("スケジュールAPI: 検索条件", JSON.stringify(whereCondition));
-
-        // Prismaでスケジュールを取得
-        const schedules = await prisma.schedule.findMany({
-            where: whereCondition,
-            include: {
-                category: true,
-                venue: true,
-                broadcastStation: true,
-                performances: {
-                    orderBy: {
-                        display_order: 'asc'
-                    }
-                },
-                performers: {
-                    include: {
-                        performer: true
-                    },
-                    orderBy: {
-                        display_order: 'asc'
-                    }
+                if (categoryData?.id) {
+                    query = query.eq('category_id', categoryData.id);
+                    console.log(`カテゴリフィルター: ${categoryMapping[category]} (ID: ${categoryData.id})`);
                 }
-            },
-            orderBy: {
-                start_date: 'asc'
             }
-        });
-
-        console.log(`スケジュールAPI: ${schedules.length}件のスケジュールが見つかりました`);
-
-        // デバッグ情報
-        if (schedules.length > 0) {
-            console.log("スケジュールAPI: 最初のスケジュールの情報", {
-                id: schedules[0].id,
-                title: schedules[0].title,
-                startDate: schedules[0].start_date,
-                categoryName: schedules[0].category?.name
-            });
         }
+
+        // クエリ実行
+        const { data: schedules, error } = await query;
+
+        if (error) {
+            console.error('スケジュール取得エラー:', error);
+            throw error;
+        }
+
+        console.log(`スケジュールAPI: ${schedules?.length || 0}件のスケジュールが見つかりました`);
 
         // フロントエンドで利用しやすい形式に整形
-        const formattedSchedules = schedules.map(schedule => {
+        const formattedSchedules = schedules?.map(schedule => {
             // Dateオブジェクトを確実に作成
             const startDate = new Date(schedule.start_date);
             const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
@@ -108,13 +109,16 @@ export default async function handler(req, res) {
 
             // パフォーマンス情報を整形
             const timeInfo = schedule.performances.length > 0
-                ? schedule.performances.map(p => p.display_start_time).join(' / ')
+                ? schedule.performances
+                    .sort((a, b) => a.display_order - b.display_order)
+                    .map(p => p.display_start_time)
+                    .join(' / ')
                 : 'TBD';
 
             // 出演者情報を整形
             const performers = schedule.performers
-                .map(p => p.performer?.name)
-                .filter(Boolean)
+                .filter(p => p.performer)
+                .map(p => p.performer.name)
                 .join('、');
 
             const description = schedule.description || (performers ? `出演：${performers}` : '');
@@ -138,9 +142,9 @@ export default async function handler(req, res) {
                 location: location,
                 locationType: isBroadcast ? '放送/配信' : '会場',
                 description: description,
-                link: schedule.officialUrl || '#'
+                link: schedule.official_url || '#'
             };
-        });
+        }) || [];
 
         // 検索期間のフォーマット
         const formatDateForDisplay = (date) => {
@@ -170,10 +174,7 @@ export default async function handler(req, res) {
         return res.status(500).json({
             error: 'スケジュールの取得に失敗しました',
             message: error.message,
-            name: error.name,
-            code: error.code,
-            meta: error.meta,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            details: error.details || error.stack
         });
     }
 }

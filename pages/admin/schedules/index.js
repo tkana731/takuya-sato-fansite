@@ -134,7 +134,7 @@ export default function SchedulesAdmin() {
             label: '日付',
             render: (item) => {
                 const date = new Date(item.date);
-                return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 (${item.weekday})`;
+                return `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')} (${item.weekday})`;
             }
         },
         {
@@ -169,11 +169,6 @@ export default function SchedulesAdmin() {
                     </div>
                 );
             }
-        },
-        {
-            key: 'isAllDay',
-            label: '終日',
-            render: (item) => item.isAllDay ? '終日' : '-'
         }
     ];
 
@@ -199,14 +194,16 @@ export default function SchedulesAdmin() {
                     <p className="text-gray-600">イベント、舞台、生放送などのスケジュールを管理します</p>
                 </div>
 
-                <DataTable
-                    data={schedules}
-                    columns={columns}
-                    title="スケジュール一覧"
-                    addButtonLink="/admin/schedules/new"
-                    addButtonText="新規スケジュール追加"
-                    onDelete={handleDelete}
-                />
+                <div className="overflow-x-auto">
+                    <DataTable
+                        data={schedules}
+                        columns={columns}
+                        title="スケジュール一覧"
+                        addButtonLink="/admin/schedules/new"
+                        addButtonText="新規スケジュール追加"
+                        onDelete={handleDelete}
+                    />
+                </div>
             </div>
         </AdminLayout>
     );

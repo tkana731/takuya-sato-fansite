@@ -10,7 +10,7 @@ export default function AdminDashboard() {
     const [stats, setStats] = useState({
         scheduleCount: 0,
         worksCount: 0,
-        birthdayCount: 0,
+        characterCount: 0,
         videoCount: 0
     });
     const [dataLoading, setDataLoading] = useState(true);
@@ -37,13 +37,12 @@ export default function AdminDashboard() {
 
                 if (worksError) throw worksError;
 
-                // 誕生日キャラクター数を取得 - カラム名の修正
-                const { count: birthdayCount, error: birthdayError } = await supabase
+                // キャラクター数を取得 - 誕生日フィルターを削除
+                const { count: characterCount, error: characterError } = await supabase
                     .from('mst_roles')
-                    .select('id', { count: 'exact', head: true })
-                    .not('birthday', 'is', null);
+                    .select('id', { count: 'exact', head: true });
 
-                if (birthdayError) throw birthdayError;
+                if (characterError) throw characterError;
 
                 // 動画数を取得
                 const { count: videoCount, error: videoError } = await supabase
@@ -55,7 +54,7 @@ export default function AdminDashboard() {
                 setStats({
                     scheduleCount: scheduleCount || 0,
                     worksCount: worksCount || 0,
-                    birthdayCount: birthdayCount || 0,
+                    characterCount: characterCount || 0,
                     videoCount: videoCount || 0
                 });
             } catch (error) {
@@ -169,9 +168,9 @@ export default function AdminDashboard() {
                         </Link>
                     </div>
                     <div className="bg-white rounded-lg shadow p-6">
-                        <h2 className="text-lg font-semibold text-gray-900">誕生日キャラクター</h2>
-                        <p className="text-3xl font-bold text-primary mt-2">{stats.birthdayCount}</p>
-                        <Link href="/admin/birthdays" className="text-sm text-accent hover:underline mt-2 inline-block">
+                        <h2 className="text-lg font-semibold text-gray-900">キャラクター</h2>
+                        <p className="text-3xl font-bold text-primary mt-2">{stats.characterCount}</p>
+                        <Link href="/admin/characters" className="text-sm text-accent hover:underline mt-2 inline-block">
                             管理ページへ →
                         </Link>
                     </div>
@@ -189,7 +188,7 @@ export default function AdminDashboard() {
                     <div className="border-t border-gray-200">
                         {recentActivities.length > 0 ? (
                             recentActivities.map((activity, index) => (
-                                <div key={`${activity.type}-${activity.id}`} className={`py-3 ${index > 0 ? 'border-t border-gray-200' : ''} flex justify-between`}>
+                                <div key={`${activity.type}-${activity.id}`} className={`py-3 ${index > 0 ? 'border-t border-gray-200' : ''} flex justify-between items-center`}>
                                     <div>
                                         <p className="text-sm font-medium">{activity.description}</p>
                                         <p className="text-xs text-gray-500">
@@ -203,10 +202,10 @@ export default function AdminDashboard() {
                                             })}
                                         </p>
                                     </div>
-                                    <span className={`text-xs px-2 py-1 rounded-full ${activity.type === 'schedule' ? 'bg-orange-100 text-orange-800' :
-                                        activity.type === 'work' ? 'bg-blue-100 text-blue-800' :
-                                            activity.type === 'video' ? 'bg-green-100 text-green-800' :
-                                                'bg-gray-100 text-gray-800'
+                                    <span className={`text-xs px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0 ${activity.type === 'schedule' ? 'bg-orange-100 text-orange-800' :
+                                            activity.type === 'work' ? 'bg-blue-100 text-blue-800' :
+                                                activity.type === 'video' ? 'bg-green-100 text-green-800' :
+                                                    'bg-gray-100 text-gray-800'
                                         }`}>
                                         {activity.type === 'schedule' ? 'スケジュール' :
                                             activity.type === 'work' ? '作品' :
@@ -225,9 +224,9 @@ export default function AdminDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <Link href="/admin/schedules/new" className="text-primary hover:underline">新規スケジュール追加</Link>
                         <Link href="/admin/works/new" className="text-primary hover:underline">新規作品追加</Link>
-                        <Link href="/admin/birthdays/new" className="text-primary hover:underline">誕生日キャラクター追加</Link>
+                        <Link href="/admin/characters/new" className="text-primary hover:underline">新規キャラクター追加</Link>
                         <Link href="/admin/videos/new" className="text-primary hover:underline">新規動画追加</Link>
-                        <Link href="/admin/masters" className="text-primary hover:underline">マスタデータ管理</Link>
+                        <Link href="/admin/on-air/new" className="text-primary hover:underline">新規放送情報追加</Link>
                         <Link href="/" target="_blank" className="text-primary hover:underline">公開サイトを表示</Link>
                     </div>
                 </div>

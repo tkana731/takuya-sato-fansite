@@ -8,18 +8,6 @@ export default function AdminLayout({ children }) {
     const router = useRouter();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // デバッグ用
-    useEffect(() => {
-        if (user) {
-            console.log('AdminLayout - ユーザー情報:', {
-                user,
-                isAdmin,
-                app_metadata: user.app_metadata,
-                user_metadata: user.user_metadata
-            });
-        }
-    }, [user, isAdmin]);
-
     // 認証チェック
     useEffect(() => {
         if (!loading) {
@@ -103,10 +91,6 @@ export default function AdminLayout({ children }) {
                     <div className="flex items-center">
                         <div>
                             <p className="text-sm font-medium text-white">{user.email}</p>
-                            {/* ロール表示を追加（デバッグ用） */}
-                            <p className="text-xs text-gray-300">
-                                {isAdmin ? '管理者権限: あり' : '管理者権限: なし'}
-                            </p>
                             <button
                                 onClick={handleLogout}
                                 className="text-xs text-primary-light hover:text-white"
@@ -162,10 +146,6 @@ export default function AdminLayout({ children }) {
                                 <div className="flex items-center">
                                     <div>
                                         <p className="text-sm font-medium text-white">{user.email}</p>
-                                        {/* ロール表示を追加（デバッグ用） */}
-                                        <p className="text-xs text-gray-300">
-                                            {isAdmin ? '管理者権限: あり' : '管理者権限: なし'}
-                                        </p>
                                         <button
                                             onClick={handleLogout}
                                             className="text-xs text-primary-light hover:text-white"
@@ -185,16 +165,6 @@ export default function AdminLayout({ children }) {
                 <main className="flex-1 pt-16 md:pt-0">
                     <div className="py-6">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                            {/* デバッグ情報表示エリア（開発中のみ表示） */}
-                            {process.env.NODE_ENV === 'development' && (
-                                <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                                    <h3 className="text-sm font-semibold text-yellow-800">デバッグ情報</h3>
-                                    <p className="text-xs text-yellow-700">ユーザー: {user?.email}</p>
-                                    <p className="text-xs text-yellow-700">管理者権限: {isAdmin ? 'あり' : 'なし'}</p>
-                                    <p className="text-xs text-yellow-700">app_metadata: {JSON.stringify(user?.app_metadata)}</p>
-                                </div>
-                            )}
-
                             {children}
                         </div>
                     </div>

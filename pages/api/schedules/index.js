@@ -1,5 +1,6 @@
 // pages/api/schedules/index.js
-import { supabase } from '../../../lib/supabase';
+import { fetchData } from '../../../lib/api-helpers';
+import { formatDate, getWeekday } from '../../../lib/form-helpers';
 
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
@@ -27,41 +28,8 @@ export default async function handler(req, res) {
             to: toDateStr
         });
 
-        // 基本クエリを構築
-        let query = supabase
-            .from('schedules')
-            .select(`
-                id,
-                title,
-                start_date,
-                end_date,
-                is_all_day,
-                description,
-                official_url,
-                category:category_id (id, name, color_code),
-                venue:venue_id (id, name),
-                broadcastStation:broadcast_station_id (id, name),
-                performances:rel_schedule_performances (
-                    id,
-                    performance_date,
-                    display_start_time,
-                    display_end_time,
-                    subtitle,
-                    description,
-                    display_order
-                ),
-                performers:rel_schedule_performers (
-                    id,
-                    role_description,
-                    display_order,
-                    performer:performer_id (id, name, is_takuya_sato)
-                )
-            `)
-            .gte('start_date', fromDateStr)
-            .lte('start_date', toDateStr + 'T23:59:59.999Z')
-            .order('start_date', { ascending: true });
-
-        // カテゴリーが指定されている場合は条件に追加
+        // カテゴリフィルタリングの準備
+        let categoryFilter = {};
         if (category && category !== 'all') {
             const categoryMapping = {
                 'event': 'イベント',
@@ -71,26 +39,59 @@ export default async function handler(req, res) {
 
             if (categoryMapping[category]) {
                 // カテゴリIDを取得するサブクエリ
-                const { data: categoryData } = await supabase
-                    .from('mst_schedule_categories')
-                    .select('id')
-                    .eq('name', categoryMapping[category])
-                    .single();
+                const { data: categoryData } = await fetchData(
+                    'mst_schedule_categories',
+                    {
+                        select: 'id',
+                        filters: { name: categoryMapping[category] },
+                        single: true
+                    }
+                );
 
                 if (categoryData?.id) {
-                    query = query.eq('category_id', categoryData.id);
-                    console.log(`カテゴリフィルター: ${categoryMapping[category]} (ID: ${categoryData.id})`);
+                    categoryFilter = { category_id: categoryData.id };
                 }
             }
         }
 
-        // クエリ実行
-        const { data: schedules, error } = await query;
-
-        if (error) {
-            console.error('スケジュール取得エラー:', error);
-            throw error;
-        }
+        // スケジュールデータ取得
+        const { data: schedules } = await fetchData(
+            'schedules',
+            {
+                select: `
+          id,
+          title,
+          start_date,
+          end_date,
+          is_all_day,
+          description,
+          official_url,
+          category:category_id (id, name, color_code),
+          venue:venue_id (id, name),
+          broadcastStation:broadcast_station_id (id, name),
+          performances:rel_schedule_performances (
+            id,
+            performance_date,
+            display_start_time,
+            display_end_time,
+            subtitle,
+            description,
+            display_order
+          ),
+          performers:rel_schedule_performers (
+            id,
+            role_description,
+            display_order,
+            performer:performer_id (id, name, is_takuya_sato)
+          )
+        `,
+                filters: {
+                    start_date: { gte: fromDateStr },
+                    ...categoryFilter
+                },
+                order: 'start_date'
+            }
+        );
 
         console.log(`スケジュールAPI: ${schedules?.length || 0}件のスケジュールが見つかりました`);
 
@@ -98,8 +99,7 @@ export default async function handler(req, res) {
         const formattedSchedules = schedules?.map(schedule => {
             // Dateオブジェクトを確実に作成
             const startDate = new Date(schedule.start_date);
-            const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
-            const weekday = weekdays[startDate.getDay()];
+            const weekday = getWeekday(startDate);
 
             // カテゴリに応じてロケーション情報を選択
             const isBroadcast = schedule.category?.name === '生放送';
@@ -163,8 +163,6 @@ export default async function handler(req, res) {
             },
             schedules: formattedSchedules
         };
-
-        console.log(`スケジュールAPI: 期間情報を含めて${formattedSchedules.length}件のフォーマット済みスケジュールを返します`);
 
         return res.status(200).json(response);
     } catch (error) {

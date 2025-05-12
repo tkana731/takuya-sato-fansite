@@ -1,5 +1,5 @@
 // pages/api/roles/index.js
-import prisma from '../../../lib/prisma';
+import { supabase } from '../../../lib/supabase';
 
 export default async function handler(req, res) {
     if (req.method === 'GET') {
@@ -8,31 +8,34 @@ export default async function handler(req, res) {
             const { actorId, search } = req.query;
 
             // クエリ条件を作成
-            const where = {};
+            let query = supabase
+                .from('mst_roles')
+                .select(`
+                    id,
+                    name,
+                    actor_id,
+                    birthday,
+                    series_name,
+                    actor:actor_id (
+                        id,
+                        name
+                    )
+                `)
+                .order('name');
 
             // 声優IDによるフィルタリング
             if (actorId) {
-                where.actorId = actorId;
+                query = query.eq('actor_id', actorId);
             }
 
             // 名前による検索
             if (search) {
-                where.OR = [
-                    { name: { contains: search, mode: 'insensitive' } },
-                    { seriesName: { contains: search, mode: 'insensitive' } }
-                ];
+                query = query.or(`name.ilike.%${search}%,series_name.ilike.%${search}%`);
             }
 
-            // 役割データを取得
-            const roles = await prisma.role.findMany({
-                where,
-                include: {
-                    actor: true
-                },
-                orderBy: {
-                    name: 'asc'
-                }
-            });
+            const { data: roles, error } = await query;
+
+            if (error) throw error;
 
             return res.status(200).json({
                 success: true,
@@ -69,19 +72,22 @@ export default async function handler(req, res) {
                 }
             }
 
-            // Prismaクライアントを使用して役割を作成
-            const newRole = await prisma.role.create({
-                data: {
+            // 役割を作成
+            const { data: newRole, error } = await supabase
+                .from('mst_roles')
+                .insert([{
                     name,
-                    actorId,
+                    actor_id: actorId,
                     birthday: birthday || null,
-                    seriesName: seriesName || null
-                }
-            });
+                    series_name: seriesName || null
+                }])
+                .select();
+
+            if (error) throw error;
 
             return res.status(201).json({
                 success: true,
-                data: newRole,
+                data: newRole[0],
                 message: '役割が正常に登録されました'
             });
         } catch (error) {

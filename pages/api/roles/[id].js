@@ -1,5 +1,5 @@
 // pages/api/roles/[id].js
-import prisma from '../../../lib/prisma';
+import { supabase } from '../../../lib/supabase';
 
 export default async function handler(req, res) {
     const { id } = req.query;
@@ -15,14 +15,23 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
         try {
             // 役割データを取得
-            const role = await prisma.role.findUnique({
-                where: {
-                    id: id
-                },
-                include: {
-                    actor: true
-                }
-            });
+            const { data: role, error } = await supabase
+                .from('mst_roles')
+                .select(`
+                    id,
+                    name,
+                    actor_id,
+                    birthday,
+                    series_name,
+                    actor:actor_id (
+                        id,
+                        name
+                    )
+                `)
+                .eq('id', id)
+                .single();
+
+            if (error) throw error;
 
             if (!role) {
                 return res.status(404).json({
@@ -69,21 +78,22 @@ export default async function handler(req, res) {
             }
 
             // 役割を更新
-            const updatedRole = await prisma.role.update({
-                where: {
-                    id: id
-                },
-                data: {
+            const { data: updatedRole, error } = await supabase
+                .from('mst_roles')
+                .update({
                     name,
-                    actorId,
+                    actor_id: actorId,
                     birthday: birthday || null,
-                    seriesName: seriesName || null
-                }
-            });
+                    series_name: seriesName || null
+                })
+                .eq('id', id)
+                .select();
+
+            if (error) throw error;
 
             return res.status(200).json({
                 success: true,
-                data: updatedRole,
+                data: updatedRole[0],
                 message: '役割が正常に更新されました'
             });
         } catch (error) {
@@ -99,14 +109,15 @@ export default async function handler(req, res) {
     else if (req.method === 'DELETE') {
         try {
             // 役割が作品に関連付けられていないかチェック
-            const relatedWorks = await prisma.workRole.findMany({
-                where: {
-                    role_id: id
-                }
-            });
+            const { data: relatedWorks, error: checkError } = await supabase
+                .from('rel_work_roles')
+                .select('id')
+                .eq('role_id', id);
+
+            if (checkError) throw checkError;
 
             // 関連付けがある場合は削除不可
-            if (relatedWorks.length > 0) {
+            if (relatedWorks && relatedWorks.length > 0) {
                 return res.status(400).json({
                     success: false,
                     message: `この役割は${relatedWorks.length}件の作品に関連付けられているため削除できません。先に関連を解除してください。`
@@ -114,11 +125,12 @@ export default async function handler(req, res) {
             }
 
             // 役割を削除
-            await prisma.role.delete({
-                where: {
-                    id: id
-                }
-            });
+            const { error } = await supabase
+                .from('mst_roles')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
 
             return res.status(200).json({
                 success: true,

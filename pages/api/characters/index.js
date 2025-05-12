@@ -1,5 +1,5 @@
 // pages/api/characters/index.js
-import prisma from '../../../lib/prisma';
+import { supabase } from '../../../lib/supabase';
 
 export default async function handler(req, res) {
     if (req.method === 'GET') {
@@ -7,39 +7,43 @@ export default async function handler(req, res) {
             // クエリパラメータからフィルタリング条件を取得
             const { actorId, search, hasBirthday } = req.query;
 
-            // クエリ条件を作成
-            const where = {};
+            // クエリの構築
+            let query = supabase
+                .from('mst_roles')
+                .select(`
+                    id,
+                    name,
+                    actor_id,
+                    birthday,
+                    series_name,
+                    actor:actor_id (
+                        id,
+                        name
+                    )
+                `)
+                .order('name');
 
             // 声優IDによるフィルタリング
             if (actorId) {
-                where.actorId = actorId;
+                query = query.eq('actor_id', actorId);
             }
 
             // 誕生日の有無でフィルタリング
             if (hasBirthday === 'true') {
-                where.birthday = { not: null };
+                query = query.not('birthday', 'is', null);
             } else if (hasBirthday === 'false') {
-                where.birthday = null;
+                query = query.is('birthday', null);
             }
 
             // 名前による検索
             if (search) {
-                where.OR = [
-                    { name: { contains: search, mode: 'insensitive' } },
-                    { seriesName: { contains: search, mode: 'insensitive' } }
-                ];
+                query = query.or(`name.ilike.%${search}%,series_name.ilike.%${search}%`);
             }
 
-            // キャラクターデータを取得
-            const characters = await prisma.role.findMany({
-                where,
-                include: {
-                    actor: true
-                },
-                orderBy: {
-                    name: 'asc'
-                }
-            });
+            // クエリの実行
+            const { data: characters, error } = await query;
+
+            if (error) throw error;
 
             return res.status(200).json({
                 success: true,
@@ -76,19 +80,22 @@ export default async function handler(req, res) {
                 }
             }
 
-            // Prismaクライアントを使用してキャラクターを作成
-            const newCharacter = await prisma.role.create({
-                data: {
+            // キャラクターを作成
+            const { data: newCharacter, error } = await supabase
+                .from('mst_roles')
+                .insert([{
                     name,
-                    actorId,
+                    actor_id: actorId,
                     birthday: birthday || null,
-                    seriesName: seriesName || null
-                }
-            });
+                    series_name: seriesName || null
+                }])
+                .select();
+
+            if (error) throw error;
 
             return res.status(201).json({
                 success: true,
-                data: newCharacter,
+                data: newCharacter[0],
                 message: 'キャラクターが正常に登録されました'
             });
         } catch (error) {

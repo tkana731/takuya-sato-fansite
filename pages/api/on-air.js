@@ -34,7 +34,7 @@ export default async function handler(req, res) {
                 )
             `)
             .eq('category.name', 'アニメ')
-            .gte('rel_broadcast_channels.broadcast_end_date', currentDate.toISOString().split('T')[0])
+            .gte('rel_broadcast_channels.broadcast_start_date', currentDate.toISOString().split('T')[0])
             .order('title');
 
         if (animeError) {
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
                 )
             `)
             .eq('category.name', 'ラジオ')
-            .gte('rel_broadcast_channels.broadcast_end_date', currentDate.toISOString().split('T')[0])
+            .gte('rel_broadcast_channels.broadcast_start_date', currentDate.toISOString().split('T')[0])
             .order('title');
 
         if (radioError) {
@@ -98,7 +98,7 @@ export default async function handler(req, res) {
                 )
             `)
             .eq('category.name', 'WEB')
-            .gte('rel_broadcast_channels.broadcast_end_date', currentDate.toISOString().split('T')[0])
+            .gte('rel_broadcast_channels.broadcast_start_date', currentDate.toISOString().split('T')[0])
             .order('title');
 
         if (webError) {

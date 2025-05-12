@@ -6,149 +6,182 @@ import Schedule from '../components/Schedule/Schedule';
 import Works from '../components/Works/Works';
 import VideoSection from '../components/Video/VideoSection';
 import Links from '../components/Links/Links';
+import SkeletonUI from '../components/Loading/SkeletonUI';
 
 export default function Home() {
+  // データ状態
   const [birthdays, setBirthdays] = useState([]);
   const [onAirContent, setOnAirContent] = useState([]);
   const [schedules, setSchedules] = useState([]);
   const [works, setWorks] = useState([]);
   const [videos, setVideos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [dataFetchStatus, setDataFetchStatus] = useState({
-    birthdays: false,
-    onAir: false,
-    schedules: false,
-    works: false,
-    videos: false
+
+  // UI状態
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [dataState, setDataState] = useState({
+    birthdays: { loaded: false, loading: true },
+    onAir: { loaded: false, loading: true },
+    schedules: { loaded: false, loading: true },
+    works: { loaded: false, loading: true },
+    videos: { loaded: false, loading: true }
   });
 
   // データのフェッチを実行
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDataWithTimeout = async (url, dataType, timeout = 5000) => {
       try {
-        setLoading(true);
+        // タイムアウト処理を追加
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-        // データ取得用の関数
-        const fetchDataWithTimeout = async (url, dataType, timeout = 10000) => {
-          try {
-            // タイムアウト処理を追加
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeout);
+        setDataState(prev => ({
+          ...prev,
+          [dataType]: { ...prev[dataType], loading: true }
+        }));
 
-            const response = await fetch(url, { signal: controller.signal });
-            clearTimeout(timeoutId);
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
 
-            if (!response.ok) throw new Error(`${dataType}データの取得に失敗しました: ${response.status}`);
-            const data = await response.json();
-            console.log(`${dataType}データ:`, data);
-            return { success: true, data };
-          } catch (err) {
-            console.error(`${dataType}データの取得エラー:`, err);
-            return { success: false, error: err.message };
-          }
-        };
+        if (!response.ok) throw new Error(`${dataType}データの取得に失敗しました: ${response.status}`);
 
-        // 誕生日キャラクターの取得
-        const birthdaysResult = await fetchDataWithTimeout('/api/birthdays', '誕生日');
-        if (birthdaysResult.success) {
-          setBirthdays(birthdaysResult.data);
-        }
-        setDataFetchStatus(prev => ({ ...prev, birthdays: true }));
-
-        // 放送中コンテンツの取得
-        const onAirResult = await fetchDataWithTimeout('/api/on-air', '放送中コンテンツ');
-        if (onAirResult.success) {
-          setOnAirContent(onAirResult.data);
-        }
-        setDataFetchStatus(prev => ({ ...prev, onAir: true }));
-
-        // スケジュールの取得
-        const today = new Date();
-        const thirtyDaysLater = new Date();
-        thirtyDaysLater.setDate(today.getDate() + 30);
-
-        // ISO形式に変換して日付パラメータを作成
-        const fromParam = today.toISOString().split('T')[0];
-        const toParam = thirtyDaysLater.toISOString().split('T')[0];
-
-        const schedulesResult = await fetchDataWithTimeout(
-          `/api/schedules?from=${fromParam}&to=${toParam}`,
-          'スケジュール'
-        );
-        if (schedulesResult.success) {
-          setSchedules(schedulesResult.data);
-        }
-        setDataFetchStatus(prev => ({ ...prev, schedules: true }));
-
-        // 作品データの取得
-        const worksResult = await fetchDataWithTimeout('/api/works', '作品');
-        if (worksResult.success) {
-          setWorks(worksResult.data);
-        }
-        setDataFetchStatus(prev => ({ ...prev, works: true }));
-
-        // 動画データの取得
-        const videosResult = await fetchDataWithTimeout('/api/videos', '動画');
-        if (videosResult.success) {
-          setVideos(videosResult.data);
-        }
-        setDataFetchStatus(prev => ({ ...prev, videos: true }));
-
-        // すべてのデータ取得が完了するか、5秒経過したらローディングを終了
-        setTimeout(() => {
-          setLoading(false);
-        }, 5000);
+        const data = await response.json();
+        return { success: true, data };
       } catch (err) {
-        console.error('データの取得エラー:', err);
-        setError(err.message);
-        setLoading(false);
+        console.error(`${dataType}データの取得エラー:`, err);
+        return { success: false, error: err.message };
+      } finally {
+        setDataState(prev => ({
+          ...prev,
+          [dataType]: { ...prev[dataType], loading: false }
+        }));
       }
     };
 
-    fetchData();
+    // すべてのデータを並列に取得
+    const fetchAllData = async () => {
+      // 初期ローディング状態
+      setInitialLoading(true);
 
-    // いかなる場合も10秒後にはローディングを強制終了
-    const forceLoadingTimeout = setTimeout(() => {
-      if (loading) {
-        console.log('タイムアウトによりローディングを強制終了します');
-        setLoading(false);
+      // 日付パラメータの準備
+      const today = new Date();
+      const thirtyDaysLater = new Date();
+      thirtyDaysLater.setDate(today.getDate() + 30);
+      const fromParam = today.toISOString().split('T')[0];
+      const toParam = thirtyDaysLater.toISOString().split('T')[0];
+
+      // 初期ローディングを1秒後に解除（少なくともスケルトンUIを表示するため）
+      setTimeout(() => {
+        setInitialLoading(false);
+      }, 1000);
+
+      // 並列にデータを取得
+      try {
+        const [birthdaysResult, onAirResult, schedulesResult, worksResult, videosResult] = await Promise.allSettled([
+          fetchDataWithTimeout('/api/birthdays', 'birthdays'),
+          fetchDataWithTimeout('/api/on-air', 'onAir'),
+          fetchDataWithTimeout(`/api/schedules?from=${fromParam}&to=${toParam}`, 'schedules'),
+          fetchDataWithTimeout('/api/works', 'works'),
+          fetchDataWithTimeout('/api/videos', 'videos')
+        ]);
+
+        // 結果を処理
+        if (birthdaysResult.value?.success) {
+          setBirthdays(birthdaysResult.value.data);
+          setDataState(prev => ({
+            ...prev,
+            birthdays: { loaded: true, loading: false }
+          }));
+        }
+
+        if (onAirResult.value?.success) {
+          setOnAirContent(onAirResult.value.data);
+          setDataState(prev => ({
+            ...prev,
+            onAir: { loaded: true, loading: false }
+          }));
+        }
+
+        if (schedulesResult.value?.success) {
+          setSchedules(schedulesResult.value.data);
+          setDataState(prev => ({
+            ...prev,
+            schedules: { loaded: true, loading: false }
+          }));
+        }
+
+        if (worksResult.value?.success) {
+          setWorks(worksResult.value.data);
+          setDataState(prev => ({
+            ...prev,
+            works: { loaded: true, loading: false }
+          }));
+        }
+
+        if (videosResult.value?.success) {
+          setVideos(videosResult.value.data);
+          setDataState(prev => ({
+            ...prev,
+            videos: { loaded: true, loading: false }
+          }));
+        }
+      } catch (error) {
+        console.error('データ取得中のエラー:', error);
       }
-    }, 10000);
+    };
 
-    return () => clearTimeout(forceLoadingTimeout);
+    fetchAllData();
   }, []);
 
-  // データ取得状況をコンソールに表示
-  useEffect(() => {
-    console.log("データ取得状況:", dataFetchStatus);
-
-    // すべてのデータ取得が完了したらローディングを終了
-    const allDataFetched = Object.values(dataFetchStatus).every(status => status === true);
-    if (allDataFetched) {
-      setLoading(false);
-    }
-  }, [dataFetchStatus]);
-
-  // エラー表示
-  if (error) {
-    console.warn('データ取得エラーがありますが、フォールバックデータを使用して表示します:', error);
-  }
+  // 各セクションの表示判定用
+  const hasData = {
+    birthdays: birthdays && birthdays.length > 0,
+    onAir: onAirContent && (onAirContent.anime?.length > 0 || onAirContent.radio?.length > 0 || onAirContent.web?.length > 0),
+    schedules: schedules && schedules.schedules && schedules.schedules.length > 0,
+    works: works && (works.anime?.length > 0 || works.game?.length > 0),
+    videos: videos && videos.length > 0
+  };
 
   return (
     <Layout title="佐藤拓也ファンサイト - 声優・佐藤拓也さんの出演作品、スケジュール情報など">
-      {loading ? (
+      {initialLoading ? (
         <div className="loading-container">
           <div className="loading-spinner"></div>
           <p>データを読み込んでいます...</p>
         </div>
       ) : (
         <>
-          <Birthday characters={birthdays} />
-          <OnAir content={onAirContent} />
-          <Schedule schedules={schedules} />
-          <Works works={works} />
-          <VideoSection videos={videos} />
+          {/* 誕生日キャラクター */}
+          {dataState.birthdays.loaded && hasData.birthdays && <Birthday characters={birthdays} />}
+
+          {/* 放送中コンテンツ */}
+          {dataState.onAir.loading ? (
+            <SkeletonUI type="default" count={3} />
+          ) : (
+            dataState.onAir.loaded && <OnAir content={onAirContent} />
+          )}
+
+          {/* スケジュール */}
+          {dataState.schedules.loading ? (
+            <SkeletonUI type="schedule" count={3} />
+          ) : (
+            dataState.schedules.loaded && <Schedule schedules={schedules} />
+          )}
+
+          {/* 作品 */}
+          {dataState.works.loading ? (
+            <SkeletonUI type="works" count={5} />
+          ) : (
+            dataState.works.loaded && <Works works={works} />
+          )}
+
+          {/* 動画 */}
+          {dataState.videos.loading ? (
+            <SkeletonUI type="video" count={3} />
+          ) : (
+            dataState.videos.loaded && <VideoSection videos={videos} />
+          )}
+
+          {/* リンク - 静的データなので常に表示 */}
           <Links />
         </>
       )}

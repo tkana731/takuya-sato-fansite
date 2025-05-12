@@ -1,5 +1,5 @@
 // pages/api/videos/index.js
-import prisma from '../../../lib/prisma';
+import { supabase } from '../../../lib/supabase';
 
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
@@ -14,40 +14,54 @@ export default async function handler(req, res) {
         const takeCount = limit ? parseInt(limit) : 3;
 
         // 検索条件を構築
-        const where = {};
+        let query = supabase
+            .from('videos')
+            .select(`
+                id,
+                title,
+                video_url,
+                published_at,
+                work:work_id (
+                    id,
+                    title
+                )
+            `)
+            .order('published_at', { ascending: false })
+            .limit(takeCount);
+
+        // workIdによるフィルタリング
         if (workId) {
-            where.work_id = workId;
+            query = query.eq('work_id', workId);
         }
 
-        // Prismaを使用して動画を取得（最新のものから指定件数）
-        const videos = await prisma.video.findMany({
-            where,
-            orderBy: {
-                publishedAt: 'desc'
-            },
-            take: takeCount,
-            include: {
-                work: true
-            }
-        });
+        // クエリ実行
+        const { data: videos, error } = await query;
+
+        if (error) {
+            console.error('動画データ取得エラー:', error);
+            throw error;
+        }
 
         // 動画が見つからない場合は空の配列を返す
-        if (videos.length === 0) {
+        if (!videos || videos.length === 0) {
+            console.log('動画が見つかりませんでした');
             return res.status(200).json([]);
         }
+
+        console.log(`${videos.length}件の動画を取得しました`);
 
         // データを整形して返す
         const formattedVideos = videos.map(video => {
             // 日付をYYYY.MM.DD形式に整形
-            const publishedDate = new Date(video.publishedAt);
+            const publishedDate = new Date(video.published_at);
             const formattedDate = `${publishedDate.getFullYear()}.${String(publishedDate.getMonth() + 1).padStart(2, '0')}.${String(publishedDate.getDate()).padStart(2, '0')}`;
 
             return {
                 id: video.id,
                 title: video.title,
                 date: formattedDate,
-                videoUrl: video.videoUrl,
-                workId: video.work_id,
+                videoUrl: video.video_url,
+                workId: video.work?.id,
                 workTitle: video.work?.title
             };
         });
@@ -59,7 +73,8 @@ export default async function handler(req, res) {
         return res.status(500).json({
             success: false,
             error: '動画データの取得に失敗しました',
-            message: error.message
+            message: error.message,
+            details: error.details || error.stack
         });
     }
 }

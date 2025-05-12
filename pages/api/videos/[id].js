@@ -1,5 +1,5 @@
 // pages/api/videos/[id].js
-import prisma from '../../../lib/prisma';
+import { supabase } from '../../../lib/supabase';
 
 export default async function handler(req, res) {
     const { id } = req.query;
@@ -11,18 +11,32 @@ export default async function handler(req, res) {
         });
     }
 
+    console.log(`動画API: ID=${id}, メソッド=${req.method}`);
+
     // GET: 動画取得
     if (req.method === 'GET') {
         try {
             // 動画データを取得
-            const video = await prisma.video.findUnique({
-                where: {
-                    id: id
-                },
-                include: {
-                    work: true
-                }
-            });
+            const { data: video, error } = await supabase
+                .from('videos')
+                .select(`
+                    id, 
+                    title, 
+                    video_url,
+                    published_at,
+                    work_id,
+                    work:work_id (
+                        id,
+                        title
+                    )
+                `)
+                .eq('id', id)
+                .single();
+
+            if (error) {
+                console.error('動画取得エラー:', error);
+                throw error;
+            }
 
             if (!video) {
                 return res.status(404).json({
@@ -31,16 +45,26 @@ export default async function handler(req, res) {
                 });
             }
 
+            console.log(`動画取得成功: タイトル=${video.title}`);
+
             return res.status(200).json({
                 success: true,
-                data: video
+                data: {
+                    id: video.id,
+                    title: video.title,
+                    videoUrl: video.video_url,
+                    publishedAt: video.published_at,
+                    work_id: video.work_id,
+                    work: video.work
+                }
             });
         } catch (error) {
             console.error('動画取得エラー:', error);
             return res.status(500).json({
                 success: false,
                 message: '動画の取得に失敗しました',
-                error: error.message
+                error: error.message,
+                details: error.details || error.stack
             });
         }
     }
@@ -58,23 +82,31 @@ export default async function handler(req, res) {
 
         try {
             // 動画データを更新
-            const updatedVideo = await prisma.video.update({
-                where: {
-                    id: id
-                },
-                data: {
+            const { data: updatedVideo, error } = await supabase
+                .from('videos')
+                .update({
                     title,
-                    videoUrl,
-                    publishedAt: new Date(publishedAt),
-                    work: workId
-                        ? { connect: { id: workId } }
-                        : { disconnect: true }
-                }
-            });
+                    video_url: videoUrl,
+                    published_at: new Date(publishedAt).toISOString(),
+                    work_id: workId || null
+                })
+                .eq('id', id)
+                .select();
+
+            if (error) {
+                console.error('動画更新エラー:', error);
+                throw error;
+            }
+
+            if (!updatedVideo || updatedVideo.length === 0) {
+                throw new Error('動画の更新に失敗しました: データが返されませんでした');
+            }
+
+            console.log(`動画が正常に更新されました: ID=${id}`);
 
             return res.status(200).json({
                 success: true,
-                data: updatedVideo,
+                data: updatedVideo[0],
                 message: '動画が正常に更新されました'
             });
         } catch (error) {
@@ -82,7 +114,8 @@ export default async function handler(req, res) {
             return res.status(500).json({
                 success: false,
                 message: '動画の更新に失敗しました',
-                error: error.message
+                error: error.message,
+                details: error.details || error.stack
             });
         }
     }
@@ -90,11 +123,17 @@ export default async function handler(req, res) {
     else if (req.method === 'DELETE') {
         try {
             // 動画を削除
-            await prisma.video.delete({
-                where: {
-                    id: id
-                }
-            });
+            const { error } = await supabase
+                .from('videos')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                console.error('動画削除エラー:', error);
+                throw error;
+            }
+
+            console.log(`動画が正常に削除されました: ID=${id}`);
 
             return res.status(200).json({
                 success: true,
@@ -105,7 +144,8 @@ export default async function handler(req, res) {
             return res.status(500).json({
                 success: false,
                 message: '動画の削除に失敗しました',
-                error: error.message
+                error: error.message,
+                details: error.details || error.stack
             });
         }
     } else {

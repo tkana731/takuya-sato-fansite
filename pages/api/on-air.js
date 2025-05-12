@@ -19,7 +19,7 @@ export default async function handler(req, res) {
                 category:category_id (id, name),
                 broadcastChannels:rel_broadcast_channels(
                     id,
-                    broadcastEndDate:broadcast_end_date,
+                    broadcastStartDate:broadcast_start_date,
                     displayBroadcastTime:display_broadcast_time,
                     station:station_id (id, name),
                     weekday:weekday_id (id, name, short_name)

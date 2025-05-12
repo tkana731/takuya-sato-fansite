@@ -1569,127 +1569,65 @@ img {
   margin-top: auto;
 }
 
-/* スケルトンローディングアニメーション用のCSS */
-@keyframes skeleton-loading {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
+/* 以下のコードを既存のglobals.cssの「ローディング関連」部分に追加してください */
+
+/* ローディング関連 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  margin: 2rem 0;
 }
 
-/* スケルトン要素の共通スタイル */
-.skeleton-title,
-.skeleton-subtitle,
-.skeleton-text,
-.skeleton-text-short,
-.skeleton-title-long,
-.skeleton-period,
-.skeleton-date,
-.skeleton-badge,
-.skeleton-thumbnail,
-.skeleton-tab {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
-  background-size: 400px 100%;
-  animation: skeleton-loading 1.4s ease infinite;
-  border-radius: 4px;
-}
-
-.skeleton-title {
-  width: 200px;
-  height: 32px;
-  margin: 0 auto 10px;
-}
-
-.skeleton-subtitle {
-  width: 150px;
-  height: 16px;
-  margin: 0 auto;
-}
-
-.skeleton-title-long {
-  width: 80%;
-  height: 18px;
-  margin-bottom: 8px;
-}
-
-.skeleton-text {
-  width: 70%;
-  height: 14px;
-  margin-bottom: 8px;
-}
-
-.skeleton-text-short {
-  width: 40%;
-  height: 14px;
-}
-
-.skeleton-period {
-  width: 200px;
-  height: 30px;
-  margin: 0 auto 20px;
-  border-radius: 30px;
-}
-
-.skeleton-tabs {
+/* 音声波形アニメーション */
+.audio-wave {
   display: flex;
   justify-content: center;
+  align-items: center;
+  height: 100px;
   margin-bottom: 20px;
-  gap: 10px;
 }
 
-.skeleton-tab {
-  width: 80px;
+.audio-wave span {
+  display: inline-block;
+  width: 5px;
   height: 30px;
-  border-radius: 4px;
-}
-
-.skeleton-date {
-  width: 80px;
-  height: 80px;
-  border-radius: 4px;
-}
-
-.skeleton-badge {
-  width: 80px;
-  height: 24px;
-  border-radius: 30px;
-}
-
-.skeleton-thumbnail {
-  width: 100%;
-  height: 180px;
-  margin-bottom: 10px;
-}
-
-.skeleton-item {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 15px;
-  padding: 15px;
-  background-color: white;
+  margin: 0 3px;
+  background-color: var(--primary-color);
   border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+  animation: audio-wave 1.2s infinite ease-in-out;
 }
 
-.skeleton-content {
-  flex: 1;
+.audio-wave span:nth-child(1) {
+  animation-delay: 0s;
+}
+.audio-wave span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.audio-wave span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.audio-wave span:nth-child(4) {
+  animation-delay: 0.6s;
+}
+.audio-wave span:nth-child(5) {
+  animation-delay: 0.8s;
 }
 
-.skeleton-card {
-  background-color: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  padding-bottom: 20px;
+@keyframes audio-wave {
+  0%, 100% {
+    height: 15px;
+  }
+  50% {
+    height: 50px;
+  }
 }
 
-.skeleton-container {
-  padding: 60px 0;
-}
-
-.skeleton-header {
-  text-align: center;
-  margin-bottom: 40px;
+.loading-text {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 3px;
 }

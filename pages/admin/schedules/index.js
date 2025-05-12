@@ -194,16 +194,15 @@ export default function SchedulesAdmin() {
                     <p className="text-gray-600">イベント、舞台、生放送などのスケジュールを管理します</p>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <DataTable
-                        data={schedules}
-                        columns={columns}
-                        title="スケジュール一覧"
-                        addButtonLink="/admin/schedules/new"
-                        addButtonText="新規スケジュール追加"
-                        onDelete={handleDelete}
-                    />
-                </div>
+                {/* 余分なoverflow-x-autoのdivを削除 */}
+                <DataTable
+                    data={schedules}
+                    columns={columns}
+                    title="スケジュール一覧"
+                    addButtonLink="/admin/schedules/new"
+                    addButtonText="新規スケジュール追加"
+                    onDelete={handleDelete}
+                />
             </div>
         </AdminLayout>
     );

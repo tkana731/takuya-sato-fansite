@@ -1,4 +1,3 @@
-// pages/admin/videos/index.js
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import AdminLayout from '../../../components/Admin/AdminLayout';
@@ -100,9 +99,10 @@ export default function VideosAdmin() {
                     href={item.videoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary hover:underline truncate block max-w-xs"
+                    className="text-primary hover:underline truncate block"
+                    title={item.videoUrl}
                 >
-                    {item.videoUrl}
+                    {item.videoUrl.replace(/^https?:\/\//, '').substring(0, 25) + '...'}
                 </a>
             )
         }

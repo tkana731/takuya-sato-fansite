@@ -56,17 +56,17 @@ export default function DataTable({
     };
 
     return (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b">
-                <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-                <div className="flex items-center space-x-2">
-                    <div className="relative">
+        <div className="bg-white shadow rounded-lg overflow-hidden w-full">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 border-b">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2 md:mb-0">{title}</h2>
+                <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-2 w-full md:w-auto">
+                    <div className="relative w-full md:w-auto">
                         <input
                             type="text"
                             placeholder="検索..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="border border-gray-300 rounded-md py-2 px-3 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                            className="border border-gray-300 rounded-md py-2 px-3 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary w-full"
                         />
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -76,22 +76,22 @@ export default function DataTable({
                     </div>
 
                     {addButtonLink && (
-                        <Link href={addButtonLink} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-accent hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent">
+                        <Link href={addButtonLink} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-accent hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent w-full md:w-auto justify-center">
                             {addButtonText}
                         </Link>
                     )}
                 </div>
             </div>
 
-            <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+            <div className="overflow-x-auto w-full">
+                <table className="min-w-full divide-y divide-gray-200 w-full">
                     <thead className="bg-gray-50">
                         <tr>
-                            {columns.map((column) => (
+                            {columns.map((column, i) => (
                                 <th
                                     key={column.key}
                                     scope="col"
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer ${i === columns.length - 1 ? 'w-1/4' : ''}`}
                                     onClick={() => handleSort(column.key)}
                                 >
                                     <div className="flex items-center">
@@ -105,7 +105,7 @@ export default function DataTable({
                                     </div>
                                 </th>
                             ))}
-                            <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
                                 操作
                             </th>
                         </tr>
@@ -114,8 +114,9 @@ export default function DataTable({
                         {sortedData.length > 0 ? (
                             sortedData.map((item) => (
                                 <tr key={item.id}>
-                                    {columns.map((column) => (
-                                        <td key={`${item.id}-${column.key}`} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {columns.map((column, i) => (
+                                        <td key={`${item.id}-${column.key}`}
+                                            className={`px-6 py-4 text-sm text-gray-500 ${i === columns.length - 1 ? 'max-w-xs truncate' : ''}`}>
                                             {column.render ? column.render(item) : item[column.key]}
                                         </td>
                                     ))}

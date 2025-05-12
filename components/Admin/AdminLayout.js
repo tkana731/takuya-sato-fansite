@@ -65,7 +65,7 @@ export default function AdminLayout({ children }) {
     };
 
     return (
-        <div className="min-h-screen flex">
+        <div className="min-h-screen flex flex-col md:flex-row">
             {/* サイドバー（PC表示） */}
             <div className="hidden md:flex md:flex-col md:w-64 md:fixed md:inset-y-0 bg-primary">
                 <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
@@ -161,10 +161,10 @@ export default function AdminLayout({ children }) {
             </div>
 
             {/* メインコンテンツ */}
-            <div className="md:pl-64 flex flex-col flex-1">
+            <div className="flex flex-col flex-1 md:ml-64 w-full overflow-hidden">
                 <main className="flex-1 pt-16 md:pt-0">
                     <div className="py-6">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        <div className="mx-auto px-4 sm:px-6 md:px-8 max-w-full">
                             {children}
                         </div>
                     </div>

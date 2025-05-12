@@ -20,7 +20,7 @@ export default function SchedulesAdmin() {
                 // カテゴリ情報を事前取得してマッピング
                 const { data: categories, error: categoryError } = await supabase
                     .from('mst_schedule_categories')
-                    .select('id, name, colorCode');
+                    .select('id, name, color_code');
 
                 if (categoryError) throw categoryError;
 
@@ -40,7 +40,7 @@ export default function SchedulesAdmin() {
                         is_all_day,
                         description, 
                         official_url,
-                        category:category_id (id, name, colorCode),
+                        category:category_id (id, name, color_code),
                         venue:venue_id (name),
                         broadcastStation:broadcast_station_id (name)
                     `)

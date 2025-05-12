@@ -136,10 +136,21 @@ export default async function handler(req, res) {
             };
         };
 
-        // フィルタリングと整形
-        const filteredAnime = animeOnAir.filter(hasTakuyaSatoRole).map(formatBroadcastInfo);
-        const filteredRadio = radioOnAir.filter(hasTakuyaSatoRole).map(formatBroadcastInfo);
-        const filteredWeb = webOnAir.filter(hasTakuyaSatoRole).map(formatBroadcastInfo);
+        // フィルタリングと整形（カテゴリの再チェック追加）
+        const filteredAnime = animeOnAir
+            .filter(hasTakuyaSatoRole)
+            .filter(work => work.category?.name === 'アニメ')  // 再度カテゴリ確認
+            .map(formatBroadcastInfo);
+
+        const filteredRadio = radioOnAir
+            .filter(hasTakuyaSatoRole)
+            .filter(work => work.category?.name === 'ラジオ')  // 再度カテゴリ確認
+            .map(formatBroadcastInfo);
+
+        const filteredWeb = webOnAir
+            .filter(hasTakuyaSatoRole)
+            .filter(work => work.category?.name === 'WEB')  // 再度カテゴリ確認
+            .map(formatBroadcastInfo);
 
         console.log(`取得結果: アニメ=${filteredAnime.length}件, ラジオ=${filteredRadio.length}件, WEB=${filteredWeb.length}件`);
 

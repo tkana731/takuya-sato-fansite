@@ -7,8 +7,6 @@
         }
     ],
     "build": {
-        "env": {
-            "PRISMA_GENERATE_DATAPROXY": "false"
-        }
+        "env": {}
     }
 }

@@ -964,12 +964,16 @@ img {
 }
 
 .on-air-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 30px;
 }
 
 .on-air-category {
+  flex: 0 1 calc(33.33% - 20px);
+  min-width: 250px;
+  max-width: 350px;
   background-color: white;
   border-radius: 10px;
   padding: 25px;
@@ -1322,6 +1326,10 @@ img {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .on-air-category {
+    flex: 0 1 calc(50% - 15px);
+  }
+
   .footer-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -1456,6 +1464,10 @@ img {
   
   .on-air-container {
     grid-template-columns: 1fr;
+  }
+
+  .on-air-category {
+    flex: 0 1 100%;
   }
   
   .back-to-top {

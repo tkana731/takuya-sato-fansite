@@ -19,8 +19,9 @@ export default async function handler(req, res) {
                 category:category_id (id, name),
                 broadcastChannels:rel_broadcast_channels(
                     id,
-                    broadcastStartDate:broadcast_start_date,
-                    displayBroadcastTime:display_broadcast_time,
+                    broadcast_start_date,
+                    broadcast_end_date,
+                    display_broadcast_time,
                     station:station_id (id, name),
                     weekday:weekday_id (id, name, short_name)
                 ),
@@ -34,7 +35,6 @@ export default async function handler(req, res) {
                 )
             `)
             .eq('category.name', 'アニメ')
-            .gte('rel_broadcast_channels.broadcast_start_date', currentDate.toISOString().split('T')[0])
             .order('title');
 
         if (animeError) {
@@ -51,8 +51,9 @@ export default async function handler(req, res) {
                 category:category_id (id, name),
                 broadcastChannels:rel_broadcast_channels(
                     id,
-                    broadcastEndDate:broadcast_end_date,
-                    displayBroadcastTime:display_broadcast_time,
+                    broadcast_start_date,
+                    broadcast_end_date,
+                    display_broadcast_time,
                     station:station_id (id, name),
                     weekday:weekday_id (id, name, short_name)
                 ),
@@ -66,7 +67,6 @@ export default async function handler(req, res) {
                 )
             `)
             .eq('category.name', 'ラジオ')
-            .gte('rel_broadcast_channels.broadcast_start_date', currentDate.toISOString().split('T')[0])
             .order('title');
 
         if (radioError) {
@@ -83,8 +83,9 @@ export default async function handler(req, res) {
                 category:category_id (id, name),
                 broadcastChannels:rel_broadcast_channels(
                     id,
-                    broadcastEndDate:broadcast_end_date,
-                    displayBroadcastTime:display_broadcast_time,
+                    broadcast_start_date,
+                    broadcast_end_date,
+                    display_broadcast_time,
                     station:station_id (id, name),
                     weekday:weekday_id (id, name, short_name)
                 ),
@@ -98,7 +99,6 @@ export default async function handler(req, res) {
                 )
             `)
             .eq('category.name', 'WEB')
-            .gte('rel_broadcast_channels.broadcast_start_date', currentDate.toISOString().split('T')[0])
             .order('title');
 
         if (webError) {
@@ -106,27 +106,33 @@ export default async function handler(req, res) {
             throw webError;
         }
 
+        // デバッグ出力
+        console.log('取得したアニメデータ例:', animeOnAir.length > 0 ? animeOnAir[0] : 'データなし');
+
         // 佐藤拓也のロールのみがある作品をフィルタリングする関数
         const hasTakuyaSatoRole = (work) => {
-            return work.workRoles.some(wr =>
+            return work.workRoles && work.workRoles.some(wr =>
                 wr.role?.actor?.name === '佐藤拓也'
             );
         };
 
         // 放送情報を整形する関数
         const formatBroadcastInfo = (work) => {
-            // データ形式を変換
-            const formattedBroadcasts = work.broadcastChannels.map(bc => {
-                return {
-                    channel: bc.station?.name || 'チャンネル不明',
-                    time: bc.displayBroadcastTime || '時間未定'
-                };
-            });
+            // データ形式を変換 - 曜日表示を削除
+            const formattedBroadcasts = work.broadcastChannels && work.broadcastChannels.length > 0 ?
+                work.broadcastChannels.map(bc => {
+                    return {
+                        channel: bc.station?.name || 'チャンネル不明',
+                        time: bc.display_broadcast_time || '時間未定'
+                    };
+                }) : [];
 
             // 佐藤拓也の役を抽出
-            const takuyaRole = work.workRoles.find(wr =>
+            const takuyaRole = work.workRoles && work.workRoles.find(wr =>
                 wr.role?.actor?.name === '佐藤拓也'
             );
+
+            console.log(`作品 "${work.title}" の放送情報:`, formattedBroadcasts);
 
             return {
                 id: work.id,

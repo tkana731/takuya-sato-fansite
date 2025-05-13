@@ -28,12 +28,19 @@ export default function OnAir({ content = [] }) {
                                         <span className="on-air-title">{item.title}</span>
                                         {item.role && <span className="on-air-role">{item.role}</span>}
                                         <div className="broadcast-info">
-                                            {item.broadcasts && item.broadcasts.map((broadcast, index) => (
-                                                <div className="broadcast-item" key={index}>
-                                                    <span className="broadcast-channel">{broadcast.channel}</span>
-                                                    <span className="broadcast-time">{broadcast.time}</span>
+                                            {item.broadcasts && item.broadcasts.length > 0 ? (
+                                                item.broadcasts.map((broadcast, index) => (
+                                                    <div className="broadcast-item" key={index}>
+                                                        <span className="broadcast-channel">{broadcast.channel}</span>
+                                                        <span className="broadcast-time">{broadcast.time}</span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="broadcast-item">
+                                                    <span className="broadcast-channel">放送情報</span>
+                                                    <span className="broadcast-time">情報なし</span>
                                                 </div>
-                                            ))}
+                                            )}
                                         </div>
                                     </li>
                                 ))}
@@ -48,13 +55,21 @@ export default function OnAir({ content = [] }) {
                                 {content.radio.map(item => (
                                     <li className="on-air-item" key={item.id}>
                                         <span className="on-air-title">{item.title}</span>
+                                        {item.role && <span className="on-air-role">{item.role}</span>}
                                         <div className="broadcast-info">
-                                            {item.broadcasts && item.broadcasts.map((broadcast, index) => (
-                                                <div className="broadcast-item" key={index}>
-                                                    <span className="broadcast-channel">{broadcast.channel}</span>
-                                                    <span className="broadcast-time">{broadcast.time}</span>
+                                            {item.broadcasts && item.broadcasts.length > 0 ? (
+                                                item.broadcasts.map((broadcast, index) => (
+                                                    <div className="broadcast-item" key={index}>
+                                                        <span className="broadcast-channel">{broadcast.channel}</span>
+                                                        <span className="broadcast-time">{broadcast.time}</span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="broadcast-item">
+                                                    <span className="broadcast-channel">放送情報</span>
+                                                    <span className="broadcast-time">情報なし</span>
                                                 </div>
-                                            ))}
+                                            )}
                                         </div>
                                     </li>
                                 ))}
@@ -69,13 +84,21 @@ export default function OnAir({ content = [] }) {
                                 {content.web.map(item => (
                                     <li className="on-air-item" key={item.id}>
                                         <span className="on-air-title">{item.title}</span>
+                                        {item.role && <span className="on-air-role">{item.role}</span>}
                                         <div className="broadcast-info">
-                                            {item.broadcasts && item.broadcasts.map((broadcast, index) => (
-                                                <div className="broadcast-item" key={index}>
-                                                    <span className="broadcast-channel">{broadcast.channel}</span>
-                                                    <span className="broadcast-time">{broadcast.time}</span>
+                                            {item.broadcasts && item.broadcasts.length > 0 ? (
+                                                item.broadcasts.map((broadcast, index) => (
+                                                    <div className="broadcast-item" key={index}>
+                                                        <span className="broadcast-channel">{broadcast.channel}</span>
+                                                        <span className="broadcast-time">{broadcast.time}</span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="broadcast-item">
+                                                    <span className="broadcast-channel">放送情報</span>
+                                                    <span className="broadcast-time">情報なし</span>
                                                 </div>
-                                            ))}
+                                            )}
                                         </div>
                                     </li>
                                 ))}

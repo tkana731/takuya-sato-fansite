@@ -1188,7 +1188,6 @@ img {
 }
 
 .youtube-thumbnail {
-  height: 180px;
   overflow: hidden;
   position: relative;
 }

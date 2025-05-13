@@ -109,53 +109,112 @@ export default async function handler(req, res) {
         // デバッグ出力
         console.log('取得したアニメデータ例:', animeOnAir.length > 0 ? animeOnAir[0] : 'データなし');
 
-        // 佐藤拓也のロールのみがある作品をフィルタリングする関数
-        const hasTakuyaSatoRole = (work) => {
-            return work.workRoles && work.workRoles.some(wr =>
-                wr.role?.actor?.name === '佐藤拓也'
-            );
+        // 現在放送中かどうかをチェックする関数
+        const isCurrentlyBroadcasting = (work, currentDate) => {
+            // 放送チャンネルがない場合はfalse
+            if (!work.broadcastChannels || work.broadcastChannels.length === 0) {
+                return false;
+            }
+
+            // 少なくとも1つの放送チャンネルが現在放送中かチェック
+            return work.broadcastChannels.some(channel => {
+                // 放送開始日がない場合はfalse
+                if (!channel.broadcast_start_date) {
+                    return false;
+                }
+
+                const startDate = new Date(channel.broadcast_start_date);
+
+                // 放送終了日がnullで、放送開始日が現在日付以前の場合は放送中
+                if (channel.broadcast_end_date === null && startDate <= currentDate) {
+                    return true;
+                }
+
+                // 放送終了日がある場合、現在日付が放送開始日と放送終了日の間にあるかチェック
+                if (channel.broadcast_end_date) {
+                    const endDate = new Date(channel.broadcast_end_date);
+                    return startDate <= currentDate && currentDate <= endDate;
+                }
+
+                return false;
+            });
+        };
+
+        // 放送チャンネルがまだ放送中かどうかをチェックする関数
+        const isChannelCurrentlyBroadcasting = (channel, currentDate) => {
+            // 放送開始日がない場合はfalse
+            if (!channel.broadcast_start_date) {
+                return false;
+            }
+
+            const startDate = new Date(channel.broadcast_start_date);
+
+            // 放送終了日がnullで、放送開始日が現在日付以前の場合は放送中
+            if (channel.broadcast_end_date === null && startDate <= currentDate) {
+                return true;
+            }
+
+            // 放送終了日がある場合、現在日付が放送開始日と放送終了日の間にあるかチェック
+            if (channel.broadcast_end_date) {
+                const endDate = new Date(channel.broadcast_end_date);
+                return startDate <= currentDate && currentDate <= endDate;
+            }
+
+            return false;
         };
 
         // 放送情報を整形する関数
         const formatBroadcastInfo = (work) => {
-            // データ形式を変換 - 曜日表示を削除
-            const formattedBroadcasts = work.broadcastChannels && work.broadcastChannels.length > 0 ?
-                work.broadcastChannels.map(bc => {
+            // 放送中のチャンネルのみをフィルタリング
+            const activeChannels = work.broadcastChannels
+                .filter(channel => isChannelCurrentlyBroadcasting(channel, currentDate))
+                .map(bc => {
                     return {
                         channel: bc.station?.name || 'チャンネル不明',
                         time: bc.display_broadcast_time || '時間未定'
                     };
-                }) : [];
+                });
 
-            // 佐藤拓也の役を抽出
-            const takuyaRole = work.workRoles && work.workRoles.find(wr =>
-                wr.role?.actor?.name === '佐藤拓也'
-            );
+            // 佐藤拓也の役を抽出（アニメの場合）
+            let roleInfo = '';
+            if (work.category?.name === 'アニメ') {
+                const takuyaRole = work.workRoles && work.workRoles.find(wr =>
+                    wr.role?.actor?.name === '佐藤拓也'
+                );
+                roleInfo = takuyaRole ? `${takuyaRole.role.name} 役` : '';
+            }
 
-            console.log(`作品 "${work.title}" の放送情報:`, formattedBroadcasts);
+            console.log(`作品 "${work.title}" の放送情報:`, activeChannels);
 
             return {
                 id: work.id,
                 title: work.title,
-                role: takuyaRole ? `${takuyaRole.role.name} 役` : '',
-                broadcasts: formattedBroadcasts
+                role: roleInfo,
+                broadcasts: activeChannels
             };
         };
 
         // フィルタリングと整形（カテゴリの再チェック追加）
         const filteredAnime = animeOnAir
-            .filter(hasTakuyaSatoRole)
+            .filter(work => {
+                // アニメの場合は佐藤拓也の役がある作品のみ
+                return work.workRoles && work.workRoles.some(wr =>
+                    wr.role?.actor?.name === '佐藤拓也'
+                );
+            })
             .filter(work => work.category?.name === 'アニメ')  // 再度カテゴリ確認
+            .filter(work => isCurrentlyBroadcasting(work, currentDate))  // 放送中かチェック
             .map(formatBroadcastInfo);
 
+        // ラジオとWEB番組はロールのフィルタリングを行わない
         const filteredRadio = radioOnAir
-            .filter(hasTakuyaSatoRole)
             .filter(work => work.category?.name === 'ラジオ')  // 再度カテゴリ確認
+            .filter(work => isCurrentlyBroadcasting(work, currentDate))  // 放送中かチェック
             .map(formatBroadcastInfo);
 
         const filteredWeb = webOnAir
-            .filter(hasTakuyaSatoRole)
             .filter(work => work.category?.name === 'WEB')  // 再度カテゴリ確認
+            .filter(work => isCurrentlyBroadcasting(work, currentDate))  // 放送中かチェック
             .map(formatBroadcastInfo);
 
         console.log(`取得結果: アニメ=${filteredAnime.length}件, ラジオ=${filteredRadio.length}件, WEB=${filteredWeb.length}件`);

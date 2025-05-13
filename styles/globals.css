@@ -1353,6 +1353,11 @@ img {
 }
 
 @media (max-width: 768px) {
+  .header {
+    position: relative;
+    z-index: 1000; /* 高いz-indexを設定して他の要素の上に表示 */
+  }
+
   .header-container {
     position: relative;
   }
@@ -1363,12 +1368,18 @@ img {
     right: 20px;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 11;
+    z-index: 1010; /* ハンバーガーメニューボタンを最前面に */
+    cursor: pointer;
+  }
+
+  .nav {
+    width: 100%;
+    position: relative;
   }
 
   .nav-menu {
-    position: fixed;
-    top: 60px;
+    position: fixed; /* 固定位置に変更 */
+    top: 60px; /* ヘッダーの高さに合わせて調整 */
     left: 0;
     width: 100%;
     background-color: var(--stu48-background);
@@ -1379,7 +1390,8 @@ img {
     transform: translateY(-100%);
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    z-index: 990; /* メニューのz-indexを設定 */
   }
 
   .nav-menu.active {

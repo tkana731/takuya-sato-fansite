@@ -5,6 +5,17 @@ import Link from 'next/link';
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    // トグルボタンのクリックハンドラ
+    const toggleMenu = (e) => {
+        e.stopPropagation(); // イベントの伝播を防止
+        setIsMenuOpen(prevState => !prevState);
+    };
+
+    // リンクのクリックでメニューを閉じる
+    const handleLinkClick = () => {
+        setIsMenuOpen(false);
+    };
+
     // スクロール時にメニューを閉じる
     useEffect(() => {
         const handleScroll = () => {
@@ -16,6 +27,20 @@ export default function Navbar() {
         window.addEventListener('scroll', handleScroll);
         return () => {
             window.removeEventListener('scroll', handleScroll);
+        };
+    }, [isMenuOpen]);
+
+    // 画面外クリックでメニューを閉じる
+    useEffect(() => {
+        const handleOutsideClick = (e) => {
+            if (isMenuOpen && !e.target.closest('.nav') && !e.target.closest('.nav-toggle')) {
+                setIsMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('click', handleOutsideClick);
+        return () => {
+            document.removeEventListener('click', handleOutsideClick);
         };
     }, [isMenuOpen]);
 
@@ -37,19 +62,19 @@ export default function Navbar() {
                 </div>
                 <button
                     className="nav-toggle"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    aria-label="メニューを開く"
+                    onClick={toggleMenu}
+                    aria-label={isMenuOpen ? "メニューを閉じる" : "メニューを開く"}
                 >
-                    ☰
+                    {isMenuOpen ? "✕" : "☰"}
                 </button>
                 <nav className="nav">
                     <ul className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
-                        <li><Link href="/" className="active">HOME</Link></li>
-                        <li><Link href="#schedule">SCHEDULE</Link></li>
-                        <li><Link href="#works">WORKS</Link></li>
-                        <li><Link href="#">DISCOGRAPHY</Link></li>
-                        <li><Link href="#video">VIDEO</Link></li>
-                        <li><Link href="#links">LINKS</Link></li>
+                        <li><Link href="/" className="active" onClick={handleLinkClick}>HOME</Link></li>
+                        <li><Link href="#schedule" onClick={handleLinkClick}>SCHEDULE</Link></li>
+                        <li><Link href="#works" onClick={handleLinkClick}>WORKS</Link></li>
+                        <li><Link href="#" onClick={handleLinkClick}>DISCOGRAPHY</Link></li>
+                        <li><Link href="#video" onClick={handleLinkClick}>VIDEO</Link></li>
+                        <li><Link href="#links" onClick={handleLinkClick}>LINKS</Link></li>
                     </ul>
                 </nav>
             </div>

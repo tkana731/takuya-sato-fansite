@@ -1352,56 +1352,284 @@ img {
   }
 }
 
+/* モバイルメニュー用のCSS（既存のスタイルに追加） */
+
+/* ベーシックスタイルの追加と調整 */
+.header {
+  position: relative;
+  z-index: 1000;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  position: relative;
+  z-index: 1001;
+}
+
+/* ハンバーガーボタンスタイル */
+.hamburger-button {
+  display: none; /* デスクトップでは非表示 */
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 10px;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  z-index: 1002; /* 最前面 */
+}
+
+.hamburger-line {
+  display: block;
+  width: 24px;
+  height: 3px;
+  margin: 5px 0;
+  background-color: var(--primary-color);
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.hamburger-button.active .hamburger-line:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger-button.active .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-button.active .hamburger-line:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* モバイルメニューオーバーレイ */
+.mobile-menu-overlay {
+  display: none; /* 初期状態では非表示 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(174, 212, 243, 0.97); /* ヘッダーと同系色 */
+  z-index: 999;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.3s, opacity 0.3s;
+}
+
+.mobile-menu-overlay.active {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+}
+
+.mobile-nav {
+  padding: 80px 20px 20px; /* ヘッダーの高さ分を上部に追加 */
+}
+
+.mobile-nav-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.mobile-nav-menu li {
+  margin: 20px 0;
+}
+
+.mobile-nav-menu a {
+  color: var(--primary-color);
+  font-size: 24px;
+  font-weight: 700;
+  display: inline-block;
+  padding: 10px;
+  position: relative;
+  transition: color 0.3s;
+}
+
+.mobile-nav-menu a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background-color: var(--accent-color);
+  transition: width 0.3s;
+}
+
+.mobile-nav-menu a:hover {
+  color: var(--accent-color);
+}
+
+.mobile-nav-menu a:hover::after {
+  width: 100%;
+}
+
+/* デスクトップナビゲーション */
+.desktop-nav {
+  display: flex;
+  align-items: center;
+}
+
+.desktop-nav .nav-menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.desktop-nav .nav-menu li {
+  margin-left: 20px;
+}
+
+.desktop-nav .nav-menu a {
+  color: var(--dark-color);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 10px 5px;
+  position: relative;
+  transition: color 0.3s;
+  white-space: nowrap;
+}
+
+.desktop-nav .nav-menu a:hover {
+  color: var(--primary-color);
+}
+
+.desktop-nav .nav-menu a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: width 0.3s;
+}
+
+.desktop-nav .nav-menu a:hover::after,
+.desktop-nav .nav-menu a.active::after {
+  width: 100%;
+}
+
+.desktop-nav .nav-menu a.active {
+  color: var(--primary-color);
+}
+
 @media (max-width: 768px) {
+  .hamburger-button {
+    display: block; /* モバイルでは表示 */
+  }
+  
+  .desktop-nav {
+    display: none; /* モバイルでは非表示 */
+  }
+  
+  .logo {
+    flex: 1; /* ロゴを左側に配置し、余白を埋める */
+  }
+
+  /* ヘッダー全体のスタイリング */
   .header {
     position: relative;
-    z-index: 1000; /* 高いz-indexを設定して他の要素の上に表示 */
+    z-index: 9999; /* 非常に高いz-indexに設定 */
   }
 
+  /* ヘッダーコンテナのスタイリング */
   .header-container {
     position: relative;
+    padding: 15px 20px;
   }
 
+  /* ナビゲーションのスタイリング */
+  .nav {
+    position: static; /* ここが重要 */
+    width: 100%;
+  }
+
+  /* ハンバーガーボタンのスタイリング */
   .nav-toggle {
     display: block;
     position: absolute;
     right: 20px;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 1010; /* ハンバーガーメニューボタンを最前面に */
+    z-index: 9999; /* 高いz-indexに設定 */
     cursor: pointer;
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    padding: 10px;
   }
 
-  .nav {
-    width: 100%;
-    position: relative;
-  }
-
+  /* メニューリストのスタイリング */
   .nav-menu {
-    position: fixed; /* 固定位置に変更 */
-    top: 60px; /* ヘッダーの高さに合わせて調整 */
+    position: absolute;
+    top: 100%; /* ヘッダーの直下 */
     left: 0;
     width: 100%;
-    background-color: var(--stu48-background);
+    background-color: rgba(174, 212, 243, 0.98); /* ほぼ不透明に */
     flex-direction: column;
     align-items: center;
-    padding: 20px 0;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-    transform: translateY(-100%);
+    padding: 15px 0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: scaleY(0);
+    transform-origin: top;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 990; /* メニューのz-indexを設定 */
+    transition: all 0.25s ease;
+    z-index: 9998; /* 非常に高いz-indexに設定 */
   }
 
+  /* アクティブ状態のメニュー */
   .nav-menu.active {
-    transform: translateY(0);
+    transform: scaleY(1);
     opacity: 1;
     visibility: visible;
   }
 
+  /* メニュー項目のスタイリング */
   .nav-menu li {
-    margin: 10px 0;
+    margin: 12px 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-menu a {
+    display: block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  /* リンクホバー時のスタイルを調整 */
+  .nav-menu a:hover::after,
+  .nav-menu a.active::after {
+    width: 50%;
+    left: 25%;
+  }
+
+  /* メインコンテンツのz-indexを調整 */
+  main {
+    position: relative;
+    z-index: 1; /* メインコンテンツは低いz-indexに */
+  }
+  
+  /* バブル背景のz-indexも調整 */
+  .bubbles {
+    z-index: 0; /* バブル背景は最も後ろに */
+  }
+  
+  /* メニューがはっきり見えるように */
+  .nav-menu {
+    font-weight: bold;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
   }
 
   .birthday-container {
@@ -1642,4 +1870,23 @@ img {
   font-size: 1.2rem;
   font-weight: 600;
   letter-spacing: 3px;
+}
+
+/* 768px～900pxの中間サイズ対応 */
+@media (min-width: 769px) and (max-width: 900px) {
+  .desktop-nav .nav-menu li {
+    margin-left: 10px; /* 横幅の小さい画面ではマージンを小さく */
+  }
+  
+  .desktop-nav .nav-menu a {
+    font-size: 14px; /* フォントサイズを少し小さく */
+    padding: 10px 3px;
+  }
+}
+
+/* ヘッダーコンテナの幅を調整 */
+@media (min-width: 901px) and (max-width: 1100px) {
+  .header-container {
+    max-width: 95%;
+  }
 }

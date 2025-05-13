@@ -6,41 +6,30 @@ export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // トグルボタンのクリックハンドラ
-    const toggleMenu = (e) => {
-        e.stopPropagation(); // イベントの伝播を防止
-        setIsMenuOpen(prevState => !prevState);
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+        // メニュー開閉時にbodyのスクロールを制御
+        document.body.style.overflow = !isMenuOpen ? 'hidden' : '';
     };
 
     // リンクのクリックでメニューを閉じる
     const handleLinkClick = () => {
         setIsMenuOpen(false);
+        document.body.style.overflow = '';
     };
 
-    // スクロール時にメニューを閉じる
+    // ESCキーでメニューを閉じる
     useEffect(() => {
-        const handleScroll = () => {
-            if (isMenuOpen) {
+        const handleEscKey = (e) => {
+            if (e.key === 'Escape' && isMenuOpen) {
                 setIsMenuOpen(false);
+                document.body.style.overflow = '';
             }
         };
 
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('keydown', handleEscKey);
         return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, [isMenuOpen]);
-
-    // 画面外クリックでメニューを閉じる
-    useEffect(() => {
-        const handleOutsideClick = (e) => {
-            if (isMenuOpen && !e.target.closest('.nav') && !e.target.closest('.nav-toggle')) {
-                setIsMenuOpen(false);
-            }
-        };
-
-        document.addEventListener('click', handleOutsideClick);
-        return () => {
-            document.removeEventListener('click', handleOutsideClick);
+            window.removeEventListener('keydown', handleEscKey);
         };
     }, [isMenuOpen]);
 
@@ -60,16 +49,37 @@ export default function Navbar() {
                         佐藤拓也<span>Voice Actor Fan Site</span>
                     </Link>
                 </div>
+
+                {/* デスクトップ用ナビゲーション - header-containerの中に配置 */}
+                <nav className="desktop-nav">
+                    <ul className="nav-menu">
+                        <li><Link href="/" className="active">HOME</Link></li>
+                        <li><Link href="#schedule">SCHEDULE</Link></li>
+                        <li><Link href="#works">WORKS</Link></li>
+                        <li><Link href="#">DISCOGRAPHY</Link></li>
+                        <li><Link href="#video">VIDEO</Link></li>
+                        <li><Link href="#links">LINKS</Link></li>
+                    </ul>
+                </nav>
+
+                {/* ハンバーガーメニューボタン */}
                 <button
-                    className="nav-toggle"
+                    className={`hamburger-button ${isMenuOpen ? 'active' : ''}`}
                     onClick={toggleMenu}
                     aria-label={isMenuOpen ? "メニューを閉じる" : "メニューを開く"}
+                    aria-expanded={isMenuOpen}
                 >
-                    {isMenuOpen ? "✕" : "☰"}
+                    <span className="hamburger-line"></span>
+                    <span className="hamburger-line"></span>
+                    <span className="hamburger-line"></span>
                 </button>
-                <nav className="nav">
-                    <ul className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
-                        <li><Link href="/" className="active" onClick={handleLinkClick}>HOME</Link></li>
+            </div>
+
+            {/* フルスクリーンオーバーレイメニュー */}
+            <div className={`mobile-menu-overlay ${isMenuOpen ? 'active' : ''}`}>
+                <nav className="mobile-nav">
+                    <ul className="mobile-nav-menu">
+                        <li><Link href="/" onClick={handleLinkClick}>HOME</Link></li>
                         <li><Link href="#schedule" onClick={handleLinkClick}>SCHEDULE</Link></li>
                         <li><Link href="#works" onClick={handleLinkClick}>WORKS</Link></li>
                         <li><Link href="#" onClick={handleLinkClick}>DISCOGRAPHY</Link></li>

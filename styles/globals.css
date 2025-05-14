@@ -1120,15 +1120,20 @@ img {
   justify-content: center;
   width: 40px;
   height: 40px;
+  min-width: 40px;  /* 追加: 最小幅を固定 */
+  min-height: 40px; /* 追加: 最小高さを固定 */
   background-color: var(--primary-light);
   border-radius: 50%;
   margin-right: 15px;
+  overflow: hidden;  /* 追加: はみ出る部分を隠す */
+  aspect-ratio: 1 / 1; /* 追加: アスペクト比を1:1に固定 */
 }
 
 .link-icon svg {
-  width: 22px;
-  height: 22px;
+  width: 20px; /* 修正: 大きさを調整 */
+  height: 20px; /* 修正: 大きさを調整 */
   fill: var(--primary-color);
+  flex-shrink: 0; /* 追加: アイコンが縮むのを防ぐ */
 }
 
 .link-text {

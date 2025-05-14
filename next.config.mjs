@@ -1,4 +1,7 @@
-/** @type {import('next').NextConfig} */
+/**
+ * 最終的な解決策 - next.config.mjs
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
   // 既存の設定を保持
   reactStrictMode: true,
@@ -14,41 +17,39 @@ const nextConfig = {
     ],
   },
 
-  // URLリライトの設定
+  // アセットプレフィックスの設定 - すべてのファイルのベースURLが変更される
+  assetPrefix: '/assets',
+
+  // URLリライトの設定 - 広告ブロッカーを回避する
   async rewrites() {
     return [
-      // _appファイルの参照を変更
+      // 静的ファイルへのアクセスを可能にする
       {
-        source: '/_next/static/chunks/pages/main-:hash.js',
-        destination: '/_next/static/chunks/pages/_app-:hash.js',
+        source: '/assets/_next/:path*',
+        destination: '/_next/:path*',
       },
-      // APIエンドポイントをより中立的な名前にリライト
+      // APIエンドポイントをリダイレクト
       {
-        source: '/data/:path*',
+        source: '/api-data/:path*',
         destination: '/api/:path*',
-      },
+      }
     ];
   },
 
-  // アセットプレフィックスの設定（オプション）
-  // assetPrefix: '/safe-assets',
-
-  // webpack設定（安全なバージョン）
-  webpack: (config, { dev }) => {
-    // 本番ビルドのみに適用
-    if (!dev) {
-      // チャンクファイル名のハッシュ部分を短くする
-      config.output.chunkFilename = 'static/chunks/[name].[chunkhash:8].js';
-
-      // CSSファイル名も同様に変更
-      config.plugins.forEach(plugin => {
-        if (plugin.constructor.name === 'MiniCssExtractPlugin') {
-          plugin.options.chunkFilename = 'static/css/[name].[contenthash:8].css';
-        }
-      });
-    }
-
-    return config;
+  // ヘッダーの設定 - キャッシュコントロールを追加
+  async headers() {
+    return [
+      {
+        // すべての静的アセットにキャッシュ制御ヘッダーを追加
+        source: '/assets/_next/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
   },
 };
 

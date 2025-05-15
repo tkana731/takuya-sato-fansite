@@ -28,7 +28,7 @@ export default function Links() {
                         <h3 className="links-title">SNS</h3>
                         <ul className="links-list">
                             <li className="links-item">
-                                <a href="https://twitter.com/takuya_satou" target="_blank" rel="noopener noreferrer">
+                                <a href="https://x.com/5takuya5" target="_blank" rel="noopener noreferrer">
                                     <div className="link-icon">
                                         <FaTwitter size={22} />
                                     </div>
@@ -36,7 +36,7 @@ export default function Links() {
                                 </a>
                             </li>
                             <li className="links-item">
-                                <a href="https://www.instagram.com/takuyasatou_official/" target="_blank" rel="noopener noreferrer">
+                                <a href="https://www.instagram.com/takuya.voices/" target="_blank" rel="noopener noreferrer">
                                     <div className="link-icon">
                                         <FaInstagram size={22} />
                                     </div>
@@ -44,11 +44,11 @@ export default function Links() {
                                 </a>
                             </li>
                             <li className="links-item">
-                                <a href="https://www.youtube.com/channel/UC3dCF3VC5X6FjlxeLU2rmLA" target="_blank" rel="noopener noreferrer">
+                                <a href="https://www.youtube.com/playlist?list=PLyKSHZQWec5FoQ2WeZS4_HWkO_9TuUAP9" target="_blank" rel="noopener noreferrer">
                                     <div className="link-icon">
                                         <FaYoutube size={22} />
                                     </div>
-                                    <span className="link-text">YouTube</span>
+                                    <span className="link-text">YouTube - 佐藤サン、もう1杯</span>
                                 </a>
                             </li>
                         </ul>
@@ -65,7 +65,7 @@ export default function Links() {
                                 </a>
                             </li>
                             <li className="links-item">
-                                <a href="https://www.scatbabysshow.com/" target="_blank" rel="noopener noreferrer">
+                                <a href="https://ch.nicovideo.jp/sukebe" target="_blank" rel="noopener noreferrer">
                                     <div className="link-icon">
                                         <FaMicrophone size={22} />
                                     </div>

@@ -95,8 +95,16 @@ export default async function handler(req, res) {
 
         console.log(`スケジュールAPI: ${schedules?.length || 0}件のスケジュールが見つかりました`);
 
+        // 取得したスケジュールから終了日を超えるものを除外
+        const filteredByDateSchedules = schedules?.filter(schedule => {
+            const startDate = new Date(schedule.start_date);
+            return startDate <= toDate;
+        }) || [];
+
+        console.log(`日付フィルタリング後: ${filteredByDateSchedules.length}件のスケジュール`);
+
         // フロントエンドで利用しやすい形式に整形
-        const formattedSchedules = schedules?.map(schedule => {
+        const formattedSchedules = filteredByDateSchedules.map(schedule => {
             // Dateオブジェクトを確実に作成
             const startDate = new Date(schedule.start_date);
             const weekday = getWeekday(startDate);

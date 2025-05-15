@@ -543,13 +543,6 @@ img {
   display: inline-block;
 }
 
-.schedule-tabs {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--gray-color);
-}
-
 .schedule-tab {
   padding: 12px 20px;
   background: none;
@@ -1892,5 +1885,114 @@ img {
 @media (min-width: 901px) and (max-width: 1100px) {
   .header-container {
     max-width: 95%;
+  }
+}
+
+/* スケジュールセクションのタブ関連スタイル */
+.schedule-tabs-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.schedule-tabs {
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid var(--gray-color);
+  width: 100%;
+  overflow-x: auto; /* 横スクロールを許可 */
+  -webkit-overflow-scrolling: touch; /* iOS用のスムーススクロール */
+  scrollbar-width: none; /* Firefox用のスクロールバー非表示 */
+  -ms-overflow-style: none; /* IE/Edge用のスクロールバー非表示 */
+  white-space: nowrap; /* タブが折り返されないように */
+  padding-bottom: 5px; /* スクロールバーのスペース */
+}
+
+/* Webkit(Chrome/Safari)用のスクロールバー非表示 */
+.schedule-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.schedule-tab {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gray-dark);
+  position: relative;
+  cursor: pointer;
+  transition: color 0.3s;
+  white-space: nowrap; /* テキストが折り返されないように */
+  flex-shrink: 0; /* タブが縮小されないように */
+}
+
+.schedule-tab .tab-text {
+  display: inline-block;
+  position: relative;
+}
+
+.schedule-tab::after {
+  content: '';
+  position: absolute;
+  bottom: -6px; /* 線の位置を少し下に */
+  left: 0;
+  width: 0;
+  height: 3px;
+  background-color: var(--primary-color);
+  transition: width 0.3s;
+}
+
+.schedule-tab:hover {
+  color: var(--primary-color);
+}
+
+.schedule-tab.active {
+  color: var(--primary-color);
+}
+
+.schedule-tab.active::after {
+  width: 100%;
+}
+
+/* モバイル表示用のタブスタイル */
+@media (max-width: 768px) {
+  .schedule-tabs {
+    justify-content: flex-start; /* モバイル表示ではスクロール可能にするため左揃え */
+    padding-bottom: 8px; /* モバイルでは少し余裕を持たせる */
+  }
+  
+  .schedule-tab {
+    padding: 8px 12px; /* モバイルでは小さめのパディング */
+    font-size: 14px; /* モバイルでは小さめのフォント */
+  }
+  
+  /* モバイルでのアクティブインジケーターを少し調整 */
+  .schedule-tab::after {
+    bottom: -8px;
+    height: 2px;
+  }
+  
+  /* スクロールのヒントを示す左右のグラデーション */
+  .schedule-tabs-wrapper::before,
+  .schedule-tabs-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .schedule-tabs-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0));
+  }
+  
+  .schedule-tabs-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(255,255,255,0.9), rgba(255,255,255,0));
   }
 }

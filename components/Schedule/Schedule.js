@@ -70,31 +70,33 @@ export default function Schedule({ schedules = [] }) {
                         <h3 className="schedule-period">{schedulePeriod}</h3>
                     </div>
 
-                    <div className="schedule-tabs">
-                        <button
-                            className={`schedule-tab ${activeFilter === 'all' ? 'active' : ''}`}
-                            onClick={() => setActiveFilter('all')}
-                        >
-                            すべて
-                        </button>
-                        <button
-                            className={`schedule-tab ${activeFilter === 'event' ? 'active' : ''}`}
-                            onClick={() => setActiveFilter('event')}
-                        >
-                            イベント
-                        </button>
-                        <button
-                            className={`schedule-tab ${activeFilter === 'stage' ? 'active' : ''}`}
-                            onClick={() => setActiveFilter('stage')}
-                        >
-                            舞台・朗読
-                        </button>
-                        <button
-                            className={`schedule-tab ${activeFilter === 'broadcast' ? 'active' : ''}`}
-                            onClick={() => setActiveFilter('broadcast')}
-                        >
-                            生放送
-                        </button>
+                    <div className="schedule-tabs-wrapper">
+                        <div className="schedule-tabs">
+                            <button
+                                className={`schedule-tab ${activeFilter === 'all' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('all')}
+                            >
+                                <span className="tab-text">すべて</span>
+                            </button>
+                            <button
+                                className={`schedule-tab ${activeFilter === 'event' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('event')}
+                            >
+                                <span className="tab-text">イベント</span>
+                            </button>
+                            <button
+                                className={`schedule-tab ${activeFilter === 'stage' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('stage')}
+                            >
+                                <span className="tab-text">舞台・朗読</span>
+                            </button>
+                            <button
+                                className={`schedule-tab ${activeFilter === 'broadcast' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('broadcast')}
+                            >
+                                <span className="tab-text">生放送</span>
+                            </button>
+                        </div>
                     </div>
 
                     <ul className="schedule-items">

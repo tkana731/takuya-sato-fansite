@@ -15,7 +15,6 @@ export default function Works({ works = [] }) {
                 <div className="section-header">
                     <h2 className="section-title">WORKS</h2>
                     <p className="section-subtitle">出演作品</p>
-                    <a href="#" className="view-all">VIEW ALL</a>
                 </div>
 
                 <div className="works-tabs">
@@ -127,6 +126,10 @@ export default function Works({ works = [] }) {
                             ))}
                         </ul>
                     </div>
+                </div>
+
+                <div className="view-all-container">
+                    <a href="#" className="view-all">VIEW ALL</a>
                 </div>
             </div>
         </section>

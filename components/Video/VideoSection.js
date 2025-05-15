@@ -24,7 +24,6 @@ export default function VideoSection({ videos = [] }) {
                 <div className="section-header">
                     <h2 className="section-title">VIDEO</h2>
                     <p className="section-subtitle">最新動画</p>
-                    <a href="#" className="view-all">VIEW ALL</a>
                 </div>
 
                 {hasVideos ? (
@@ -91,6 +90,10 @@ export default function VideoSection({ videos = [] }) {
                         <p>動画がまだありません</p>
                     </div>
                 )}
+
+                <div className="view-all-container">
+                    <a href="#" className="view-all">VIEW ALL</a>
+                </div>
             </div>
         </section>
     );

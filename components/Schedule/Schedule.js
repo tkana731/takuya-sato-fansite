@@ -63,7 +63,6 @@ export default function Schedule({ schedules = [] }) {
                 <div className="section-header">
                     <h2 className="section-title">SCHEDULE</h2>
                     <p className="section-subtitle">スケジュール</p>
-                    <a href="#" className="view-all">VIEW ALL</a>
                 </div>
                 <div className="schedule-container">
                     <div className="schedule-header">
@@ -131,6 +130,10 @@ export default function Schedule({ schedules = [] }) {
                             <div className="no-schedule">該当する予定はありません。</div>
                         )}
                     </ul>
+
+                    <div className="view-all-container">
+                        <a href="#" className="view-all">VIEW ALL</a>
+                    </div>
                 </div>
             </div>
         </section>

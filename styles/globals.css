@@ -494,24 +494,44 @@ img {
 }
 
 /* VIEW ALL ボタン */
+.view-all-container {
+  text-align: center;
+  margin-top: 40px;
+  margin-bottom: 10px;
+}
+
 .view-all {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--accent-color);
-  padding: 8px 15px;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  background-color: var(--accent-color);
+  padding: 12px 30px;
   border: 2px solid var(--accent-color);
   border-radius: 30px;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(228, 21, 126, 0.3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .view-all:hover {
-  background-color: var(--accent-color);
+  background-color: #c2126b; /* 少し暗めのアクセントカラー */
+  border-color: #c2126b;
   color: white;
-  transform: translateY(-50%) scale(1.05);
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(228, 21, 126, 0.4);
+}
+
+.view-all::after {
+  content: ' →';
+  display: inline-block;
+  margin-left: 5px;
+  transition: transform 0.3s ease;
+}
+
+.view-all:hover::after {
+  transform: translateX(5px);
 }
 
 /* スケジュールセクション */
@@ -1339,14 +1359,6 @@ img {
   .wave-divider-top svg {
     height: 40px;
   }
-
-  .view-all {
-    position: static;
-    display: block;
-    transform: none;
-    margin: 15px auto 0;
-    width: fit-content;
-  }
 }
 
 /* モバイルメニュー用のCSS（既存のスタイルに追加） */
@@ -1712,6 +1724,12 @@ img {
     right: 20px;
     width: 45px;
     height: 45px;
+  }
+
+  /* VIEW ALL ボタン */
+  .view-all {
+    font-size: 15px;
+    padding: 10px 25px;
   }
 }
 

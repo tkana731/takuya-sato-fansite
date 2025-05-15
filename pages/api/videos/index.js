@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
     try {
         // クエリパラメータからオプションを取得
-        const { limit, workId } = req.query;
+        const { limit, workId, year } = req.query;
 
         // 取得件数（デフォルトは3件）
         const takeCount = limit ? parseInt(limit) : 3;
@@ -26,13 +26,26 @@ export default async function handler(req, res) {
                     title
                 )
             `)
-            .order('published_at', { ascending: false })
-            .limit(takeCount);
+            .order('published_at', { ascending: false });
 
         // workIdによるフィルタリング
         if (workId) {
             query = query.eq('work_id', workId);
         }
+
+        // 年によるフィルタリング
+        if (year) {
+            // YYYY-MM-DD形式の日付で年の範囲を指定
+            const startDate = `${year}-01-01`;
+            const endDate = `${year}-12-31`;
+
+            query = query
+                .gte('published_at', startDate)
+                .lte('published_at', endDate);
+        }
+
+        // 件数制限を適用
+        query = query.limit(takeCount);
 
         // クエリ実行
         const { data: videos, error } = await query;

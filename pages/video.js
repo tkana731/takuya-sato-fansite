@@ -7,10 +7,21 @@ export default function VideoPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // 現在の年を取得
+    const currentYear = new Date().getFullYear();
+
+    // 固定の年リスト（2018年から現在まで、降順）
+    const years = Array.from({ length: currentYear - 2018 + 1 }, (_, i) => currentYear - i);
+
+    // 初期値は現在の年
+    const [selectedYear, setSelectedYear] = useState(currentYear);
+
+    // 選択された年に基づいて動画を取得
     useEffect(() => {
-        async function fetchVideos() {
+        async function fetchVideosByYear() {
+            setLoading(true);
             try {
-                const response = await fetch('/api/videos?limit=50');
+                const response = await fetch(`/api/videos?limit=100&year=${selectedYear}`);
                 if (!response.ok) {
                     throw new Error('動画データの取得に失敗しました');
                 }
@@ -24,8 +35,8 @@ export default function VideoPage() {
             }
         }
 
-        fetchVideos();
-    }, []);
+        fetchVideosByYear();
+    }, [selectedYear]);
 
     // YouTube動画IDを抽出する関数
     const extractYoutubeVideoId = (url) => {
@@ -39,6 +50,11 @@ export default function VideoPage() {
         return (match && match[2].length === 11) ? match[2] : null;
     };
 
+    // 年を変更するハンドラ
+    const handleYearChange = (year) => {
+        setSelectedYear(year);
+    };
+
     return (
         <Layout title="動画一覧 - 佐藤拓也ファンサイト">
             <section className="video-page-section">
@@ -46,6 +62,21 @@ export default function VideoPage() {
                     <div className="section-header">
                         <h1 className="section-title">VIDEO</h1>
                         <p className="section-subtitle">動画一覧</p>
+                    </div>
+
+                    {/* 年別タブ */}
+                    <div className="year-tabs-wrapper">
+                        <div className="year-tabs">
+                            {years.map(year => (
+                                <button
+                                    key={year}
+                                    className={`year-tab ${selectedYear === year ? 'active' : ''}`}
+                                    onClick={() => handleYearChange(year)}
+                                >
+                                    <span className="tab-text">{year}年</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     {loading ? (
@@ -125,7 +156,7 @@ export default function VideoPage() {
                                 })
                             ) : (
                                 <div className="text-center py-8 text-gray-500 col-span-full">
-                                    <p>動画がまだありません</p>
+                                    <p>{selectedYear}年の動画はありません</p>
                                 </div>
                             )}
                         </div>

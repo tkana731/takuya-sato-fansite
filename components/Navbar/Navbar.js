@@ -57,7 +57,7 @@ export default function Navbar() {
                         <li><Link href="#schedule">SCHEDULE</Link></li>
                         <li><Link href="#works">WORKS</Link></li>
                         <li><Link href="#">DISCOGRAPHY</Link></li>
-                        <li><Link href="#video">VIDEO</Link></li>
+                        <li><Link href="/video">VIDEO</Link></li>
                         <li><Link href="#links">LINKS</Link></li>
                     </ul>
                 </nav>
@@ -83,7 +83,7 @@ export default function Navbar() {
                         <li><Link href="#schedule" onClick={handleLinkClick}>SCHEDULE</Link></li>
                         <li><Link href="#works" onClick={handleLinkClick}>WORKS</Link></li>
                         <li><Link href="#" onClick={handleLinkClick}>DISCOGRAPHY</Link></li>
-                        <li><Link href="#video" onClick={handleLinkClick}>VIDEO</Link></li>
+                        <li><Link href="/video" onClick={handleLinkClick}>VIDEO</Link></li>
                         <li><Link href="#links" onClick={handleLinkClick}>LINKS</Link></li>
                     </ul>
                 </nav>

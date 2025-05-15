@@ -92,7 +92,7 @@ export default function VideoSection({ videos = [] }) {
                 )}
 
                 <div className="view-all-container">
-                    <a href="#" className="view-all">VIEW ALL</a>
+                    <Link href="/video" className="view-all">VIEW ALL</Link>
                 </div>
             </div>
         </section>

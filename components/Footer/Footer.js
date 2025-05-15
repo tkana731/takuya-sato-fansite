@@ -27,7 +27,7 @@ export default function Footer() {
                             <li><Link href="#schedule">SCHEDULE</Link></li>
                             <li><Link href="#works">WORKS</Link></li>
                             <li><Link href="#">DISCOGRAPHY</Link></li>
-                            <li><Link href="#video">VIDEO</Link></li>
+                            <li><Link href="/video">VIDEO</Link></li>
                             <li><Link href="#links">LINKS</Link></li>
                         </ul>
                     </div>

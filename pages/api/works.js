@@ -48,14 +48,20 @@ export default async function handler(req, res) {
 
         // 整形したデータを生成する関数
         const formatWork = (work, takuyaRoles) => {
-            const mainRole = takuyaRoles.find(r => r.is_main_role);
-            const role = mainRole || takuyaRoles[0]; // メイン役割または最初の役割
+            // すべての役割名を抽出（配列）
+            const roleNames = takuyaRoles.map(r => r.role?.name).filter(Boolean);
+
+            // 役割が複数ある場合は「、」で区切ってテキスト化
+            const rolesText = roleNames.length > 0 ? roleNames.join('、') + ' 役' : '';
+
+            // メイン役割が1つでもあるかどうかをチェック
+            const hasMainRole = takuyaRoles.some(r => r.is_main_role);
 
             return {
                 id: work.id,
                 title: work.title,
-                role: role?.role?.name ? `${role.role.name} 役` : '',
-                isMain: role?.is_main_role || false,
+                role: rolesText,
+                isMain: hasMainRole,
                 year: work.year ? `${work.year}年` : ''
             };
         };

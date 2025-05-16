@@ -2017,6 +2017,72 @@ img {
 
 /* 以下を既存のglobals.cssファイルの末尾に追加 */
 
+/* スケジュールページのスタイル */
+.schedule-page-section {
+  padding: 60px 0;
+  position: relative;
+}
+
+.schedule-page-section .container {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.month-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.month-nav-button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 20px;
+}
+
+.month-nav-button:hover {
+  background-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.current-month {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 0 20px;
+  min-width: 150px;
+  text-align: center;
+  background-color: var(--primary-light);
+  padding: 8px 15px;
+  border-radius: 30px;
+}
+
+@media (max-width: 768px) {
+  .month-navigation {
+    flex-wrap: wrap;
+  }
+  
+  .month-nav-button {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  
+  .current-month {
+    font-size: 18px;
+    margin: 0 10px;
+    min-width: 120px;
+  }
+}
+
 /* 動画ページのスタイル */
 .video-page-section {
   padding: 60px 0;

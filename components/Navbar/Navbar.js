@@ -54,7 +54,7 @@ export default function Navbar() {
                 <nav className="desktop-nav">
                     <ul className="nav-menu">
                         <li><Link href="/" className="active">HOME</Link></li>
-                        <li><Link href="#schedule">SCHEDULE</Link></li>
+                        <li><Link href="/schedule">SCHEDULE</Link></li>
                         <li><Link href="#works">WORKS</Link></li>
                         <li><Link href="#">DISCOGRAPHY</Link></li>
                         <li><Link href="/video">VIDEO</Link></li>
@@ -80,7 +80,7 @@ export default function Navbar() {
                 <nav className="mobile-nav">
                     <ul className="mobile-nav-menu">
                         <li><Link href="/" onClick={handleLinkClick}>HOME</Link></li>
-                        <li><Link href="#schedule" onClick={handleLinkClick}>SCHEDULE</Link></li>
+                        <li><Link href="/schedule" onClick={handleLinkClick}>SCHEDULE</Link></li>
                         <li><Link href="#works" onClick={handleLinkClick}>WORKS</Link></li>
                         <li><Link href="#" onClick={handleLinkClick}>DISCOGRAPHY</Link></li>
                         <li><Link href="/video" onClick={handleLinkClick}>VIDEO</Link></li>

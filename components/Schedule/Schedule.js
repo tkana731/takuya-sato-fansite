@@ -132,7 +132,7 @@ export default function Schedule({ schedules = [] }) {
                     </ul>
 
                     <div className="view-all-container">
-                        <a href="#" className="view-all">VIEW ALL</a>
+                        <Link href="/schedule" className="view-all">VIEW ALL</Link>
                     </div>
                 </div>
             </div>

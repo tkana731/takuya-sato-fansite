@@ -10,14 +10,25 @@ export default async function handler(req, res) {
     try {
         const { category, from, to } = req.query;
 
-        // 今日から1ヶ月後までのスケジュールをデフォルトで取得
-        const today = new Date();
-        const oneMonthLater = new Date();
-        oneMonthLater.setMonth(today.getMonth() + 1);
+        // 現在のUTC時間を取得
+        const utcNow = new Date();
 
-        // 検索期間の設定
-        const fromDate = from ? new Date(from) : today;
-        const toDate = to ? new Date(to) : oneMonthLater;
+        // 日本時間のオフセット（UTC+9時間）を計算
+        const jstOffset = 9 * 60 * 60 * 1000; // 9時間をミリ秒に変換
+
+        // UTC時間に9時間を追加して日本時間を取得
+        const today = new Date(utcNow.getTime() + jstOffset);
+
+        // from/toクエリパラメータを取得（必須）
+        if (!from || !to) {
+            return res.status(400).json({
+                error: '検索期間（from/to）は必須パラメータです'
+            });
+        }
+
+        // fromとtoのDateオブジェクトを作成
+        const fromDate = new Date(from);
+        const toDate = new Date(to);
 
         // ISO文字列に変換（日付部分のみを抽出）
         const fromDateStr = fromDate.toISOString().split('T')[0];
@@ -25,7 +36,8 @@ export default async function handler(req, res) {
 
         console.log("スケジュールAPI: 検索期間", {
             from: fromDateStr,
-            to: toDateStr
+            to: toDateStr,
+            jstNow: today.toISOString()
         });
 
         // カテゴリフィルタリングの準備
@@ -98,7 +110,8 @@ export default async function handler(req, res) {
         // 取得したスケジュールから終了日を超えるものを除外
         const filteredByDateSchedules = schedules?.filter(schedule => {
             const startDate = new Date(schedule.start_date);
-            return startDate <= toDate;
+            const startDateStr = startDate.toISOString().split('T')[0];
+            return startDateStr <= toDateStr;
         }) || [];
 
         console.log(`日付フィルタリング後: ${filteredByDateSchedules.length}件のスケジュール`);
@@ -107,7 +120,10 @@ export default async function handler(req, res) {
         const formattedSchedules = filteredByDateSchedules.map(schedule => {
             // Dateオブジェクトを確実に作成
             const startDate = new Date(schedule.start_date);
-            const weekday = getWeekday(startDate);
+
+            // 日本時間に調整
+            const startDateJST = new Date(startDate.getTime() + jstOffset);
+            const weekday = getWeekday(startDateJST);
 
             // カテゴリに応じてロケーション情報を選択
             const isBroadcast = schedule.category?.name === '生放送';
@@ -136,8 +152,8 @@ export default async function handler(req, res) {
                 schedule.category?.name === '舞台・朗読' ? 'stage' :
                     schedule.category?.name === '生放送' ? 'broadcast' : 'other';
 
-            // 日付をYYYY-MM-DD形式に整形
-            const formattedDate = startDate.toISOString().split('T')[0];
+            // 日本時間ベースの日付をYYYY-MM-DD形式に整形
+            const formattedDate = startDateJST.toISOString().split('T')[0];
 
             return {
                 id: schedule.id,

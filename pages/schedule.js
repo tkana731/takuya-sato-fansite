@@ -1,3 +1,4 @@
+// pages/schedule.js
 import { useEffect, useState } from 'react';
 import Layout from '../components/Layout/Layout';
 import Link from 'next/link';
@@ -7,14 +8,21 @@ export default function SchedulePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // 日本時間の現在日時を取得する関数
+    const getJSTDate = () => {
+        const utcDate = new Date();
+        const jstOffset = 9 * 60 * 60 * 1000; // 9時間をミリ秒に変換
+        return new Date(utcDate.getTime() + jstOffset);
+    };
+
     // 月選択のための状態
-    const currentDate = new Date();
+    const currentDate = getJSTDate();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth(); // 0-11
 
     // 表示する月（初期値は現在の月）
-    const [displayDate, setDisplayDate] = useState({ 
-        year: currentYear, 
+    const [displayDate, setDisplayDate] = useState({
+        year: currentYear,
         month: currentMonth + 1 // 表示用は1-12
     });
 
@@ -45,48 +53,35 @@ export default function SchedulePage() {
             setLoading(true);
             try {
                 // 選択された月の初日と最終日を取得
-                const firstDay = new Date(displayDate.year, displayDate.month - 1, 1); // 月は0から始まるので-1
-                const lastDay = new Date(displayDate.year, displayDate.month, 0); // 次の月の0日 = 今月の最終日
-                
-                // ISO形式に変換（YYYY-MM-DD）
-                // APIのstart_date { gte: } フィルタにより、開始日がfromDate以降のものしか取得されないため
-                // 前月以前に開始したイベントも含めるため、fromDateを1ヶ月前にする
-                const prevMonth = new Date(firstDay);
-                prevMonth.setMonth(prevMonth.getMonth() - 1); // 1ヶ月前
-                
-                const fromDate = prevMonth.toISOString().split('T')[0]; // 前月の同日
-                const toDate = lastDay.toISOString().split('T')[0]; // 当月の最終日
+                const firstDay = new Date(Date.UTC(displayDate.year, displayDate.month - 1, 1)); // UTC時間で月初日
 
-                const response = await fetch(`/api/schedules?from=${fromDate}&to=${toDate}`);
+                // 月末日を計算（次の月の0日 = 今月の最終日）
+                const lastDay = new Date(Date.UTC(displayDate.year, displayDate.month, 0));
+
+                // ISO形式に変換
+                const fromDateStr = firstDay.toISOString().split('T')[0]; // 月初日
+                const toDateStr = lastDay.toISOString().split('T')[0];    // 月末日
+
+                console.log(`スケジュール取得: ${displayDate.year}年${displayDate.month}月 (${fromDateStr} 〜 ${toDateStr})`);
+
+                const response = await fetch(`/api/schedules?from=${fromDateStr}&to=${toDateStr}`);
                 if (!response.ok) {
                     throw new Error('スケジュールデータの取得に失敗しました');
                 }
                 const data = await response.json();
-                
-                // 取得したデータの中から表示月に該当するスケジュールをフィルタリング
-                // データ構造を維持するために、schedules配列だけを置き換える
-                if (data && data.schedules && Array.isArray(data.schedules)) {
-                    // 当月中に開催されるイベントのみをフィルタリング
-                    const filteredSchedules = data.schedules.filter(schedule => {
-                        const scheduleDate = new Date(schedule.date);
-                        const scheduleYear = scheduleDate.getFullYear();
-                        const scheduleMonth = scheduleDate.getMonth() + 1; // 1-12に変換
-                        
-                        return scheduleYear === displayDate.year && scheduleMonth === displayDate.month;
-                    });
-                    
-                    // フィルタリング結果を設定
-                    setSchedules({
-                        ...data,
-                        period: {
-                            ...data.period,
-                            formatted: `${displayDate.year}.${String(displayDate.month).padStart(2, '0')}`
-                        },
-                        schedules: filteredSchedules
-                    });
-                } else {
-                    setSchedules(data);
-                }
+
+                // 月表示用のフォーマット設定
+                const monthDisplay = `${displayDate.year}年${String(displayDate.month).padStart(2, '0')}月`;
+
+                // レスポンスデータを設定
+                setSchedules({
+                    ...data,
+                    period: {
+                        ...data.period,
+                        formatted: monthDisplay
+                    },
+                    schedules: data.schedules || []
+                });
             } catch (err) {
                 console.error('スケジュールの取得エラー:', err);
                 setError(err.message);
@@ -104,7 +99,7 @@ export default function SchedulePage() {
     // フィルタリング関数
     const filterSchedules = (schedules) => {
         if (!schedules || !Array.isArray(schedules)) return [];
-        
+
         if (activeFilter === 'all') {
             return schedules;
         }
@@ -125,8 +120,8 @@ export default function SchedulePage() {
     const monthDisplay = `${displayDate.year}年${String(displayDate.month).padStart(2, '0')}月`;
 
     // フィルタリングされたスケジュール
-    const filteredSchedules = schedules && schedules.schedules 
-        ? filterSchedules(schedules.schedules) 
+    const filteredSchedules = schedules && schedules.schedules
+        ? filterSchedules(schedules.schedules)
         : [];
 
     return (
@@ -140,7 +135,7 @@ export default function SchedulePage() {
 
                     {/* 月切り替えナビゲーション */}
                     <div className="month-navigation">
-                        <button 
+                        <button
                             onClick={handlePrevMonth}
                             className="month-nav-button prev-month"
                             aria-label="前月へ"
@@ -148,7 +143,7 @@ export default function SchedulePage() {
                             &lt; 前月
                         </button>
                         <h2 className="current-month">{monthDisplay}</h2>
-                        <button 
+                        <button
                             onClick={handleNextMonth}
                             className="month-nav-button next-month"
                             aria-label="翌月へ"

@@ -49,7 +49,11 @@ export default function Navbar() {
             <div className="header-container">
                 <div className="logo">
                     <Link href="/" className="logo-text">
-                        佐藤拓也<span>Voice Actor Fan Site</span>
+                        <div className="site-title-wrapper">
+                            <span className="site-title-main">TAKUYA SATO</span>
+                            <span className="site-title-sub">非公式ファンサイト</span>
+                            <div className="logo-accent"></div>
+                        </div>
                     </Link>
                 </div>
 

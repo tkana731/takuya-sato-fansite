@@ -20,9 +20,9 @@ export default function Footer() {
             <div className="footer-container">
                 <div className="footer-grid">
                     <div className="footer-about">
-                        <h3>佐藤拓也ファンサイト</h3>
+                        <h3>佐藤拓也さん非公式ファンサイト</h3>
                         <p>声優・佐藤拓也さんの非公式ファンサイトです。出演作品や最新情報などを発信しています。</p>
-                        <p>このサイトは佐藤拓也さんのファンによって運営されており、公式とは一切関係ありません。</p>
+                        <p>このサイトはファンによって運営されており、公式とは一切関係ありません。</p>
                     </div>
                     <div className="footer-links">
                         <h4>サイトマップ</h4>
@@ -35,18 +35,16 @@ export default function Footer() {
                         </ul>
                     </div>
                     <div className="footer-links">
-                        <h4>リンク</h4>
+                        {/* <h4>リンク</h4>
                         <ul>
                             <li><Link href="#">プライバシーポリシー</Link></li>
                             <li><Link href="#">免責事項</Link></li>
-                        </ul>
+                        </ul> */}
                     </div>
                 </div>
                 <div className="footer-bottom">
-                    <p className="copyright">© 2025 佐藤拓也ファンサイト（非公式）</p>
-                    <p className="disclaimer">このサイトは佐藤拓也さんの非公式ファンサイトです。情報の正確性については保証いたしかねます。正確な情報は
-                        <a href="https://www.kenproduction.co.jp/talent/39" target="_blank" rel="noopener noreferrer" style={{ color: '#2fabeb' }}>公式サイト</a>
-                        をご確認ください。
+                    <p className="copyright">© 2025 佐藤拓也さん非公式ファンサイト</p>
+                    <p className="disclaimer">このサイトは佐藤拓也さんの非公式ファンサイトです。情報の正確性については保証いたしかねます。
                     </p>
                 </div>
             </div>

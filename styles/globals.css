@@ -258,20 +258,20 @@ img {
   white-space: nowrap;
 }
 
-.logo-text {
+/* .logo-text {
   font-size: 24px;
   font-weight: 700;
   color: var(--primary-color);
   white-space: nowrap;
-}
+} */
 
-.logo-text span {
+/* .logo-text span {
   font-size: 14px;
   font-weight: 400;
   color: var(--gray-dark);
   margin-left: 5px;
   white-space: nowrap;
-}
+} */
 
 .nav-toggle {
   display: none;
@@ -1705,11 +1705,11 @@ img {
     height: 30px;
   }
 
-  .logo-text span {
+  /* .logo-text span {
     display: block;
     margin-top: 5px;
     margin-left: 0;
-  }
+  } */
   
   .on-air-container {
     grid-template-columns: 1fr;
@@ -1734,13 +1734,13 @@ img {
 }
 
 @media (max-width: 850px) {
-  .logo-text {
+  /* .logo-text {
     font-size: 20px;
   }
 
   .logo-text span {
     display: none;
-  }
+  } */
 
   .nav-menu li {
     margin-left: 10px;
@@ -2463,5 +2463,89 @@ img {
   .hero-description {
     font-size: 14px;
     padding: 15px;
+  }
+}
+
+/* 以下を既存のglobals.cssファイルに追加してください */
+
+/* ロゴとサイト名の新しいスタイル */
+.site-title-wrapper {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 0 5px;
+}
+
+.site-title-main {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--primary-dark);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s ease;
+  font-family: "Montserrat", sans-serif, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP";
+}
+
+.site-title-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-color);
+  letter-spacing: 1px;
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.logo-accent {
+  position: absolute;
+  height: 8px;
+  width: 40%;
+  background-color: rgba(174, 212, 243, 0.6);
+  bottom: 5px;
+  left: 0;
+  z-index: 0;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+/* ホバー効果 */
+.logo-text:hover .site-title-main {
+  color: var(--primary-color);
+}
+
+.logo-text:hover .site-title-sub {
+  color: var(--accent-color);
+}
+
+.logo-text:hover .logo-accent {
+  width: 60%;
+  background-color: rgba(174, 212, 243, 0.8);
+}
+
+/* ロゴの全体のスタイル調整 */
+.logo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.logo-text {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  padding: 5px 10px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .site-title-main {
+    font-size: 18px;
+  }
+  
+  .site-title-sub {
+    font-size: 10px;
   }
 }

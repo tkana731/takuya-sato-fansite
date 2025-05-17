@@ -56,7 +56,7 @@ export default function VideoPage() {
     };
 
     return (
-        <Layout title="動画一覧 - 佐藤拓也ファンサイト">
+        <Layout title="動画一覧 - 佐藤拓也さん非公式ファンサイト">
             <section className="video-page-section">
                 <div className="container">
                     <div className="section-header">

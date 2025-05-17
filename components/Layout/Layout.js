@@ -5,7 +5,7 @@ import Footer from '../Footer/Footer';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 
-export default function Layout({ children, title = '佐藤拓也ファンサイト' }) {
+export default function Layout({ children, title = '佐藤拓也さん非公式ファンサイト' }) {
     const [isBackToTopVisible, setIsBackToTopVisible] = useState(false);
     const router = useRouter();
     const layoutRef = useRef(null);

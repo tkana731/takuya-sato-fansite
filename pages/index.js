@@ -389,7 +389,7 @@ export default function Home() {
   };
 
   return (
-    <Layout title="佐藤拓也ファンサイト - 声優・佐藤拓也さんの出演作品、スケジュール情報など">
+    <Layout title="佐藤拓也さん非公式ファンサイト - 声優・佐藤拓也さんの出演作品、スケジュール情報など">
       <div ref={homeRef}>
         {loading ? (
           <div className="loading-container">

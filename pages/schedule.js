@@ -125,7 +125,7 @@ export default function SchedulePage() {
         : [];
 
     return (
-        <Layout title="スケジュール一覧 - 佐藤拓也ファンサイト">
+        <Layout title="スケジュール一覧 - 佐藤拓也さん非公式ファンサイト">
             <section className="schedule-page-section">
                 <div className="container">
                     <div className="section-header">

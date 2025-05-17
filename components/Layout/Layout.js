@@ -2,10 +2,15 @@
 import Head from 'next/head';
 import Navbar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/router';
 
 export default function Layout({ children, title = '佐藤拓也ファンサイト' }) {
     const [isBackToTopVisible, setIsBackToTopVisible] = useState(false);
+    const router = useRouter();
+    const layoutRef = useRef(null);
+    const lastScrollTime = useRef(0);
+    const scrollInProgress = useRef(false);
 
     // バブルアニメーション作成関数
     const createBubbles = () => {
@@ -49,6 +54,109 @@ export default function Layout({ children, title = '佐藤拓也ファンサイ�
         }
     };
 
+    // ヘッダーの高さを取得
+    const getHeaderHeight = () => {
+        const header = document.querySelector('.header');
+        return header ? header.offsetHeight : 80; // デフォルト値は80px
+    };
+
+    // ページ内リンクのスクロール処理を改善する関数
+    const scrollToHashElement = (hash, delay = 0, attempt = 0) => {
+        setTimeout(() => {
+            if (!hash) return;
+
+            const element = document.querySelector(hash);
+            if (!element) {
+                // 要素が見つからない場合、再試行（5回まで）
+                if (attempt < 5) {
+                    console.log(`Element ${hash} not found, retrying... (${attempt + 1}/5)`);
+                    scrollToHashElement(hash, 200, attempt + 1);
+                }
+                return;
+            }
+
+            // ヘッダーの高さを動的に取得
+            const headerHeight = getHeaderHeight() + 20; // ヘッダー高さ + 余白
+
+            // 正確な位置計算（ページ読み込み完了後）
+            const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = elementTop - headerHeight;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+
+            // 追加の確認スクロール（初回スクロール後の要素位置を再確認）
+            setTimeout(() => {
+                const newElementTop = element.getBoundingClientRect().top;
+                // 要素がまだ見えていない場合、位置を微調整
+                if (Math.abs(newElementTop) > 20) { // 少しの誤差は許容
+                    const newOffset = window.pageYOffset + newElementTop - headerHeight;
+                    window.scrollTo({
+                        top: newOffset,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 500);
+        }, delay);
+    };
+
+    // ページ内ハッシュリンクのクリックイベントをカスタマイズ
+    const setupHashLinkHandler = () => {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const element = document.querySelector(href);
+                    if (element) {
+                        // ヘッダーの高さを考慮したスクロール位置の調整
+                        const headerHeight = getHeaderHeight() + 20; // ヘッダー高さ + 余白
+                        const elementPosition = element.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+
+                        // URLにハッシュを追加（必要に応じて履歴に追加）
+                        history.pushState(null, null, href);
+                    }
+                }
+            });
+        });
+    };
+
+    // ページ遷移後のハッシュスクロール処理
+    const handleRouteChangeComplete = (url) => {
+        const { hash } = new URL(url, window.location.origin);
+        if (hash) {
+            // ページ遷移後は長めの遅延を設定（コンテンツの読み込みを待つ）
+            scrollToHashElement(hash, 500);
+
+            // さらに遅延を追加して再チェック（画像などの遅延読み込み対応）
+            setTimeout(() => {
+                scrollToHashElement(hash, 0);
+            }, 1500);
+        }
+    };
+
+    // インラインで定義したトップにスクロールする関数
+    const directScrollToTop = () => {
+        // URLからハッシュを削除
+        if (window.location.hash) {
+            history.pushState("", document.title, window.location.pathname);
+        }
+
+        // 直接スクロールを実行
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
     useEffect(() => {
         // バブルアニメーション作成
         createBubbles();
@@ -63,20 +171,32 @@ export default function Layout({ children, title = '佐藤拓也ファンサイ�
         };
 
         window.addEventListener('scroll', handleScroll);
+
+        // ページ内ハッシュリンクのカスタムハンドラをセットアップ
+        setupHashLinkHandler();
+
+        // 初回ロード時にハッシュがある場合の処理
+        if (window.location.hash) {
+            // 初回ロード時は少し長めの遅延を設定
+            scrollToHashElement(window.location.hash, 700);
+
+            // さらに遅延を追加して再チェック
+            setTimeout(() => {
+                scrollToHashElement(window.location.hash, 0);
+            }, 1500);
+        }
+
+        // ルート変更を監視（ページ遷移後のハッシュスクロール用）
+        router.events.on('routeChangeComplete', handleRouteChangeComplete);
+
         return () => {
             window.removeEventListener('scroll', handleScroll);
+            router.events.off('routeChangeComplete', handleRouteChangeComplete);
         };
-    }, []);
-
-    const scrollToTop = () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    };
+    }, [router.asPath]); // ルートが変わるたびに再実行
 
     return (
-        <>
+        <div ref={layoutRef}>
             <Head>
                 <title>{title}</title>
                 <meta name="description" content="声優・佐藤拓也さんの非公式ファンサイトです" />
@@ -98,20 +218,19 @@ export default function Layout({ children, title = '佐藤拓也ファンサイ�
 
             <main>{children}</main>
 
-            {/* トップに戻るボタン */}
-            <div
+            {/* トップに戻るボタン - オンクリックハンドラを単純化 */}
+            <button
                 className={`back-to-top ${isBackToTopVisible ? 'visible' : ''}`}
-                onClick={scrollToTop}
-                role="button"
-                tabIndex={0}
+                onClick={directScrollToTop}
                 aria-label="ページトップに戻る"
+                type="button"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
                 </svg>
-            </div>
+            </button>
 
             <Footer />
-        </>
+        </div>
     );
 }

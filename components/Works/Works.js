@@ -1,8 +1,10 @@
 // components/Works/Works.js
-import { useState } from 'react';
+import { useState, useRef, forwardRef } from 'react';
 
-export default function Works({ works = [] }) {
+const Works = forwardRef((props, ref) => {
+    const { works = [] } = props;
     const [activeTab, setActiveTab] = useState('anime');
+    const worksRef = useRef(null);
 
     // タブ切り替え処理
     const handleTabChange = (tab) => {
@@ -10,7 +12,7 @@ export default function Works({ works = [] }) {
     };
 
     return (
-        <section className="works-section" id="works">
+        <section className="works-section" id="works" ref={ref || worksRef}>
             <div className="container">
                 <div className="section-header">
                     <h2 className="section-title">WORKS</h2>
@@ -134,4 +136,8 @@ export default function Works({ works = [] }) {
             </div>
         </section>
     );
-}
+});
+
+Works.displayName = 'Works';
+
+export default Works;

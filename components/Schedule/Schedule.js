@@ -1,12 +1,14 @@
 // components/Schedule/Schedule.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef, useRef } from 'react';
 import Link from 'next/link';
 
-export default function Schedule({ schedules = [] }) {
+const Schedule = forwardRef((props, ref) => {
+    const { schedules = [] } = props;
     const [activeFilter, setActiveFilter] = useState('all');
     const [processedSchedules, setProcessedSchedules] = useState([]);
     const [schedulePeriod, setSchedulePeriod] = useState('');
     const [loading, setLoading] = useState(true);
+    const scheduleRef = useRef(null);
 
     // 日本時間で現在の年月を取得
     const getCurrentJSTMonth = () => {
@@ -95,7 +97,7 @@ export default function Schedule({ schedules = [] }) {
     const filteredSchedules = filterSchedules(processedSchedules);
 
     return (
-        <section className="schedule-section" id="schedule">
+        <section className="schedule-section" id="schedule" ref={ref || scheduleRef}>
             <div className="container">
                 <div className="section-header">
                     <h2 className="section-title">SCHEDULE</h2>
@@ -188,4 +190,8 @@ export default function Schedule({ schedules = [] }) {
             </div>
         </section>
     );
-}
+});
+
+Schedule.displayName = 'Schedule';
+
+export default Schedule;

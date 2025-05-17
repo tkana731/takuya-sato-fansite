@@ -1,7 +1,11 @@
 // components/Footer/Footer.js
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 export default function Footer() {
+    const router = useRouter();
+    const isHomePage = router.pathname === '/';
+
     return (
         <footer className="footer">
             {/* フッター上部の波状区切り */}
@@ -24,11 +28,10 @@ export default function Footer() {
                         <h4>サイトマップ</h4>
                         <ul>
                             <li><Link href="/">HOME</Link></li>
-                            <li><Link href="#schedule">SCHEDULE</Link></li>
-                            <li><Link href="#works">WORKS</Link></li>
-                            <li><Link href="#">DISCOGRAPHY</Link></li>
+                            <li><Link href={isHomePage ? "#schedule" : "/#schedule"}>SCHEDULE</Link></li>
+                            <li><Link href={isHomePage ? "#works" : "/#works"}>WORKS</Link></li>
                             <li><Link href="/video">VIDEO</Link></li>
-                            <li><Link href="#links">LINKS</Link></li>
+                            <li><Link href={isHomePage ? "#links" : "/#links"}>LINKS</Link></li>
                         </ul>
                     </div>
                     <div className="footer-links">

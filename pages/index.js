@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+// pages/index.js
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/router';
 import Layout from '../components/Layout/Layout';
 import Birthday from '../components/Birthday/Birthday';
 import OnAir from '../components/OnAir/OnAir';
@@ -24,6 +26,82 @@ export default function Home() {
     works: false,
     videos: false
   });
+
+  const router = useRouter();
+  const homeRef = useRef(null);
+  const sectionsRef = useRef({});
+
+  // セクション参照を登録する関数
+  const registerSectionRef = (id, ref) => {
+    if (ref) {
+      sectionsRef.current[id] = ref;
+    }
+  };
+
+  // ハッシュに基づいてスクロール位置を調整する関数
+  const scrollToHashSection = () => {
+    if (!router.isReady || loading) return;
+
+    const hash = window.location.hash;
+    if (!hash) return;
+
+    const sectionId = hash.substring(1); // #を削除
+
+    // 少し遅延を与えて要素が完全に描画された後に実行
+    setTimeout(() => {
+      let element;
+
+      // まず参照から要素を探す
+      if (sectionsRef.current[sectionId]) {
+        element = sectionsRef.current[sectionId];
+      } else {
+        // 参照がなければIDから探す
+        element = document.getElementById(sectionId);
+        if (!element) {
+          // classからも探してみる
+          const elements = document.getElementsByClassName(`${sectionId}-section`);
+          if (elements.length > 0) {
+            element = elements[0];
+          }
+        }
+      }
+
+      if (element) {
+        // ヘッダーの高さを取得
+        const header = document.querySelector('.header');
+        const headerHeight = header ? header.offsetHeight : 80;
+
+        // スクロール位置を計算
+        const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementTop - (headerHeight + 20); // ヘッダー + 余白
+
+        // スクロール実行
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+
+        // 念のため位置を再調整（画像読み込みなどでレイアウトシフトが発生する可能性があるため）
+        setTimeout(() => {
+          const newElementTop = element.getBoundingClientRect().top;
+          if (Math.abs(newElementTop) > 20) { // 若干のずれは許容
+            const newOffset = window.pageYOffset + newElementTop - (headerHeight + 20);
+            window.scrollTo({
+              top: newOffset,
+              behavior: 'smooth'
+            });
+          }
+        }, 700);
+      }
+    }, 500);
+  };
+
+  // ルート変更完了時に実行
+  useEffect(() => {
+    if (router.isReady && !loading) {
+      scrollToHashSection();
+    }
+  }, [router.isReady, loading, router.asPath]);
 
   // データのフェッチを実行
   useEffect(() => {
@@ -118,38 +196,46 @@ export default function Home() {
 
   return (
     <Layout title="佐藤拓也ファンサイト - 声優・佐藤拓也さんの出演作品、スケジュール情報など">
-      {loading ? (
-        <div className="loading-container">
-          <div className="audio-wave">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
+      <div ref={homeRef}>
+        {loading ? (
+          <div className="loading-container">
+            <div className="audio-wave">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <p className="loading-text">LOADING...</p>
           </div>
-          <p className="loading-text">LOADING...</p>
-        </div>
-      ) : (
-        <>
-          {/* 誕生日キャラクター */}
-          {hasData.birthdays && <Birthday characters={birthdays} />}
+        ) : (
+          <>
+            {/* 誕生日キャラクター */}
+            {hasData.birthdays && <Birthday characters={birthdays} />}
 
-          {/* 放送中コンテンツ */}
-          <OnAir content={onAirContent} />
+            {/* 放送中コンテンツ */}
+            <OnAir content={onAirContent} />
 
-          {/* スケジュール */}
-          <Schedule schedules={schedules} />
+            {/* スケジュール */}
+            <div id="schedule" ref={(ref) => registerSectionRef('schedule', ref)}>
+              <Schedule schedules={schedules} />
+            </div>
 
-          {/* 作品 */}
-          <Works works={works} />
+            {/* 作品 */}
+            <div id="works" ref={(ref) => registerSectionRef('works', ref)}>
+              <Works works={works} />
+            </div>
 
-          {/* 動画 */}
-          <VideoSection videos={videos} />
+            {/* 動画 */}
+            <VideoSection videos={videos} />
 
-          {/* リンク - 静的データなので常に表示 */}
-          <Links />
-        </>
-      )}
+            {/* リンク - 静的データなので常に表示 */}
+            <div id="links" ref={(ref) => registerSectionRef('links', ref)}>
+              <Links />
+            </div>
+          </>
+        )}
+      </div>
     </Layout>
   );
 }

@@ -1,10 +1,13 @@
 // components/Links/Links.js
 import Link from 'next/link';
+import { forwardRef, useRef } from 'react';
 import { FaGlobe, FaTwitter, FaInstagram, FaYoutube, FaBuilding, FaMicrophone } from 'react-icons/fa';
 
-export default function Links() {
+const Links = forwardRef((props, ref) => {
+    const linksRef = useRef(null);
+
     return (
-        <section className="links-section" id="links">
+        <section className="links-section" id="links" ref={ref || linksRef}>
             <div className="container">
                 <div className="section-header">
                     <h2 className="section-title">LINKS</h2>
@@ -78,4 +81,8 @@ export default function Links() {
             </div>
         </section>
     );
-}
+});
+
+Links.displayName = 'Links';
+
+export default Links;

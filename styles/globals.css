@@ -2477,16 +2477,16 @@ img {
 }
 
 .site-title-main {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   letter-spacing: 2px;
-  color: var(--primary-dark);
+  color: var(--primary-color);
   text-transform: uppercase;
   margin-bottom: 2px;
   position: relative;
   z-index: 1;
   transition: color 0.3s ease;
-  font-family: "Montserrat", sans-serif, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP";
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP";
 }
 
 .site-title-sub {
@@ -2512,7 +2512,7 @@ img {
 
 /* ホバー効果 */
 .logo-text:hover .site-title-main {
-  color: var(--primary-color);
+  color: var(--primary-dark);
 }
 
 .logo-text:hover .site-title-sub {
@@ -2542,7 +2542,7 @@ img {
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
   .site-title-main {
-    font-size: 18px;
+    font-size: 22px;
   }
   
   .site-title-sub {

@@ -204,6 +204,8 @@ export default function SchedulePage() {
                                 filteredSchedules.map(schedule => {
                                     const date = formatDate(schedule.date);
                                     const isBroadcast = schedule.locationType === '放送/配信';
+                                    // 公式リンクが有効かどうかをチェック
+                                    const hasValidLink = schedule.link && schedule.link !== '#';
 
                                     return (
                                         <li className="schedule-item" key={schedule.id} data-category={schedule.category}>
@@ -221,7 +223,9 @@ export default function SchedulePage() {
                                                     {isBroadcast && <small className="ml-1 text-gray-600">（{schedule.locationType}）</small>}
                                                 </p>
                                                 <p className="schedule-info">{schedule.description}</p>
-                                                <a href={schedule.link} className="schedule-link" target="_blank" rel="noopener noreferrer">詳細はこちら →</a>
+                                                {hasValidLink && (
+                                                    <a href={schedule.link} className="schedule-link" target="_blank" rel="noopener noreferrer">詳細はこちら →</a>
+                                                )}
                                             </div>
                                         </li>
                                     );

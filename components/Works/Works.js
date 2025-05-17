@@ -101,38 +101,109 @@ const Works = forwardRef((props, ref) => {
                                 </li>
                             ))}
                         </ul>
+
+                        {works.dub && works.dub.anime && works.dub.anime.length > 0 && (
+                            <>
+                                <h3 className="list-title">海外アニメ吹き替え</h3>
+                                <ul className="list-items">
+                                    {works.dub.anime.map(item => (
+                                        <li className="list-item" key={item.id}>
+                                            <span className="item-title">{item.title}</span>
+                                            <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                            {item.year && <span className="item-year">{item.year}</span>}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
                     </div>
                 </div>
 
                 <div id="other-content" className={`works-content ${activeTab === 'other' ? 'active' : ''}`}>
                     <div className="works-list">
-                        <h3 className="list-title">ナレーション</h3>
-                        <ul className="list-items">
-                            {works.other && works.other.narration && works.other.narration.map(item => (
-                                <li className="list-item" key={item.id}>
-                                    <span className="item-title">{item.title}</span>
-                                    {item.role && <span className="item-role">{item.role}</span>}
-                                    {item.year && <span className="item-year">{item.year}</span>}
-                                </li>
-                            ))}
-                        </ul>
+                        {works.other && works.other.special && works.other.special.length > 0 && (
+                            <>
+                                <h3 className="list-title">特撮/舞台</h3>
+                                <ul className="list-items">
+                                    {works.other.special.map(item => (
+                                        <li className="list-item" key={item.id}>
+                                            <span className="item-title">{item.title}</span>
+                                            <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                            {item.year && <span className="item-year">{item.year}</span>}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
 
-                        <h3 className="list-title">ラジオ・ネット配信番組</h3>
-                        <ul className="list-items">
-                            {works.other && works.other.radio && works.other.radio.map(item => (
-                                <li className="list-item" key={item.id}>
-                                    <span className="item-title">{item.title}</span>
-                                    {item.role && <span className="item-role">{item.role}</span>}
-                                    {item.year && <span className="item-year">{item.year}</span>}
-                                </li>
-                            ))}
-                        </ul>
+                        {works.other && works.other.radio && works.other.radio.length > 0 && (
+                            <>
+                                <h3 className="list-title">ラジオ・配信番組</h3>
+                                <ul className="list-items">
+                                    {works.other.radio.map(item => (
+                                        <li className="list-item" key={item.id}>
+                                            <span className="item-title">{item.title}</span>
+                                            {item.role && <span className="item-role">{item.role}</span>}
+                                            {item.year && <span className="item-year">{item.year}</span>}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+
+                        {works.other && works.other.voice && works.other.voice.length > 0 && (
+                            <>
+                                <h3 className="list-title">ナレーション・ボイスオーバー</h3>
+                                <ul className="list-items">
+                                    {works.other.voice.map(item => (
+                                        <li className="list-item" key={item.id}>
+                                            <span className="item-title">{item.title}</span>
+                                            {item.role && <span className="item-role">{item.role}</span>}
+                                            {item.year && <span className="item-year">{item.year}</span>}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+
+                        {works.other && works.other.comic && works.other.comic.length > 0 && (
+                            <>
+                                <h3 className="list-title">ボイスコミック</h3>
+                                <ul className="list-items">
+                                    {works.other.comic.map(item => (
+                                        <li className="list-item" key={item.id}>
+                                            <span className="item-title">{item.title}</span>
+                                            {item.role && <span className="item-role">{item.role}</span>}
+                                            {item.year && <span className="item-year">{item.year}</span>}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+
+                        {works.other && works.other.drama && works.other.drama.length > 0 && (
+                            <>
+                                <h3 className="list-title">テレビドラマ</h3>
+                                <ul className="list-items">
+                                    {works.other.drama.map(item => (
+                                        <li className="list-item" key={item.id}>
+                                            <span className="item-title">{item.title}</span>
+                                            {item.role && <span className="item-role">{item.role}</span>}
+                                            {item.year && <span className="item-year">{item.year}</span>}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
                     </div>
                 </div>
 
+                {/* VIEW ALLボタンを一時的に非表示にする */}
+                {/* 
                 <div className="view-all-container">
                     <a href="#" className="view-all">VIEW ALL</a>
                 </div>
+                */}
             </div>
         </section>
     );

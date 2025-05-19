@@ -25,6 +25,37 @@ export default function Navbar() {
         }
     };
 
+    // ハッシュリンクの処理を改善
+    const handleHashLinkClick = (e, hash) => {
+        // モバイルメニューを閉じる
+        handleLinkClick();
+
+        if (isHomePage && hash) {
+            e.preventDefault();
+
+            // ターゲット要素を取得
+            const targetElement = document.querySelector(hash);
+            if (!targetElement) return;
+
+            // ヘッダーの高さを取得（余白なし）
+            const header = document.querySelector('.header');
+            const headerHeight = header ? header.offsetHeight : 80;
+
+            // スクロール位置を計算（余白を調整）
+            const elementPosition = targetElement.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+
+            // スクロール実行
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+
+            // URLのハッシュを更新
+            history.pushState(null, null, hash);
+        }
+    };
+
     // ESCキーでメニューを閉じる
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -70,9 +101,21 @@ export default function Navbar() {
                     <ul className="nav-menu">
                         <li><Link href="/" legacyBehavior><a className={router.pathname === '/' ? "active" : ""}>HOME</a></Link></li>
                         <li><Link href="/schedule" legacyBehavior><a className={router.pathname === '/schedule' ? "active" : ""}>SCHEDULE</a></Link></li>
-                        <li><Link href={isHomePage ? "#works" : "/#works"} legacyBehavior><a>WORKS</a></Link></li>
+                        <li>
+                            {isHomePage ? (
+                                <a href="#works" onClick={(e) => handleHashLinkClick(e, "#works")}>WORKS</a>
+                            ) : (
+                                <Link href="/#works" legacyBehavior><a>WORKS</a></Link>
+                            )}
+                        </li>
                         <li><Link href="/video" legacyBehavior><a className={router.pathname === '/video' ? "active" : ""}>VIDEO</a></Link></li>
-                        <li><Link href={isHomePage ? "#links" : "/#links"} legacyBehavior><a>LINKS</a></Link></li>
+                        <li>
+                            {isHomePage ? (
+                                <a href="#links" onClick={(e) => handleHashLinkClick(e, "#links")}>LINKS</a>
+                            ) : (
+                                <Link href="/#links" legacyBehavior><a>LINKS</a></Link>
+                            )}
+                        </li>
                     </ul>
                 </nav>
 
@@ -95,9 +138,21 @@ export default function Navbar() {
                     <ul className="mobile-nav-menu">
                         <li><Link href="/" legacyBehavior><a onClick={handleLinkClick}>HOME</a></Link></li>
                         <li><Link href="/schedule" legacyBehavior><a onClick={handleLinkClick}>SCHEDULE</a></Link></li>
-                        <li><Link href={isHomePage ? "#works" : "/#works"} legacyBehavior><a onClick={handleLinkClick}>WORKS</a></Link></li>
+                        <li>
+                            {isHomePage ? (
+                                <a href="#works" onClick={(e) => handleHashLinkClick(e, "#works")}>WORKS</a>
+                            ) : (
+                                <Link href="/#works" legacyBehavior><a onClick={handleLinkClick}>WORKS</a></Link>
+                            )}
+                        </li>
                         <li><Link href="/video" legacyBehavior><a onClick={handleLinkClick}>VIDEO</a></Link></li>
-                        <li><Link href={isHomePage ? "#links" : "/#links"} legacyBehavior><a onClick={handleLinkClick}>LINKS</a></Link></li>
+                        <li>
+                            {isHomePage ? (
+                                <a href="#links" onClick={(e) => handleHashLinkClick(e, "#links")}>LINKS</a>
+                            ) : (
+                                <Link href="/#links" legacyBehavior><a onClick={handleLinkClick}>LINKS</a></Link>
+                            )}
+                        </li>
                     </ul>
                 </nav>
             </div>

@@ -76,7 +76,7 @@ export default function Layout({ children, title = '佐藤拓也さん非公式�
             }
 
             // ヘッダーの高さを動的に取得
-            const headerHeight = getHeaderHeight() + 20; // ヘッダー高さ + 余白
+            const headerHeight = getHeaderHeight(); // 余白を減らす (以前は+20)
 
             // 正確な位置計算（ページ読み込み完了後）
             const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
@@ -87,18 +87,19 @@ export default function Layout({ children, title = '佐藤拓也さん非公式�
                 behavior: 'smooth'
             });
 
-            // 追加の確認スクロール（初回スクロール後の要素位置を再確認）
+            // 追加のスクロール確認は必要な場合のみ実行する
+            // 大きな誤差がある場合のみ再調整
             setTimeout(() => {
                 const newElementTop = element.getBoundingClientRect().top;
-                // 要素がまだ見えていない場合、位置を微調整
-                if (Math.abs(newElementTop) > 20) { // 少しの誤差は許容
+                // 要素がまだ明らかに見えていない場合のみ位置を微調整
+                if (Math.abs(newElementTop) > 50) {
                     const newOffset = window.pageYOffset + newElementTop - headerHeight;
                     window.scrollTo({
                         top: newOffset,
                         behavior: 'smooth'
                     });
                 }
-            }, 500);
+            }, 600);
         }, delay);
     };
 
@@ -111,8 +112,8 @@ export default function Layout({ children, title = '佐藤拓也さん非公式�
                     e.preventDefault();
                     const element = document.querySelector(href);
                     if (element) {
-                        // ヘッダーの高さを考慮したスクロール位置の調整
-                        const headerHeight = getHeaderHeight() + 20; // ヘッダー高さ + 余白
+                        // ヘッダーの高さのみを考慮（余白を削除）
+                        const headerHeight = getHeaderHeight();
                         const elementPosition = element.getBoundingClientRect().top;
                         const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
 
@@ -135,11 +136,6 @@ export default function Layout({ children, title = '佐藤拓也さん非公式�
         if (hash) {
             // ページ遷移後は長めの遅延を設定（コンテンツの読み込みを待つ）
             scrollToHashElement(hash, 500);
-
-            // さらに遅延を追加して再チェック（画像などの遅延読み込み対応）
-            setTimeout(() => {
-                scrollToHashElement(hash, 0);
-            }, 1500);
         }
     };
 
@@ -179,11 +175,6 @@ export default function Layout({ children, title = '佐藤拓也さん非公式�
         if (window.location.hash) {
             // 初回ロード時は少し長めの遅延を設定
             scrollToHashElement(window.location.hash, 700);
-
-            // さらに遅延を追加して再チェック
-            setTimeout(() => {
-                scrollToHashElement(window.location.hash, 0);
-            }, 1500);
         }
 
         // ルート変更を監視（ページ遷移後のハッシュスクロール用）

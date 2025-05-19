@@ -83,13 +83,13 @@ export default function Home() {
       }
 
       if (element) {
-        // ヘッダーの高さを取得
+        // ヘッダーの高さを取得（余白なし）
         const header = document.querySelector('.header');
         const headerHeight = header ? header.offsetHeight : 80;
 
         // スクロール位置を計算
         const elementTop = element.getBoundingClientRect().top + window.pageYOffset;
-        const offsetPosition = elementTop - (headerHeight + 20); // ヘッダー + 余白
+        const offsetPosition = elementTop - headerHeight;
 
         // スクロール実行
         window.scrollTo({
@@ -97,17 +97,17 @@ export default function Home() {
           behavior: 'smooth'
         });
 
-        // 念のため位置を再調整（画像読み込みなどでレイアウトシフトが発生する可能性があるため）
+        // 再調整は大幅なずれがある場合のみ行う
         setTimeout(() => {
           const newElementTop = element.getBoundingClientRect().top;
-          if (Math.abs(newElementTop) > 20) { // 若干のずれは許容
-            const newOffset = window.pageYOffset + newElementTop - (headerHeight + 20);
+          if (Math.abs(newElementTop) > 80) { // 大幅なずれがある場合のみ再調整
+            const newOffset = window.pageYOffset + newElementTop - headerHeight;
             window.scrollTo({
               top: newOffset,
               behavior: 'smooth'
             });
           }
-        }, 700);
+        }, 800);
       }
     }, 500);
   };

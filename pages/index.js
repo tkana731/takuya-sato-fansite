@@ -2,6 +2,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout/Layout';
+import SEO from '../components/SEO/SEO';
+import SchemaOrg from '../components/SEO/SchemaOrg';
 import Hero from '../components/Hero/Hero'; // ヒーローセクションをインポート
 import Birthday from '../components/Birthday/Birthday';
 import OnAir from '../components/OnAir/OnAir';
@@ -213,6 +215,14 @@ export default function Home() {
 
   return (
     <Layout title="佐藤拓也さん非公式ファンサイト - 声優・佐藤拓也さんの出演作品、スケジュール情報など">
+      <SEO
+        title="佐藤拓也さん非公式ファンサイト - 声優・佐藤拓也さんの出演作品、スケジュール情報など"
+        description="声優・佐藤拓也さんの非公式ファンサイトです。出演アニメ、ゲーム、吹き替え作品やイベント情報、放送中のコンテンツ、最新動画などをまとめています。"
+        type="website"
+      />
+      <SchemaOrg type="WebSite" />
+      <SchemaOrg type="Person" />
+
       <div ref={homeRef}>
         {loading ? (
           <div className="loading-container">

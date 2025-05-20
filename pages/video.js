@@ -1,5 +1,8 @@
+// pages/video.js
 import { useEffect, useState } from 'react';
 import Layout from '../components/Layout/Layout';
+import SEO from '../components/SEO/SEO';
+import SchemaOrg from '../components/SEO/SchemaOrg';
 import Link from 'next/link';
 
 export default function VideoPage() {
@@ -55,8 +58,40 @@ export default function VideoPage() {
         setSelectedYear(year);
     };
 
+    // ビデオコレクション用の構造化データ
+    const videoCollectionSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: `佐藤拓也さん関連動画 ${selectedYear}年`,
+        description: `声優・佐藤拓也さんの${selectedYear}年の関連動画やプロモーション映像をまとめました。`,
+        numberOfItems: videos.length,
+        itemListElement: videos.map((video, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            item: {
+                '@type': 'VideoObject',
+                name: video.title,
+                description: `${video.title} - 佐藤拓也さん関連動画`,
+                uploadDate: video.date ? video.date.replace(/\./g, '-') : '',
+                thumbnailUrl: `https://i.ytimg.com/vi/${extractYoutubeVideoId(video.videoUrl) || 'default'}/hqdefault.jpg`,
+                contentUrl: video.videoUrl || '',
+                embedUrl: video.videoUrl ? `https://www.youtube.com/embed/${extractYoutubeVideoId(video.videoUrl)}` : ''
+            }
+        }))
+    };
+
     return (
-        <Layout title="動画一覧 - 佐藤拓也さん非公式ファンサイト">
+        <Layout>
+            <SEO
+                title={`佐藤拓也さん出演動画一覧 ${selectedYear}年 | 佐藤拓也さん非公式ファンサイト`}
+                description={`声優・佐藤拓也さんの${selectedYear}年の出演動画やプロモーション映像をまとめました。YouTubeの公式動画を年別に整理して掲載しています。`}
+                type="article"
+            />
+            <SchemaOrg
+                type="VideoObject"
+                data={videoCollectionSchema}
+            />
+
             <section className="video-page-section">
                 <div className="container">
                     <div className="section-header">
@@ -72,6 +107,7 @@ export default function VideoPage() {
                                     key={year}
                                     className={`year-tab ${selectedYear === year ? 'active' : ''}`}
                                     onClick={() => handleYearChange(year)}
+                                    aria-label={`${year}年の動画を表示`}
                                 >
                                     <span className="tab-text">{year}年</span>
                                 </button>

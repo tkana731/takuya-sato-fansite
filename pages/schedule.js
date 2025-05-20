@@ -1,6 +1,8 @@
 // pages/schedule.js
 import { useEffect, useState } from 'react';
 import Layout from '../components/Layout/Layout';
+import SEO from '../components/SEO/SEO';
+import SchemaOrg from '../components/SEO/SchemaOrg';
 import Link from 'next/link';
 
 export default function SchedulePage() {
@@ -124,8 +126,62 @@ export default function SchedulePage() {
         ? filterSchedules(schedules.schedules)
         : [];
 
+    // スケジュールページのメタデータ
+    const pageTitle = `佐藤拓也さんスケジュール ${monthDisplay} | 非公式ファンサイト`;
+    const pageDescription = `声優・佐藤拓也さんの${monthDisplay}のイベント、舞台、生放送などの出演スケジュールをまとめています。最新の活動予定をチェックできます。`;
+
+    // イベントの構造化データを作成
+    const createEventSchemaData = () => {
+        if (!filteredSchedules.length) return null;
+
+        return {
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            name: `佐藤拓也さん ${monthDisplay} スケジュール一覧`,
+            description: pageDescription,
+            numberOfItems: filteredSchedules.length,
+            itemListElement: filteredSchedules.map((event, index) => {
+                // 日付をISO形式に変換
+                const eventDate = new Date(event.date);
+                const formattedDate = eventDate.toISOString();
+
+                return {
+                    '@type': 'ListItem',
+                    position: index + 1,
+                    item: {
+                        '@type': 'Event',
+                        name: event.title,
+                        description: event.description || `佐藤拓也さん出演 ${event.categoryName}`,
+                        startDate: formattedDate,
+                        location: {
+                            '@type': 'Place',
+                            name: event.location || '未定',
+                        },
+                        performer: {
+                            '@type': 'Person',
+                            name: '佐藤拓也'
+                        },
+                        url: event.link && event.link !== '#' ? event.link : null
+                    }
+                };
+            })
+        };
+    };
+
     return (
-        <Layout title="スケジュール一覧 - 佐藤拓也さん非公式ファンサイト">
+        <Layout>
+            <SEO
+                title={pageTitle}
+                description={pageDescription}
+                type="article"
+            />
+            {filteredSchedules.length > 0 && (
+                <SchemaOrg
+                    type="Event"
+                    data={createEventSchemaData()}
+                />
+            )}
+
             <section className="schedule-page-section">
                 <div className="container">
                     <div className="section-header">
@@ -134,11 +190,11 @@ export default function SchedulePage() {
                     </div>
 
                     {/* 月切り替えナビゲーション */}
-                    <div className="month-navigation">
+                    <div className="month-navigation" aria-label="月切り替えナビゲーション">
                         <button
                             onClick={handlePrevMonth}
                             className="month-nav-button prev-month"
-                            aria-label="前月へ"
+                            aria-label={`${displayDate.month === 1 ? displayDate.year - 1 : displayDate.year}年${displayDate.month === 1 ? 12 : displayDate.month - 1}月へ移動`}
                         >
                             &lt; 前月
                         </button>
@@ -146,7 +202,7 @@ export default function SchedulePage() {
                         <button
                             onClick={handleNextMonth}
                             className="month-nav-button next-month"
-                            aria-label="翌月へ"
+                            aria-label={`${displayDate.month === 12 ? displayDate.year + 1 : displayDate.year}年${displayDate.month === 12 ? 1 : displayDate.month + 1}月へ移動`}
                         >
                             翌月 &gt;
                         </button>
@@ -154,28 +210,44 @@ export default function SchedulePage() {
 
                     {/* カテゴリタブ */}
                     <div className="schedule-tabs-wrapper">
-                        <div className="schedule-tabs">
+                        <div className="schedule-tabs" role="tablist" aria-label="スケジュールカテゴリー">
                             <button
                                 className={`schedule-tab ${activeFilter === 'all' ? 'active' : ''}`}
                                 onClick={() => setActiveFilter('all')}
+                                role="tab"
+                                aria-selected={activeFilter === 'all'}
+                                aria-controls="all-content"
+                                id="all-tab"
                             >
                                 <span className="tab-text">すべて</span>
                             </button>
                             <button
                                 className={`schedule-tab ${activeFilter === 'event' ? 'active' : ''}`}
                                 onClick={() => setActiveFilter('event')}
+                                role="tab"
+                                aria-selected={activeFilter === 'event'}
+                                aria-controls="event-content"
+                                id="event-tab"
                             >
                                 <span className="tab-text">イベント</span>
                             </button>
                             <button
                                 className={`schedule-tab ${activeFilter === 'stage' ? 'active' : ''}`}
                                 onClick={() => setActiveFilter('stage')}
+                                role="tab"
+                                aria-selected={activeFilter === 'stage'}
+                                aria-controls="stage-content"
+                                id="stage-tab"
                             >
                                 <span className="tab-text">舞台・朗読</span>
                             </button>
                             <button
                                 className={`schedule-tab ${activeFilter === 'broadcast' ? 'active' : ''}`}
                                 onClick={() => setActiveFilter('broadcast')}
+                                role="tab"
+                                aria-selected={activeFilter === 'broadcast'}
+                                aria-controls="broadcast-content"
+                                id="broadcast-tab"
                             >
                                 <span className="tab-text">生放送</span>
                             </button>
@@ -199,41 +271,43 @@ export default function SchedulePage() {
                             <button onClick={() => window.location.reload()} className="retry-button">再読み込み</button>
                         </div>
                     ) : (
-                        <ul className="schedule-items">
-                            {filteredSchedules.length > 0 ? (
-                                filteredSchedules.map(schedule => {
-                                    const date = formatDate(schedule.date);
-                                    const isBroadcast = schedule.locationType === '放送/配信';
-                                    // 公式リンクが有効かどうかをチェック
-                                    const hasValidLink = schedule.link && schedule.link !== '#';
+                        <div role="tabpanel" id={`${activeFilter}-content`} aria-labelledby={`${activeFilter}-tab`}>
+                            <ul className="schedule-items">
+                                {filteredSchedules.length > 0 ? (
+                                    filteredSchedules.map(schedule => {
+                                        const date = formatDate(schedule.date);
+                                        const isBroadcast = schedule.locationType === '放送/配信';
+                                        // 公式リンクが有効かどうかをチェック
+                                        const hasValidLink = schedule.link && schedule.link !== '#';
 
-                                    return (
-                                        <li className="schedule-item" key={schedule.id} data-category={schedule.category}>
-                                            <div className="schedule-date">
-                                                <span className="date-year">{date.year}</span>
-                                                <span className="date-month">{date.month}</span>
-                                                <span className="date-day">{date.day}</span>
-                                                <span className="date-weekday">{schedule.weekday}</span>
-                                            </div>
-                                            <div className="schedule-content">
-                                                <span className={`schedule-category category-${schedule.category}`}>{schedule.categoryName}</span>
-                                                <h3 className="schedule-title">{schedule.title}</h3>
-                                                <p className="schedule-info">
-                                                    <span className="schedule-time">{schedule.time}</span> / {schedule.location}
-                                                    {isBroadcast && <small className="ml-1 text-gray-600">（{schedule.locationType}）</small>}
-                                                </p>
-                                                <p className="schedule-info">{schedule.description}</p>
-                                                {hasValidLink && (
-                                                    <a href={schedule.link} className="schedule-link" target="_blank" rel="noopener noreferrer">詳細はこちら →</a>
-                                                )}
-                                            </div>
-                                        </li>
-                                    );
-                                })
-                            ) : (
-                                <div className="no-schedule">該当する予定はありません。</div>
-                            )}
-                        </ul>
+                                        return (
+                                            <li className="schedule-item" key={schedule.id} data-category={schedule.category}>
+                                                <div className="schedule-date">
+                                                    <span className="date-year">{date.year}</span>
+                                                    <span className="date-month">{date.month}</span>
+                                                    <span className="date-day">{date.day}</span>
+                                                    <span className="date-weekday">{schedule.weekday}</span>
+                                                </div>
+                                                <div className="schedule-content">
+                                                    <span className={`schedule-category category-${schedule.category}`}>{schedule.categoryName}</span>
+                                                    <h3 className="schedule-title">{schedule.title}</h3>
+                                                    <p className="schedule-info">
+                                                        <span className="schedule-time">{schedule.time}</span> / {schedule.location}
+                                                        {isBroadcast && <small className="ml-1 text-gray-600">（{schedule.locationType}）</small>}
+                                                    </p>
+                                                    <p className="schedule-info">{schedule.description}</p>
+                                                    {hasValidLink && (
+                                                        <a href={schedule.link} className="schedule-link" target="_blank" rel="noopener noreferrer">詳細はこちら →</a>
+                                                    )}
+                                                </div>
+                                            </li>
+                                        );
+                                    })
+                                ) : (
+                                    <div className="no-schedule">該当する予定はありません。</div>
+                                )}
+                            </ul>
+                        </div>
                     )}
                 </div>
             </section>

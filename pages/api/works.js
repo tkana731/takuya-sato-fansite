@@ -82,7 +82,7 @@ export default async function handler(req, res) {
                         role:role_id (
                             id,
                             name,
-                            actor:actor_id (id, name)
+                            actor:voice_actor_id (id, name)
                         )
                     )
                 `)
@@ -104,7 +104,7 @@ export default async function handler(req, res) {
                         role:role_id (
                             id,
                             name,
-                            actor:actor_id (id, name)
+                            actor:voice_actor_id (id, name)
                         )
                     )
                 `)
@@ -126,7 +126,7 @@ export default async function handler(req, res) {
                         role:role_id (
                             id,
                             name,
-                            actor:actor_id (id, name)
+                            actor:voice_actor_id (id, name)
                         )
                     )
                 `)
@@ -148,7 +148,7 @@ export default async function handler(req, res) {
                         role:role_id (
                             id,
                             name,
-                            actor:actor_id (id, name)
+                            actor:voice_actor_id (id, name)
                         )
                     )
                 `)

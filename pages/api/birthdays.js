@@ -33,7 +33,7 @@ export default async function handler(req, res) {
                 name,
                 series_name,
                 birthday,
-                actor:actor_id (id, name)
+                actor:voice_actor_id (id, name)
             `)
             .eq('birthday', formattedBirthday)
             .order('name');

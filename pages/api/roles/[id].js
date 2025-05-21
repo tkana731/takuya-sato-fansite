@@ -20,10 +20,10 @@ export default async function handler(req, res) {
                 .select(`
                     id,
                     name,
-                    actor_id,
+                    voice_actor_id,
                     birthday,
                     series_name,
-                    actor:actor_id (
+                    actor:voice_actor_id (
                         id,
                         name
                     )
@@ -56,10 +56,10 @@ export default async function handler(req, res) {
     // PUT: 役割更新
     else if (req.method === 'PUT') {
         try {
-            const { name, actorId, birthday, seriesName } = req.body;
+            const { name, voiceActorId, birthday, seriesName } = req.body;
 
             // バリデーション
-            if (!name || !actorId) {
+            if (!name || !voiceActorId) {
                 return res.status(400).json({
                     success: false,
                     message: '名前と声優は必須項目です'
@@ -82,7 +82,7 @@ export default async function handler(req, res) {
                 .from('mst_roles')
                 .update({
                     name,
-                    actor_id: actorId,
+                    voice_actor_id: voiceActorId,
                     birthday: birthday || null,
                     series_name: seriesName || null
                 })

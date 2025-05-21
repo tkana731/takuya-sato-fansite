@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
         try {
             // クエリパラメータからフィルタリング条件を取得
-            const { actorId, search } = req.query;
+            const { voiceActorId, search } = req.query;
 
             // クエリ条件を作成
             let query = supabase
@@ -13,10 +13,10 @@ export default async function handler(req, res) {
                 .select(`
                     id,
                     name,
-                    actor_id,
+                    voice_actor_id,
                     birthday,
                     series_name,
-                    actor:actor_id (
+                    actor:voice_actor_id (
                         id,
                         name
                     )
@@ -24,8 +24,8 @@ export default async function handler(req, res) {
                 .order('name');
 
             // 声優IDによるフィルタリング
-            if (actorId) {
-                query = query.eq('actor_id', actorId);
+            if (voiceActorId) {
+                query = query.eq('voice_actor_id', voiceActorId);
             }
 
             // 名前による検索
@@ -51,10 +51,10 @@ export default async function handler(req, res) {
         }
     } else if (req.method === 'POST') {
         try {
-            const { name, actorId, birthday, seriesName } = req.body;
+            const { name, voiceActorId, birthday, seriesName } = req.body;
 
             // バリデーション
-            if (!name || !actorId) {
+            if (!name || !voiceActorId) {
                 return res.status(400).json({
                     success: false,
                     message: '名前と声優は必須項目です'
@@ -77,7 +77,7 @@ export default async function handler(req, res) {
                 .from('mst_roles')
                 .insert([{
                     name,
-                    actor_id: actorId,
+                    voice_actor_id: voiceActorId,
                     birthday: birthday || null,
                     series_name: seriesName || null
                 }])

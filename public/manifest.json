@@ -1,0 +1,24 @@
+{
+    "name": "佐藤拓也さん非公式ファンサイト",
+    "short_name": "佐藤拓也ファンサイト",
+    "description": "声優・佐藤拓也さんの非公式ファンサイトです。出演作品、スケジュール、最新情報をまとめています。",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#aed4f3",
+    "theme_color": "#0078d4",
+    "orientation": "portrait-primary",
+    "lang": "ja",
+    "scope": "/",
+    "icons": [
+        {
+            "src": "/favicon.ico",
+            "sizes": "any",
+            "type": "image/x-icon"
+        }
+    ],
+    "categories": [
+        "entertainment",
+        "lifestyle"
+    ],
+    "screenshots": []
+}

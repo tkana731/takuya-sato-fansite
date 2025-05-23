@@ -28,8 +28,8 @@ export default function Footer() {
                         <h4>サイトマップ</h4>
                         <ul>
                             <li><Link href="/">HOME</Link></li>
-                            <li><Link href={isHomePage ? "#schedule" : "/#schedule"}>SCHEDULE</Link></li>
-                            <li><Link href={isHomePage ? "#works" : "/#works"}>WORKS</Link></li>
+                            <li><Link href="/schedule">SCHEDULE</Link></li>
+                            <li><Link href="/works">WORKS</Link></li>
                             <li><Link href="/video">VIDEO</Link></li>
                             <li><Link href={isHomePage ? "#links" : "/#links"}>LINKS</Link></li>
                         </ul>

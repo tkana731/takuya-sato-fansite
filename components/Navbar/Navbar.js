@@ -85,35 +85,43 @@ export default function Navbar() {
             </div>
             <div className="header-container">
                 <div className="logo">
-                    <Link href="/" legacyBehavior>
-                        <a className="logo-text">
-                            <div className="site-title-wrapper">
-                                <span className="site-title-main">TAKUYA SATO</span>
-                                <span className="site-title-sub">非公式ファンサイト</span>
-                                <div className="logo-accent"></div>
-                            </div>
-                        </a>
+                    <Link href="/" className="logo-text">
+                        <div className="site-title-wrapper">
+                            <span className="site-title-main">TAKUYA SATO</span>
+                            <span className="site-title-sub">非公式ファンサイト</span>
+                            <div className="logo-accent"></div>
+                        </div>
                     </Link>
                 </div>
 
                 {/* デスクトップ用ナビゲーション - header-containerの中に配置 */}
                 <nav className="desktop-nav">
                     <ul className="nav-menu">
-                        <li><Link href="/" legacyBehavior><a className={router.pathname === '/' ? "active" : ""}>HOME</a></Link></li>
-                        <li><Link href="/schedule" legacyBehavior><a className={router.pathname === '/schedule' ? "active" : ""}>SCHEDULE</a></Link></li>
                         <li>
-                            {isHomePage ? (
-                                <a href="#works" onClick={(e) => handleHashLinkClick(e, "#works")}>WORKS</a>
-                            ) : (
-                                <Link href="/#works" legacyBehavior><a>WORKS</a></Link>
-                            )}
+                            <Link href="/" className={router.pathname === '/' ? "active" : ""}>
+                                HOME
+                            </Link>
                         </li>
-                        <li><Link href="/video" legacyBehavior><a className={router.pathname === '/video' ? "active" : ""}>VIDEO</a></Link></li>
+                        <li>
+                            <Link href="/schedule" className={router.pathname === '/schedule' ? "active" : ""}>
+                                SCHEDULE
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/works" className={router.pathname === '/works' ? "active" : ""}>
+                                WORKS
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/video" className={router.pathname === '/video' ? "active" : ""}>
+                                VIDEO
+                            </Link>
+                        </li>
                         <li>
                             {isHomePage ? (
                                 <a href="#links" onClick={(e) => handleHashLinkClick(e, "#links")}>LINKS</a>
                             ) : (
-                                <Link href="/#links" legacyBehavior><a>LINKS</a></Link>
+                                <Link href="/#links">LINKS</Link>
                             )}
                         </li>
                     </ul>
@@ -136,21 +144,23 @@ export default function Navbar() {
             <div className={`mobile-menu-overlay ${isMenuOpen ? 'active' : ''}`}>
                 <nav className="mobile-nav">
                     <ul className="mobile-nav-menu">
-                        <li><Link href="/" legacyBehavior><a onClick={handleLinkClick}>HOME</a></Link></li>
-                        <li><Link href="/schedule" legacyBehavior><a onClick={handleLinkClick}>SCHEDULE</a></Link></li>
                         <li>
-                            {isHomePage ? (
-                                <a href="#works" onClick={(e) => handleHashLinkClick(e, "#works")}>WORKS</a>
-                            ) : (
-                                <Link href="/#works" legacyBehavior><a onClick={handleLinkClick}>WORKS</a></Link>
-                            )}
+                            <Link href="/" onClick={handleLinkClick}>HOME</Link>
                         </li>
-                        <li><Link href="/video" legacyBehavior><a onClick={handleLinkClick}>VIDEO</a></Link></li>
+                        <li>
+                            <Link href="/schedule" onClick={handleLinkClick}>SCHEDULE</Link>
+                        </li>
+                        <li>
+                            <Link href="/works" onClick={handleLinkClick}>WORKS</Link>
+                        </li>
+                        <li>
+                            <Link href="/video" onClick={handleLinkClick}>VIDEO</Link>
+                        </li>
                         <li>
                             {isHomePage ? (
                                 <a href="#links" onClick={(e) => handleHashLinkClick(e, "#links")}>LINKS</a>
                             ) : (
-                                <Link href="/#links" legacyBehavior><a onClick={handleLinkClick}>LINKS</a></Link>
+                                <Link href="/#links" onClick={handleLinkClick}>LINKS</Link>
                             )}
                         </li>
                     </ul>

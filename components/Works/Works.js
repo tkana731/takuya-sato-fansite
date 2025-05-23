@@ -1,5 +1,6 @@
 // components/Works/Works.js
 import { useState, useRef, forwardRef } from 'react';
+import Link from 'next/link';
 
 const Works = forwardRef((props, ref) => {
     const { works = [] } = props;
@@ -52,7 +53,7 @@ const Works = forwardRef((props, ref) => {
                     <div className="works-list">
                         <h3 className="list-title">アニメ出演作品一覧</h3>
                         <ul className="list-items">
-                            {works.anime && works.anime.map(item => (
+                            {works.anime && works.anime.slice(0, 10).map(item => (
                                 <li className="list-item" key={item.id}>
                                     <span className="item-title">{item.title}</span>
                                     <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
@@ -60,6 +61,11 @@ const Works = forwardRef((props, ref) => {
                                 </li>
                             ))}
                         </ul>
+                        {works.anime && works.anime.length > 10 && (
+                            <div className="more-indicator">
+                                <p className="text-center text-gray-600 mt-4">...他 {works.anime.length - 10}作品</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -67,7 +73,7 @@ const Works = forwardRef((props, ref) => {
                     <div className="works-list">
                         <h3 className="list-title">ゲーム出演作品一覧</h3>
                         <ul className="list-items">
-                            {works.game && works.game.map(item => (
+                            {works.game && works.game.slice(0, 10).map(item => (
                                 <li className="list-item" key={item.id}>
                                     <span className="item-title">{item.title}</span>
                                     <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
@@ -75,6 +81,11 @@ const Works = forwardRef((props, ref) => {
                                 </li>
                             ))}
                         </ul>
+                        {works.game && works.game.length > 10 && (
+                            <div className="more-indicator">
+                                <p className="text-center text-gray-600 mt-4">...他 {works.game.length - 10}作品</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -82,7 +93,7 @@ const Works = forwardRef((props, ref) => {
                     <div className="works-list">
                         <h3 className="list-title">海外映画吹き替え</h3>
                         <ul className="list-items">
-                            {works.dub && works.dub.movie && works.dub.movie.map(item => (
+                            {works.dub && works.dub.movie && works.dub.movie.slice(0, 5).map(item => (
                                 <li className="list-item" key={item.id}>
                                     <span className="item-title">{item.title}</span>
                                     <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
@@ -90,10 +101,15 @@ const Works = forwardRef((props, ref) => {
                                 </li>
                             ))}
                         </ul>
+                        {works.dub && works.dub.movie && works.dub.movie.length > 5 && (
+                            <div className="more-indicator">
+                                <p className="text-center text-gray-600 mt-2">...他 {works.dub.movie.length - 5}作品</p>
+                            </div>
+                        )}
 
                         <h3 className="list-title">海外ドラマ吹き替え</h3>
                         <ul className="list-items">
-                            {works.dub && works.dub.drama && works.dub.drama.map(item => (
+                            {works.dub && works.dub.drama && works.dub.drama.slice(0, 5).map(item => (
                                 <li className="list-item" key={item.id}>
                                     <span className="item-title">{item.title}</span>
                                     <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
@@ -101,12 +117,17 @@ const Works = forwardRef((props, ref) => {
                                 </li>
                             ))}
                         </ul>
+                        {works.dub && works.dub.drama && works.dub.drama.length > 5 && (
+                            <div className="more-indicator">
+                                <p className="text-center text-gray-600 mt-2">...他 {works.dub.drama.length - 5}作品</p>
+                            </div>
+                        )}
 
                         {works.dub && works.dub.anime && works.dub.anime.length > 0 && (
                             <>
                                 <h3 className="list-title">海外アニメ吹き替え</h3>
                                 <ul className="list-items">
-                                    {works.dub.anime.map(item => (
+                                    {works.dub.anime.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
                                             <span className="item-title">{item.title}</span>
                                             <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
@@ -114,6 +135,11 @@ const Works = forwardRef((props, ref) => {
                                         </li>
                                     ))}
                                 </ul>
+                                {works.dub.anime.length > 5 && (
+                                    <div className="more-indicator">
+                                        <p className="text-center text-gray-600 mt-2">...他 {works.dub.anime.length - 5}作品</p>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>
@@ -125,7 +151,7 @@ const Works = forwardRef((props, ref) => {
                             <>
                                 <h3 className="list-title">特撮/舞台</h3>
                                 <ul className="list-items">
-                                    {works.other.special.map(item => (
+                                    {works.other.special.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
                                             <span className="item-title">{item.title}</span>
                                             <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
@@ -133,6 +159,11 @@ const Works = forwardRef((props, ref) => {
                                         </li>
                                     ))}
                                 </ul>
+                                {works.other.special.length > 5 && (
+                                    <div className="more-indicator">
+                                        <p className="text-center text-gray-600 mt-2">...他 {works.other.special.length - 5}作品</p>
+                                    </div>
+                                )}
                             </>
                         )}
 
@@ -140,7 +171,7 @@ const Works = forwardRef((props, ref) => {
                             <>
                                 <h3 className="list-title">ラジオ・配信番組</h3>
                                 <ul className="list-items">
-                                    {works.other.radio.map(item => (
+                                    {works.other.radio.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
                                             <span className="item-title">{item.title}</span>
                                             {item.role && <span className="item-role">{item.role}</span>}
@@ -148,6 +179,11 @@ const Works = forwardRef((props, ref) => {
                                         </li>
                                     ))}
                                 </ul>
+                                {works.other.radio.length > 5 && (
+                                    <div className="more-indicator">
+                                        <p className="text-center text-gray-600 mt-2">...他 {works.other.radio.length - 5}作品</p>
+                                    </div>
+                                )}
                             </>
                         )}
 
@@ -155,7 +191,7 @@ const Works = forwardRef((props, ref) => {
                             <>
                                 <h3 className="list-title">ナレーション・ボイスオーバー</h3>
                                 <ul className="list-items">
-                                    {works.other.voice.map(item => (
+                                    {works.other.voice.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
                                             <span className="item-title">{item.title}</span>
                                             {item.role && <span className="item-role">{item.role}</span>}
@@ -163,6 +199,11 @@ const Works = forwardRef((props, ref) => {
                                         </li>
                                     ))}
                                 </ul>
+                                {works.other.voice.length > 5 && (
+                                    <div className="more-indicator">
+                                        <p className="text-center text-gray-600 mt-2">...他 {works.other.voice.length - 5}作品</p>
+                                    </div>
+                                )}
                             </>
                         )}
 
@@ -170,7 +211,7 @@ const Works = forwardRef((props, ref) => {
                             <>
                                 <h3 className="list-title">ボイスコミック</h3>
                                 <ul className="list-items">
-                                    {works.other.comic.map(item => (
+                                    {works.other.comic.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
                                             <span className="item-title">{item.title}</span>
                                             {item.role && <span className="item-role">{item.role}</span>}
@@ -178,6 +219,11 @@ const Works = forwardRef((props, ref) => {
                                         </li>
                                     ))}
                                 </ul>
+                                {works.other.comic.length > 5 && (
+                                    <div className="more-indicator">
+                                        <p className="text-center text-gray-600 mt-2">...他 {works.other.comic.length - 5}作品</p>
+                                    </div>
+                                )}
                             </>
                         )}
 
@@ -185,7 +231,7 @@ const Works = forwardRef((props, ref) => {
                             <>
                                 <h3 className="list-title">テレビドラマ</h3>
                                 <ul className="list-items">
-                                    {works.other.drama.map(item => (
+                                    {works.other.drama.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
                                             <span className="item-title">{item.title}</span>
                                             {item.role && <span className="item-role">{item.role}</span>}
@@ -193,17 +239,20 @@ const Works = forwardRef((props, ref) => {
                                         </li>
                                     ))}
                                 </ul>
+                                {works.other.drama.length > 5 && (
+                                    <div className="more-indicator">
+                                        <p className="text-center text-gray-600 mt-2">...他 {works.other.drama.length - 5}作品</p>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>
                 </div>
 
-                {/* VIEW ALLボタンを一時的に非表示にする */}
-                {/* 
+                {/* VIEW ALLボタンを復活 */}
                 <div className="view-all-container">
-                    <a href="#" className="view-all">VIEW ALL</a>
+                    <Link href="/works" className="view-all">VIEW ALL</Link>
                 </div>
-                */}
             </div>
         </section>
     );

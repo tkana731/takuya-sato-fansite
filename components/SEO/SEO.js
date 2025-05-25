@@ -8,7 +8,7 @@ export default function SEO({
     type = 'website'
 }) {
     const router = useRouter();
-    const canonicalUrl = `https://takuya-sato.example.com${router.asPath}`;
+    const canonicalUrl = `https://takuya-sato-fansite.vercel.app${router.asPath}`;
     const siteTitle = '佐藤拓也さん非公式ファンサイト';
 
     return (
@@ -22,7 +22,7 @@ export default function SEO({
             <meta property="og:description" content={description} />
             <meta property="og:type" content={type} />
             <meta property="og:url" content={canonicalUrl} />
-            <meta property="og:image" content={`https://takuya-sato.example.com${image}`} />
+            <meta property="og:image" content={`https://takuya-sato-fansite.vercel.app${image}`} />
             <meta property="og:site_name" content={siteTitle} />
             <meta property="og:locale" content="ja_JP" />
 
@@ -30,7 +30,7 @@ export default function SEO({
             <meta name="twitter:card" content="summary_large_image" />
             <meta name="twitter:title" content={title} />
             <meta name="twitter:description" content={description} />
-            <meta name="twitter:image" content={`https://takuya-sato.example.com${image}`} />
+            <meta name="twitter:image" content={`https://takuya-sato-fansite.vercel.app${image}`} />
 
             {/* 検索エンジン向けメタタグ */}
             <meta name="robots" content="index, follow" />

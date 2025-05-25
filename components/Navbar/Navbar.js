@@ -118,6 +118,11 @@ export default function Navbar() {
                             </Link>
                         </li>
                         <li>
+                            <Link href="/event-map" className={router.pathname === '/event-map' ? "active" : ""}>
+                                EVENT MAP
+                            </Link>
+                        </li>
+                        <li>
                             {isHomePage ? (
                                 <a href="#links" onClick={(e) => handleHashLinkClick(e, "#links")}>LINKS</a>
                             ) : (
@@ -155,6 +160,9 @@ export default function Navbar() {
                         </li>
                         <li>
                             <Link href="/video" onClick={handleLinkClick}>VIDEO</Link>
+                        </li>
+                        <li>
+                            <Link href="/event-map" onClick={handleLinkClick}>EVENT MAP</Link>
                         </li>
                         <li>
                             {isHomePage ? (

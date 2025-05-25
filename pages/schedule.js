@@ -4,6 +4,7 @@ import Layout from '../components/Layout/Layout';
 import SEO from '../components/SEO/SEO';
 import SchemaOrg from '../components/SEO/SchemaOrg';
 import Link from 'next/link';
+import CalendarButton from '../components/CalendarButton/CalendarButton';
 
 export default function SchedulePage() {
     const [schedules, setSchedules] = useState([]);
@@ -299,6 +300,7 @@ export default function SchedulePage() {
                                                     {hasValidLink && (
                                                         <a href={schedule.link} className="schedule-link" target="_blank" rel="noopener noreferrer">詳細はこちら →</a>
                                                     )}
+                                                    <CalendarButton schedule={schedule} />
                                                 </div>
                                             </li>
                                         );

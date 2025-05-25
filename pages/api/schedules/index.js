@@ -135,7 +135,12 @@ export default async function handler(req, res) {
             const timeInfo = schedule.performances.length > 0
                 ? schedule.performances
                     .sort((a, b) => a.display_order - b.display_order)
-                    .map(p => p.display_start_time)
+                    .map(p => {
+                        if (p.display_end_time && p.display_start_time !== p.display_end_time) {
+                            return `${p.display_start_time}-${p.display_end_time}`;
+                        }
+                        return p.display_start_time;
+                    })
                     .join(' / ')
                 : 'TBD';
 

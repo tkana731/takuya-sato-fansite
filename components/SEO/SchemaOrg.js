@@ -8,7 +8,7 @@ export default function SchemaOrg({
         WebSite: {
             '@context': 'https://schema.org',
             '@type': 'WebSite',
-            url: 'https://takuya-sato.example.com',
+            url: 'https://takuya-sato-fansite.vercel.app/',
             name: '佐藤拓也さん非公式ファンサイト',
             description: '声優・佐藤拓也さんの出演作品、スケジュール、最新情報をまとめた非公式ファンサイトです。',
             ...data
@@ -17,7 +17,7 @@ export default function SchemaOrg({
             '@context': 'https://schema.org',
             '@type': 'Person',
             name: '佐藤拓也',
-            url: 'https://takuya-sato.example.com',
+            url: 'https://takuya-sato-fansite.vercel.app/',
             jobTitle: '声優',
             description: '声優として多数のアニメ、ゲーム、吹き替え作品に出演',
             sameAs: [

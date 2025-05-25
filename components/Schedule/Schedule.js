@@ -1,6 +1,7 @@
 // components/Schedule/Schedule.js
 import { useState, useEffect, forwardRef, useRef } from 'react';
 import Link from 'next/link';
+import CalendarButton from '../CalendarButton/CalendarButton';
 
 const Schedule = forwardRef((props, ref) => {
     const { schedules = [] } = props;
@@ -177,6 +178,7 @@ const Schedule = forwardRef((props, ref) => {
                                                 {hasValidLink && (
                                                     <a href={schedule.link} className="schedule-link" target="_blank" rel="noopener noreferrer">詳細はこちら →</a>
                                                 )}
+                                                <CalendarButton schedule={schedule} />
                                             </div>
                                         </li>
                                     );

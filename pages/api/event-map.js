@@ -14,8 +14,8 @@ export default async function handler(req, res) {
         select: `
           id,
           title,
-          start_date,
-          end_date,
+          start_datetime,
+          end_datetime,
           category:category_id (id, name),
           venue:venue_id (
             id, 
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
           ),
           broadcastStation:broadcast_station_id (id, name)
         `,
-        order: 'start_date'
+        order: 'start_datetime'
       }
     );
 
@@ -84,7 +84,7 @@ export default async function handler(req, res) {
         prefectureMap[prefecture].count++;
         prefectureMap[prefecture].events.push({
           title: schedule.title,
-          date: schedule.start_date,
+          date: schedule.start_datetime,
           location: locationName,
           category: schedule.category?.name || '',
           id: schedule.id

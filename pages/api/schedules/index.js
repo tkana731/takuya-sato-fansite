@@ -73,23 +73,14 @@ export default async function handler(req, res) {
                 select: `
           id,
           title,
-          start_date,
-          end_date,
+          start_datetime,
+          end_datetime,
           is_all_day,
           description,
           official_url,
           category:category_id (id, name, color_code),
           venue:venue_id (id, name),
           broadcastStation:broadcast_station_id (id, name),
-          performances:rel_schedule_performances (
-            id,
-            performance_date,
-            display_start_time,
-            display_end_time,
-            subtitle,
-            description,
-            display_order
-          ),
           performers:rel_schedule_performers (
             id,
             role_description,
@@ -98,10 +89,10 @@ export default async function handler(req, res) {
           )
         `,
                 filters: {
-                    start_date: { gte: fromDateStr },
+                    start_datetime: { gte: fromDateStr + 'T00:00:00+09:00', lte: toDateStr + 'T23:59:59+09:00' },
                     ...categoryFilter
                 },
-                order: 'start_date'
+                order: 'start_datetime'
             }
         );
 
@@ -109,7 +100,7 @@ export default async function handler(req, res) {
 
         // 取得したスケジュールから終了日を超えるものを除外
         const filteredByDateSchedules = schedules?.filter(schedule => {
-            const startDate = new Date(schedule.start_date);
+            const startDate = new Date(schedule.start_datetime);
             const startDateStr = startDate.toISOString().split('T')[0];
             return startDateStr <= toDateStr;
         }) || [];
@@ -118,31 +109,26 @@ export default async function handler(req, res) {
 
         // フロントエンドで利用しやすい形式に整形
         const formattedSchedules = filteredByDateSchedules.map(schedule => {
-            // Dateオブジェクトを確実に作成
-            const startDate = new Date(schedule.start_date);
-
-            // 日本時間に調整
-            const startDateJST = new Date(startDate.getTime() + jstOffset);
-            const weekday = getWeekday(startDateJST);
+            // start_datetimeはtimestamptzなので、既に正しいタイムゾーン情報を持っている
+            const startDate = new Date(schedule.start_datetime);
+            
+            // 日本時間で日付と時刻を取得
+            const year = startDate.getFullYear();
+            const month = String(startDate.getMonth() + 1).padStart(2, '0');
+            const day = String(startDate.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
+            
+            const hours = startDate.getHours();
+            const minutes = startDate.getMinutes();
+            const timeInfo = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            
+            const weekday = getWeekday(startDate);
 
             // カテゴリに応じてロケーション情報を選択
             const isBroadcast = schedule.category?.name === '生放送';
             const location = isBroadcast
                 ? (schedule.broadcastStation ? schedule.broadcastStation.name : '')
                 : (schedule.venue ? schedule.venue.name : '');
-
-            // パフォーマンス情報を整形
-            const timeInfo = schedule.performances.length > 0
-                ? schedule.performances
-                    .sort((a, b) => a.display_order - b.display_order)
-                    .map(p => {
-                        if (p.display_end_time && p.display_start_time !== p.display_end_time) {
-                            return `${p.display_start_time}-${p.display_end_time}`;
-                        }
-                        return p.display_start_time;
-                    })
-                    .join(' / ')
-                : 'TBD';
 
             // 出演者情報を整形
             const performers = schedule.performers
@@ -157,12 +143,10 @@ export default async function handler(req, res) {
                 schedule.category?.name === '舞台・朗読' ? 'stage' :
                     schedule.category?.name === '生放送' ? 'broadcast' : 'other';
 
-            // 日本時間ベースの日付をYYYY-MM-DD形式に整形
-            const formattedDate = startDateJST.toISOString().split('T')[0];
-
             return {
                 id: schedule.id,
                 date: formattedDate,
+                datetime: schedule.start_datetime,
                 weekday: weekday,
                 category: categoryCode,
                 categoryName: schedule.category?.name || '',

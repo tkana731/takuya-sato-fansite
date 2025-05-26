@@ -54,9 +54,17 @@ export default async function handler(req, res) {
             // 時刻情報をstart_datetimeから取得
             // start_datetimeはtimestamptzなので、既に正しいタイムゾーン情報を持っている
             const startDate = new Date(schedule.start_datetime);
-            const hours = startDate.getHours();
-            const minutes = startDate.getMinutes();
-            const performanceInfo = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            
+            // Vercelのサーバーはタイムゾーンが異なる可能性があるため、
+            // 日本時間に明示的に変換する
+            const jstOffset = 9 * 60 * 60 * 1000; // 9時間をミリ秒に変換
+            const jstDate = new Date(startDate.getTime() + jstOffset);
+            
+            // ISO文字列から時刻を抽出
+            const jstString = jstDate.toISOString();
+            const [, timePart] = jstString.split('T');
+            const [hours, minutes] = timePart.split(':');
+            const performanceInfo = `${hours}:${minutes}`;
 
             // フロントエンド用に整形したデータ
             const formattedSchedule = {

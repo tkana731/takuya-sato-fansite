@@ -113,16 +113,22 @@ export default async function handler(req, res) {
             const startDate = new Date(schedule.start_datetime);
             
             // 日本時間で日付と時刻を取得
-            const year = startDate.getFullYear();
-            const month = String(startDate.getMonth() + 1).padStart(2, '0');
-            const day = String(startDate.getDate()).padStart(2, '0');
+            // Vercelのサーバーはタイムゾーンが異なる可能性があるため、
+            // 日本時間に明示的に変換する
+            const jstOffset = 9 * 60 * 60 * 1000; // 9時間をミリ秒に変換
+            const jstDate = new Date(startDate.getTime() + jstOffset);
+            
+            // ISO文字列から日本時間の各要素を抽出
+            const jstString = jstDate.toISOString(); // YYYY-MM-DDTHH:mm:ss.sssZ
+            const [datePart, timePart] = jstString.split('T');
+            const [year, month, day] = datePart.split('-');
+            const [hours, minutes] = timePart.split(':');
+            
             const formattedDate = `${year}-${month}-${day}`;
+            const timeInfo = `${hours}:${minutes}`;
             
-            const hours = startDate.getHours();
-            const minutes = startDate.getMinutes();
-            const timeInfo = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-            
-            const weekday = getWeekday(startDate);
+            // 曜日計算も日本時間で行う
+            const weekday = getWeekday(jstDate);
 
             // カテゴリに応じてロケーション情報を選択
             const isBroadcast = schedule.category?.name === '生放送';

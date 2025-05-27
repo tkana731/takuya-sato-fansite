@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 export default function SEO({
     title = '佐藤拓也さん非公式ファンサイト',
     description = '声優・佐藤拓也さんの出演作品、スケジュール、最新情報をまとめた非公式ファンサイトです。',
+    keywords,
     image = '/images/ogp.jpg',
     type = 'website'
 }) {
@@ -34,7 +35,7 @@ export default function SEO({
 
             {/* 検索エンジン向けメタタグ */}
             <meta name="robots" content="index, follow" />
-            <meta name="keywords" content="佐藤拓也,声優,アニメ,出演作品,スケジュール,非公式,ファンサイト" />
+            <meta name="keywords" content={keywords || "佐藤拓也,声優,アニメ,出演作品,スケジュール,非公式,ファンサイト,キャラ"} />
         </Head>
     );
 }

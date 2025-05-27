@@ -1,0 +1,356 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ER図からモデルを定義
+model WorkCategory {
+  id                   String             @id @default(uuid())
+  name                 String
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  works                Work[]
+
+  @@map("mst_work_categories")
+}
+
+model Work {
+  id                   String             @id @default(uuid())
+  categoryId           String             @map("category_id")
+  title                String
+  year                 Int?
+  description          String?
+  officialUrl          String?            @map("official_url")
+  xUrl                 String?            @map("x_url")
+  instagramUrl         String?            @map("instagram_url")
+  createdAt            DateTime           @map("created_at") @default(now())
+  category             WorkCategory       @relation(fields: [categoryId], references: [id])
+  broadcastChannels    BroadcastChannel[]
+  workRoles            WorkRole[]
+  schedules            Schedule[]
+  videos               Video[]
+  workPerformers       WorkPerformer[]
+  workStaff            WorkStaff[]
+  parentRelations      RelatedWork[]    @relation("ParentWork")
+  childRelations       RelatedWork[]    @relation("ChildWork")
+  workSeries           WorkSeries[]
+
+  @@map("works")
+}
+
+model BroadcastStation {
+  id                   String             @id @default(uuid())
+  name                 String
+  typeId               String             @map("type_id")
+  officialUrl          String?            @map("official_url")
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  type                 StationType        @relation(fields: [typeId], references: [id])
+  channels             BroadcastChannel[]
+  schedules            Schedule[]
+
+  @@map("mst_broadcast_stations")
+}
+
+model StationType {
+  id                   String             @id @default(uuid())
+  name                 String
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  stations             BroadcastStation[]
+
+  @@map("mst_station_types")
+}
+
+model Weekday {
+  id                   String             @id @default(uuid())
+  name                 String
+  shortName            String　           @map("short_name")
+  code                 String
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  channels             BroadcastChannel[]
+
+  @@map("mst_weekdays")
+}
+
+model BroadcastChannel {
+  id                   String             @id @default(uuid())
+  workId               String             @map("work_id")
+  stationId            String             @map("station_id")
+  weekdayId            String?            @map("weekday_id")
+  broadcastTime        DateTime?          @db.Time()
+  displayBroadcastTime String?            @map("display_broadcast_time") 
+  broadcastStartDate   DateTime           @map("broadcast_start_date") @db.Date()
+  broadcastEndDate     DateTime?          @map("broadcast_end_date")   @db.Date()
+  pageUrl              String?
+  description          String?
+  createdAt            DateTime           @map("created_at") @default(now())
+  work                 Work               @relation(fields: [workId], references: [id])
+  station              BroadcastStation   @relation(fields: [stationId], references: [id])
+  weekday              Weekday?           @relation(fields: [weekdayId], references: [id])
+
+  @@map("rel_broadcast_channels")
+}
+
+model Role {
+  id                   String             @id @default(uuid())
+  name                 String
+  voiceActorId         String?            @map("voice_actor_id")
+  actorId              String?            @map("actor_id")
+  birthday             String?
+  seriesName           String?            @map("series_name")
+  createdAt            DateTime           @map("created_at") @default(now())
+  voiceActor           Actor?             @relation("VoiceActorRoles", fields: [voiceActorId], references: [id])
+  actor                Actor?             @relation("ActorRoles", fields: [actorId], references: [id])
+  workRoles            WorkRole[]
+
+  @@map("mst_roles")
+}
+
+model Actor {
+  id                   String             @id @default(uuid())
+  name                 String
+  officialUrl          String?            @map("official_url")
+  xUrl                 String?            @map("x_url")
+  instagramUrl         String?            @map("instagram_url")
+  createdAt            DateTime           @map("created_at") @default(now())
+  voiceActorRoles      Role[]             @relation("VoiceActorRoles")
+  actorRoles           Role[]             @relation("ActorRoles")
+
+  @@map("mst_actors")
+}
+
+model WorkRole {
+  id                   String             @id @default(uuid())
+  workId               String             @map("work_id")
+  roleId               String             @map("role_id")
+  performanceYear      Int?               @map("performance_year")
+  description          String?
+  isMainRole           Boolean            @map("is_main_role")
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  work                 Work               @relation(fields: [workId], references: [id])
+  role                 Role               @relation(fields: [roleId], references: [id])
+
+  @@unique([workId, roleId, performanceYear])
+  @@map("rel_work_roles")
+}
+
+model ScheduleCategory {
+  id                   String             @id @default(uuid())
+  name                 String
+  colorCode            String             @map("color_code")
+  hasPeriod            Boolean            @map("has_period")
+  hasPerformances      Boolean            @map("has_performances")
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  schedules            Schedule[]
+
+  @@map("mst_schedule_categories")
+}
+
+model Prefecture {
+  id                   String             @id @default(uuid())
+  name                 String
+  region               String
+  code                 String
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  venues               Venue[]
+
+  @@map("mst_prefectures")
+}
+
+model Venue {
+  id                   String             @id @default(uuid())
+  name                 String
+  postal_code          String?
+  prefectureId         String             @map("prefecture_id")
+  address              String?
+  capacity             String?
+  officialUrl          String?            @map("official_url")
+  google_maps_url      String?
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  prefecture           Prefecture         @relation(fields: [prefectureId], references: [id])
+  schedules            Schedule[]
+
+  @@map("mst_venues")
+}
+
+model Schedule {
+  id                   String             @id @default(uuid())
+  categoryId           String             @map("category_id")
+  workId               String?            @map("work_id")
+  seriesId             String?            @map("series_id")
+  venueId              String?            @map("venue_id")
+  broadcastStationId   String?            @map("broadcast_station_id")
+  title                String
+  startDateTime        DateTime           @map("start_datetime")
+  endDateTime          DateTime?          @map("end_datetime")
+  isAllDay             Boolean            @map("is_all_day")
+  description          String?
+  officialUrl          String?            @map("official_url")
+  xUrl                 String?            @map("x_url")
+  instagramUrl         String?            @map("instagram_url")
+  createdAt            DateTime           @map("created_at") @default(now())
+  category             ScheduleCategory      @relation(fields: [categoryId], references: [id])
+  work                 Work?                 @relation(fields: [workId], references: [id])
+  venue                Venue?                @relation(fields: [venueId], references: [id])
+  broadcastStation     BroadcastStation?     @relation(fields: [broadcastStationId], references: [id])
+  performers           SchedulePerformer[]
+
+  @@map("schedules")
+}
+
+
+model Performer {
+  id                   String             @id @default(uuid())
+  name                 String
+  isTakuyaSato         Boolean            @map("is_takuya_sato")
+  officialUrl          String?            @map("official_url")
+  xUrl                 String?            @map("x_url")
+  instagramUrl         String?            @map("instagram_url")
+  createdAt            DateTime           @map("created_at") @default(now())
+  workPerformers       WorkPerformer[]
+  schedulePerformers   SchedulePerformer[]
+
+  @@map("mst_performers")
+}
+
+model WorkPerformer {
+  id                   String             @id @default(uuid())
+  workId               String             @map("work_id")
+  performerId          String             @map("performer_id")
+  role_description     String?
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  work                 Work               @relation(fields: [workId], references: [id])
+  performer            Performer          @relation(fields: [performerId], references: [id])
+
+  @@map("rel_work_performers")
+}
+
+model SchedulePerformer {
+  id                   String             @id @default(uuid())
+  scheduleId           String             @map("schedule_id")
+  performerId          String             @map("performer_id")
+  role_description     String?
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  schedule             Schedule           @relation(fields: [scheduleId], references: [id])
+  performer            Performer          @relation(fields: [performerId], references: [id])
+
+  @@map("rel_schedule_performers")
+}
+
+model Staff {
+  id                   String             @id @default(uuid())
+  name                 String
+  officialUrl          String?            @map("official_url")
+  xUrl                 String?            @map("x_url")
+  instagramUrl         String?            @map("instagram_url")
+  createdAt            DateTime           @map("created_at") @default(now())
+  workStaff            WorkStaff[]
+
+  @@map("mst_staff")
+}
+
+model StaffRole {
+  id                   String             @id @default(uuid())
+  name                 String
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  workStaff            WorkStaff[]
+
+  @@map("mst_staff_roles")
+}
+
+model WorkStaff {
+  id                   String             @id @default(uuid())
+  workId               String             @map("work_id")
+  staffId              String             @map("staff_id")
+  staffRoleId          String             @map("staff_role_id")
+  description          String?
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now()) @db.Timestamptz()
+  work                 Work               @relation(fields: [workId], references: [id])
+  staff                Staff              @relation(fields: [staffId], references: [id])
+  staffRole            StaffRole          @relation(fields: [staffRoleId], references: [id])
+
+  @@map("rel_work_staff")
+}
+
+model Video {
+  id                   String             @id @default(uuid())
+  workId               String?            @map("work_id")
+  title                String
+  videoUrl             String             @map("video_url")
+  publishedAt          DateTime           @db.Date() @map("published_at")
+  createdAt            DateTime           @map("created_at") @default(now())
+  work                 Work?              @relation(fields: [workId], references: [id])
+
+  @@map("videos")
+}
+
+model Series {
+  id                   String             @id @default(uuid())
+  name                 String
+  description          String?
+  officialUrl          String?            @map("official_url")
+  xUrl                 String?            @map("x_url")
+  instagramUrl         String?            @map("instagram_url")
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  workSeries           WorkSeries[]
+
+  @@map("mst_series")
+}
+
+model WorkSeries {
+  id                   String             @id @default(uuid())
+  seriesId             String
+  workId               String             @map("work_id")
+  sequenceNumber       Int?
+  subtitle             String?
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  series               Series             @relation(fields: [seriesId], references: [id])
+  work                 Work               @relation(fields: [workId], references: [id])
+
+  @@map("rel_work_series")
+}
+
+model WorkRelationType {
+  id                   String             @id @default(uuid())
+  name                 String
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  relatedWorks         RelatedWork[]
+
+  @@map("mst_work_relation_types")
+}
+
+model RelatedWork {
+  id                   String             @id @default(uuid())
+  parentWorkId         String             @map("parent_work_id")
+  childWorkId          String             @map("child_work_id")
+  relationTypeId       String             @map("relation_type_id")
+  description          String?
+  displayOrder         Int                @map("display_order")
+  createdAt            DateTime           @map("created_at") @default(now())
+  parentWork           Work               @relation("ParentWork", fields: [parentWorkId], references: [id])
+  childWork            Work               @relation("ChildWork", fields: [childWorkId], references: [id])
+  relationType         WorkRelationType   @relation(fields: [relationTypeId], references: [id])
+
+  @@map("rel_related_works")
+}

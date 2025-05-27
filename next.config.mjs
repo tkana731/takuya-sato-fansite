@@ -5,6 +5,7 @@
 const nextConfig = {
   // 既存の設定を保持
   reactStrictMode: true,
+  
 
   // 画像最適化の設定
   images: {
@@ -18,7 +19,8 @@ const nextConfig = {
   },
 
   // アセットプレフィックスの設定 - すべてのファイルのベースURLが変更される
-  assetPrefix: '/assets',
+  // 開発環境ではHMRのために無効化
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/assets' : '',
 
   // URLリライトの設定 - 広告ブロッカーを回避する
   async rewrites() {

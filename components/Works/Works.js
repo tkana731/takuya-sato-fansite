@@ -56,7 +56,13 @@ const Works = forwardRef((props, ref) => {
                             {works.anime && works.anime.slice(0, 10).map(item => (
                                 <li className="list-item" key={item.id}>
                                     <span className="item-title">{item.title}</span>
-                                    <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                    {item.roles ? (
+                                        item.roles.map((role, index) => (
+                                            <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                        ))
+                                    ) : (
+                                        <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                    )}
                                     <span className="item-year">{item.year}</span>
                                 </li>
                             ))}
@@ -76,7 +82,13 @@ const Works = forwardRef((props, ref) => {
                             {works.game && works.game.slice(0, 10).map(item => (
                                 <li className="list-item" key={item.id}>
                                     <span className="item-title">{item.title}</span>
-                                    <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                    {item.roles ? (
+                                        item.roles.map((role, index) => (
+                                            <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                        ))
+                                    ) : (
+                                        <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                    )}
                                     {item.year && <span className="item-year">{item.year}</span>}
                                 </li>
                             ))}
@@ -96,7 +108,13 @@ const Works = forwardRef((props, ref) => {
                             {works.dub && works.dub.movie && works.dub.movie.slice(0, 5).map(item => (
                                 <li className="list-item" key={item.id}>
                                     <span className="item-title">{item.title}</span>
-                                    <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                    {item.roles ? (
+                                        item.roles.map((role, index) => (
+                                            <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                        ))
+                                    ) : (
+                                        <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                    )}
                                     {item.year && <span className="item-year">{item.year}</span>}
                                 </li>
                             ))}
@@ -112,7 +130,13 @@ const Works = forwardRef((props, ref) => {
                             {works.dub && works.dub.drama && works.dub.drama.slice(0, 5).map(item => (
                                 <li className="list-item" key={item.id}>
                                     <span className="item-title">{item.title}</span>
-                                    <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                    {item.roles ? (
+                                        item.roles.map((role, index) => (
+                                            <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                        ))
+                                    ) : (
+                                        <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                    )}
                                     {item.year && <span className="item-year">{item.year}</span>}
                                 </li>
                             ))}
@@ -130,7 +154,13 @@ const Works = forwardRef((props, ref) => {
                                     {works.dub.anime.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
                                             <span className="item-title">{item.title}</span>
-                                            <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                            {item.roles ? (
+                                                item.roles.map((role, index) => (
+                                                    <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                ))
+                                            ) : (
+                                                <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                            )}
                                             {item.year && <span className="item-year">{item.year}</span>}
                                         </li>
                                     ))}
@@ -154,7 +184,13 @@ const Works = forwardRef((props, ref) => {
                                     {works.other.special.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
                                             <span className="item-title">{item.title}</span>
-                                            <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                            {item.roles ? (
+                                                item.roles.map((role, index) => (
+                                                    <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                ))
+                                            ) : (
+                                                <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                            )}
                                             {item.year && <span className="item-year">{item.year}</span>}
                                         </li>
                                     ))}

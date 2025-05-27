@@ -5,6 +5,7 @@ import SEO from '../components/SEO/SEO';
 import SchemaOrg from '../components/SEO/SchemaOrg';
 import Link from 'next/link';
 import CalendarButton from '../components/CalendarButton/CalendarButton';
+import { FaCalendarAlt } from 'react-icons/fa';
 
 export default function SchedulePage() {
     const [schedules, setSchedules] = useState([]);
@@ -29,6 +30,17 @@ export default function SchedulePage() {
         month: currentMonth + 1 // 表示用は1-12
     });
 
+    // 年月選択モーダルの表示状態
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [tempYear, setTempYear] = useState(displayDate.year);
+    const [tempMonth, setTempMonth] = useState(displayDate.month);
+    
+    // 選択可能な年の範囲
+    const [yearRange, setYearRange] = useState({
+        minYear: currentYear - 1,
+        maxYear: currentYear + 1
+    });
+
     // 月の移動
     const handlePrevMonth = () => {
         setDisplayDate(prev => {
@@ -49,6 +61,49 @@ export default function SchedulePage() {
             return { year: prev.year, month: prev.month + 1 };
         });
     };
+
+    // 年月選択モーダルを開く
+    const openDatePicker = () => {
+        setTempYear(displayDate.year);
+        setTempMonth(displayDate.month);
+        setShowDatePicker(true);
+    };
+
+    // 年月選択を確定
+    const confirmDateSelection = () => {
+        setDisplayDate({ year: tempYear, month: tempMonth });
+        setShowDatePicker(false);
+    };
+
+    // 年月選択をキャンセル
+    const cancelDateSelection = () => {
+        setShowDatePicker(false);
+        setTempYear(displayDate.year);
+        setTempMonth(displayDate.month);
+    };
+
+    // 年の選択肢を生成（データベースの最小年から最大年まで）
+    const yearOptions = [];
+    for (let i = yearRange.minYear; i <= yearRange.maxYear; i++) {
+        yearOptions.push(i);
+    }
+
+    // 日付範囲を取得
+    useEffect(() => {
+        async function fetchDateRange() {
+            try {
+                const response = await fetch('/api/schedules/date-range');
+                if (response.ok) {
+                    const data = await response.json();
+                    setYearRange(data);
+                }
+            } catch (error) {
+                console.error('日付範囲の取得エラー:', error);
+            }
+        }
+        
+        fetchDateRange();
+    }, []);
 
     // 選択された月に基づいてスケジュールを取得
     useEffect(() => {
@@ -199,7 +254,14 @@ export default function SchedulePage() {
                         >
                             &lt; 前月
                         </button>
-                        <h2 className="current-month">{monthDisplay}</h2>
+                        <button
+                            onClick={openDatePicker}
+                            className="current-month-button"
+                            aria-label="年月を選択"
+                        >
+                            <h2 className="current-month">{monthDisplay}</h2>
+                            <FaCalendarAlt className="calendar-icon" size={16} />
+                        </button>
                         <button
                             onClick={handleNextMonth}
                             className="month-nav-button next-month"
@@ -309,6 +371,57 @@ export default function SchedulePage() {
                                     <div className="no-schedule">該当する予定はありません。</div>
                                 )}
                             </ul>
+                        </div>
+                    )}
+
+                    {/* 年月選択モーダル */}
+                    {showDatePicker && (
+                        <div className="date-picker-overlay" onClick={cancelDateSelection}>
+                            <div className="date-picker-modal" onClick={(e) => e.stopPropagation()}>
+                                <h3 className="date-picker-title">年月を選択</h3>
+                                <div className="date-picker-content">
+                                    <div className="date-picker-row">
+                                        <label htmlFor="year-select" className="date-picker-label">年</label>
+                                        <select
+                                            id="year-select"
+                                            value={tempYear}
+                                            onChange={(e) => setTempYear(Number(e.target.value))}
+                                            className="date-picker-select"
+                                        >
+                                            {yearOptions.map(year => (
+                                                <option key={year} value={year}>{year}年</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="date-picker-row">
+                                        <label htmlFor="month-select" className="date-picker-label">月</label>
+                                        <select
+                                            id="month-select"
+                                            value={tempMonth}
+                                            onChange={(e) => setTempMonth(Number(e.target.value))}
+                                            className="date-picker-select"
+                                        >
+                                            {[...Array(12)].map((_, i) => (
+                                                <option key={i + 1} value={i + 1}>{i + 1}月</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="date-picker-actions">
+                                    <button
+                                        onClick={cancelDateSelection}
+                                        className="date-picker-button date-picker-cancel"
+                                    >
+                                        キャンセル
+                                    </button>
+                                    <button
+                                        onClick={confirmDateSelection}
+                                        className="date-picker-button date-picker-confirm"
+                                    >
+                                        決定
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>

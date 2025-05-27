@@ -34,6 +34,7 @@ export default async function handler(req, res) {
 
     // 都道府県別にイベントを集計
     const prefectureMap = {};
+    const yearlyData = {}; // 年別のデータを保持
     const prefectureList = [
       '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
       '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県',
@@ -48,7 +49,8 @@ export default async function handler(req, res) {
     prefectureList.forEach(pref => {
       prefectureMap[pref] = {
         count: 0,
-        events: []
+        events: [],
+        yearlyBreakdown: {} // 年別の内訳を追加
       };
     });
 
@@ -81,28 +83,64 @@ export default async function handler(req, res) {
       }
 
       if (prefecture && prefectureMap[prefecture]) {
+        const eventYear = new Date(schedule.start_datetime).getFullYear();
+        
+        // 年別データの集計
+        if (!yearlyData[eventYear]) {
+          yearlyData[eventYear] = 0;
+        }
+        yearlyData[eventYear]++;
+        
+        // 都道府県ごとの年別集計
+        if (!prefectureMap[prefecture].yearlyBreakdown[eventYear]) {
+          prefectureMap[prefecture].yearlyBreakdown[eventYear] = 0;
+        }
+        prefectureMap[prefecture].yearlyBreakdown[eventYear]++;
+        
         prefectureMap[prefecture].count++;
         prefectureMap[prefecture].events.push({
           title: schedule.title,
           date: schedule.start_datetime,
           location: locationName,
           category: schedule.category?.name || '',
+          year: eventYear,
           id: schedule.id
         });
       }
     });
 
+    // 年のリストを作成（降順）
+    const availableYears = Object.keys(yearlyData).map(year => parseInt(year)).sort((a, b) => b - a);
+    
+    // 全イベントのリストを作成（開催日降順）
+    const allEvents = [];
+    Object.entries(prefectureMap).forEach(([prefName, data]) => {
+      data.events.forEach(event => {
+        allEvents.push({
+          ...event,
+          prefecture: prefName
+        });
+      });
+    });
+    
+    // 開催日の降順でソート
+    allEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
     // レスポンスデータを整形
     const responseData = {
       prefectures: Object.entries(prefectureMap).map(([name, data]) => ({
         name,
         count: data.count,
-        totalEvents: data.events.length, // 総イベント数を追加
+        totalEvents: data.events.length,
+        yearlyBreakdown: data.yearlyBreakdown,
         events: data.events
           .sort((a, b) => new Date(b.date) - new Date(a.date))
           .slice(0, 10) // 最新10件まで
-      })).filter(pref => pref.count > 0), // イベントがある都道府県のみ
+      })), // 全ての都道府県を返す（0件も含む）
+      allEvents: allEvents, // 全イベントリストを追加
       totalEvents: schedules.filter(s => s.category?.name !== '生放送').length,
+      yearlyData: yearlyData,
+      availableYears: availableYears,
       lastUpdated: new Date().toISOString()
     };
 

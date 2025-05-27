@@ -37,6 +37,7 @@ export default function WorksPage() {
                 }
                 const data = await response.json();
                 console.log('WORKSページ: 取得したデータ:', data);
+                console.log('ボイスコミックデータ:', data.other?.comic);
 
                 setWorks(data);
             } catch (err) {
@@ -200,7 +201,13 @@ export default function WorksPage() {
                                         {works.anime && works.anime.map(item => (
                                             <li className="list-item" key={item.id}>
                                                 <span className="item-title">{item.title}</span>
-                                                <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                {item.roles ? (
+                                                    item.roles.map((role, index) => (
+                                                        <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                    ))
+                                                ) : (
+                                                    <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                )}
                                                 <span className="item-year">{item.year}</span>
                                             </li>
                                         ))}
@@ -216,7 +223,13 @@ export default function WorksPage() {
                                         {works.game && works.game.map(item => (
                                             <li className="list-item" key={item.id}>
                                                 <span className="item-title">{item.title}</span>
-                                                <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                {item.roles ? (
+                                                    item.roles.map((role, index) => (
+                                                        <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                    ))
+                                                ) : (
+                                                    <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                )}
                                                 {item.year && <span className="item-year">{item.year}</span>}
                                             </li>
                                         ))}
@@ -232,7 +245,13 @@ export default function WorksPage() {
                                         {works.dub && works.dub.movie && works.dub.movie.map(item => (
                                             <li className="list-item" key={item.id}>
                                                 <span className="item-title">{item.title}</span>
-                                                <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                {item.roles ? (
+                                                    item.roles.map((role, index) => (
+                                                        <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                    ))
+                                                ) : (
+                                                    <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                )}
                                                 {item.year && <span className="item-year">{item.year}</span>}
                                             </li>
                                         ))}
@@ -246,7 +265,13 @@ export default function WorksPage() {
                                         {works.dub && works.dub.drama && works.dub.drama.map(item => (
                                             <li className="list-item" key={item.id}>
                                                 <span className="item-title">{item.title}</span>
-                                                <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                {item.roles ? (
+                                                    item.roles.map((role, index) => (
+                                                        <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                    ))
+                                                ) : (
+                                                    <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                )}
                                                 {item.year && <span className="item-year">{item.year}</span>}
                                             </li>
                                         ))}
@@ -260,7 +285,13 @@ export default function WorksPage() {
                                         {works.dub && works.dub.anime && works.dub.anime.map(item => (
                                             <li className="list-item" key={item.id}>
                                                 <span className="item-title">{item.title}</span>
-                                                <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                {item.roles ? (
+                                                    item.roles.map((role, index) => (
+                                                        <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                    ))
+                                                ) : (
+                                                    <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                )}
                                                 {item.year && <span className="item-year">{item.year}</span>}
                                             </li>
                                         ))}
@@ -279,7 +310,13 @@ export default function WorksPage() {
                                         {works.other && works.other.special && works.other.special.map(item => (
                                             <li className="list-item" key={item.id}>
                                                 <span className="item-title">{item.title}</span>
-                                                <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                {item.roles ? (
+                                                    item.roles.map((role, index) => (
+                                                        <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                    ))
+                                                ) : (
+                                                    <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                )}
                                                 {item.year && <span className="item-year">{item.year}</span>}
                                             </li>
                                         ))}
@@ -318,13 +355,25 @@ export default function WorksPage() {
 
                                     <h3 className="list-title">ボイスコミック</h3>
                                     <ul className="list-items">
-                                        {works.other && works.other.comic && works.other.comic.map(item => (
-                                            <li className="list-item" key={item.id}>
-                                                <span className="item-title">{item.title}</span>
-                                                {item.role && <span className="item-role">{item.role}</span>}
-                                                {item.year && <span className="item-year">{item.year}</span>}
-                                            </li>
-                                        ))}
+                                        {works.other && works.other.comic && works.other.comic.map(item => {
+                                            console.log('ボイスコミックアイテム:', item);
+                                            return (
+                                                <li className="list-item" key={item.id}>
+                                                    <span className="item-title">{item.title}</span>
+                                                    {item.roles ? (
+                                                        item.roles.map((role, index) => {
+                                                            console.log(`ボイスコミック「${item.title}」の役:`, role);
+                                                            return (
+                                                                <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                            );
+                                                        })
+                                                    ) : (
+                                                        item.role && <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                    )}
+                                                    {item.year && <span className="item-year">{item.year}</span>}
+                                                </li>
+                                            );
+                                        })}
                                     </ul>
                                     {works.other && works.other.comic && works.other.comic.length === 0 && (
                                         <p className="text-center text-gray-600 mt-4">現在データがありません</p>

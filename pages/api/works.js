@@ -60,10 +60,23 @@ export default async function handler(req, res) {
             const roleNames = takuyaRoles.map(r => r.role?.name).filter(Boolean);
 
             // 役割が複数ある場合は「、」で区切ってテキスト化
-            const rolesText = roleNames.length > 0 ? roleNames.join('、') + ' 役' : '';
+            const rolesText = roleNames.length > 0 ? roleNames.join('、') : '';
 
             // メイン役割が1つでもあるかどうかをチェック
             const hasMainRole = takuyaRoles.some(r => r.is_main_role);
+
+            // 複数の役がある場合は roles 配列として返す
+            if (roleNames.length > 1) {
+                return {
+                    id: work.id,
+                    title: work.title,
+                    roles: takuyaRoles.map(r => ({
+                        name: r.role?.name,
+                        isMain: r.is_main_role
+                    })),
+                    year: work.year ? `${work.year}年` : ''
+                };
+            }
 
             return {
                 id: work.id,
@@ -432,27 +445,27 @@ export default async function handler(req, res) {
         const formattedAnime = animeResult.data?.map(work => {
             const takuyaRoles = filterTakuyaSatoRoles(work);
             return formatWork(work, takuyaRoles);
-        }).filter(work => work.role) || []; // 佐藤拓也の役割がある作品のみ
+        }).filter(work => work.role || work.roles) || []; // 佐藤拓也の役割がある作品のみ
 
         const formattedGame = gameResult.data?.map(work => {
             const takuyaRoles = filterTakuyaSatoRoles(work);
             return formatWork(work, takuyaRoles);
-        }).filter(work => work.role) || [];
+        }).filter(work => work.role || work.roles) || [];
 
         const formattedDubMovie = dubMovieResult.data?.map(work => {
             const takuyaRoles = filterTakuyaSatoRoles(work);
             return formatWork(work, takuyaRoles);
-        }).filter(work => work.role) || [];
+        }).filter(work => work.role || work.roles) || [];
 
         const formattedDubDrama = dubDramaResult.data?.map(work => {
             const takuyaRoles = filterTakuyaSatoRoles(work);
             return formatWork(work, takuyaRoles);
-        }).filter(work => work.role) || [];
+        }).filter(work => work.role || work.roles) || [];
 
         const formattedDubAnime = dubAnimeResult.data?.map(work => {
             const takuyaRoles = filterTakuyaSatoRoles(work);
             return formatWork(work, takuyaRoles);
-        }).filter(work => work.role) || [];
+        }).filter(work => work.role || work.roles) || [];
 
         const formattedNarration = narrationResult.data?.map(work => formatSpecialWork(work)) || [];
         const formattedRadio = radioResult.data?.map(work => formatRadioWork(work)) || [];
@@ -462,22 +475,22 @@ export default async function handler(req, res) {
             ...(specialResult.data?.map(work => {
                 const takuyaRoles = filterTakuyaSatoRoles(work);
                 return formatWork(work, takuyaRoles);
-            }).filter(work => work.role) || []),
+            }).filter(work => work.role || work.roles) || []),
             ...(stageResult.data?.map(work => {
                 const takuyaRoles = filterTakuyaSatoRoles(work);
                 return formatWork(work, takuyaRoles);
-            }).filter(work => work.role) || [])
+            }).filter(work => work.role || work.roles) || [])
         ];
 
         const formattedDrama = dramaResult.data?.map(work => {
             const takuyaRoles = filterTakuyaSatoRoles(work);
             return formatWork(work, takuyaRoles);
-        }).filter(work => work.role) || [];
+        }).filter(work => work.role || work.roles) || [];
 
         const formattedComic = comicResult.data?.map(work => {
             const takuyaRoles = filterTakuyaSatoRoles(work);
             return formatWork(work, takuyaRoles);
-        }).filter(work => work.role) || [];
+        }).filter(work => work.role || work.roles) || [];
 
         const formattedWeb = webResult.data?.map(work => formatRadioWork(work)) || [];
 

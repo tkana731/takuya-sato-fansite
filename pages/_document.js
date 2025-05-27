@@ -1,7 +1,8 @@
 import { Html, Head, Main, NextScript } from "next/document";
-import { GA_MEASUREMENT_ID } from '../lib/gtag';
 
 export default function Document() {
+  const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  
   return (
     <Html lang="ja">
       <Head>
@@ -24,9 +25,7 @@ export default function Document() {
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
-                  gtag('config', '${GA_MEASUREMENT_ID}', {
-                    page_path: window.location.pathname,
-                  });
+                  gtag('config', '${GA_MEASUREMENT_ID}');
                 `,
               }}
             />

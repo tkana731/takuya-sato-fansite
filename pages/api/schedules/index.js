@@ -79,7 +79,7 @@ export default async function handler(req, res) {
           description,
           official_url,
           category:category_id (id, name, color_code),
-          venue:venue_id (id, name),
+          venue:venue_id (id, name, prefecture_id (id, name)),
           broadcastStation:broadcast_station_id (id, name),
           performers:rel_schedule_performers (
             id,
@@ -135,6 +135,7 @@ export default async function handler(req, res) {
             const location = isBroadcast
                 ? (schedule.broadcastStation ? schedule.broadcastStation.name : '')
                 : (schedule.venue ? schedule.venue.name : '');
+            const prefecture = !isBroadcast && schedule.venue?.prefecture_id?.name || null;
 
             // 出演者情報を整形
             const performers = schedule.performers
@@ -160,6 +161,7 @@ export default async function handler(req, res) {
                 time: timeInfo,
                 location: location,
                 locationType: isBroadcast ? '放送/配信' : '会場',
+                prefecture: prefecture,
                 description: description,
                 link: schedule.official_url || '#'
             };

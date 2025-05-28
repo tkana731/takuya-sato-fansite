@@ -31,21 +31,43 @@ export default function CharactersPage() {
         fetchCharacters();
     }, []);
 
-    // 作品名でグルーピング
+    // キャラクター名でグルーピング（同名でも別IDは別キャラとして扱う、ただし「（役名なし）」は例外）
     const groupedCharacters = characters.reduce((acc, character) => {
-        const workTitle = character.workTitle || 'その他';
-        if (!acc[workTitle]) {
-            acc[workTitle] = [];
+        // 「（役名なし）」の場合は名前でグルーピング、それ以外はIDを含めてグルーピング
+        const groupKey = character.name === '（役名なし）' 
+            ? character.name 
+            : `${character.name}_${character.id.split('-')[0]}`;
+        
+        if (!acc[groupKey]) {
+            acc[groupKey] = {
+                character: {
+                    id: character.id.split('-')[0], // 元のキャラクターIDを取得
+                    name: character.name,
+                    birthday: character.birthday
+                },
+                works: []
+            };
         }
-        acc[workTitle].push(character);
+        
+        // 作品情報を追加（重複チェック）
+        if (character.workTitle && !acc[groupKey].works.some(work => work.workId === character.workId)) {
+            acc[groupKey].works.push({
+                workId: character.workId,
+                workTitle: character.workTitle,
+                mediaType: character.mediaType,
+                mediaTypeOrder: character.mediaTypeOrder,
+                isMainRole: character.isMainRole
+            });
+        }
+        
         return acc;
     }, {});
 
-    // 作品名をソート
-    const sortedWorkTitles = Object.keys(groupedCharacters).sort((a, b) => {
-        if (a === 'その他') return 1;
-        if (b === 'その他') return -1;
-        return a.localeCompare(b, 'ja');
+    // キャラクター名をソート（表示用の名前で比較）
+    const sortedCharacterNames = Object.keys(groupedCharacters).sort((a, b) => {
+        const nameA = groupedCharacters[a].character.name;
+        const nameB = groupedCharacters[b].character.name;
+        return nameA.localeCompare(nameB, 'ja');
     });
 
     // メディアタイプを抽出して display_order で並べ替え
@@ -68,15 +90,15 @@ export default function CharactersPage() {
     // フィルタリング機能
     const filterCharacters = () => {
         if (activeFilter === 'all') {
-            return sortedWorkTitles;
+            return sortedCharacterNames;
         }
-        return sortedWorkTitles.filter(workTitle => {
-            const workCharacters = groupedCharacters[workTitle];
-            return workCharacters.some(character => character.mediaType === activeFilter);
+        return sortedCharacterNames.filter(groupKey => {
+            const characterData = groupedCharacters[groupKey];
+            return characterData.works.some(work => work.mediaType === activeFilter);
         });
     };
 
-    const filteredWorkTitles = filterCharacters();
+    const filteredCharacterNames = filterCharacters();
 
     // 誕生日のフォーマット
     const formatBirthday = (birthday) => {
@@ -136,29 +158,28 @@ export default function CharactersPage() {
                         <p className="section-subtitle">キャラクター一覧</p>
                     </div>
 
-                    {/* フィルタータブ */}
+                    {/* フィルタープルダウン */}
                     {mediaTypes.length > 0 && (
-                        <div className="filter-tabs-wrapper">
-                            <div className="filter-tabs" role="tablist" aria-label="メディアタイプフィルター">
-                                <button
-                                    className={`filter-tab ${activeFilter === 'all' ? 'active' : ''}`}
-                                    onClick={() => setActiveFilter('all')}
-                                    role="tab"
-                                    aria-selected={activeFilter === 'all'}
+                        <div className="filters-container">
+                            <div className="filter-group">
+                                <label className="filter-label">作品カテゴリ：</label>
+                                <select 
+                                    value={activeFilter} 
+                                    onChange={(e) => setActiveFilter(e.target.value)}
+                                    className="filter-select"
+                                    aria-label="メディアタイプフィルター"
                                 >
-                                    <span className="tab-text">すべて</span>
-                                </button>
-                                {mediaTypes.map(type => (
-                                    <button
-                                        key={type}
-                                        className={`filter-tab ${activeFilter === type ? 'active' : ''}`}
-                                        onClick={() => setActiveFilter(type)}
-                                        role="tab"
-                                        aria-selected={activeFilter === type}
-                                    >
-                                        <span className="tab-text">{type}</span>
-                                    </button>
-                                ))}
+                                    <option value="all">すべて</option>
+                                    {mediaTypes.map(type => (
+                                        <option key={type} value={type}>
+                                            {type}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            
+                            <div className="filter-result">
+                                <span className="result-count">{filteredCharacterNames.length}</span>件のキャラクター
                             </div>
                         </div>
                     )}
@@ -181,36 +202,38 @@ export default function CharactersPage() {
                         </div>
                     ) : (
                         <div className="characters-container">
-                            {filteredWorkTitles.length > 0 ? (
-                                filteredWorkTitles.map(workTitle => {
-                                    const workCharacters = groupedCharacters[workTitle].filter(character =>
-                                        activeFilter === 'all' || character.mediaType === activeFilter
-                                    );
+                            {filteredCharacterNames.length > 0 ? (
+                                filteredCharacterNames.map(groupKey => {
+                                    const characterData = groupedCharacters[groupKey];
+                                    const filteredWorks = activeFilter === 'all' 
+                                        ? characterData.works 
+                                        : characterData.works.filter(work => work.mediaType === activeFilter);
 
-                                    if (workCharacters.length === 0) return null;
+                                    if (filteredWorks.length === 0) return null;
 
                                     return (
-                                        <div key={workTitle} className="work-group">
-                                            <h3 className="work-group-title">{workTitle}</h3>
-                                            <div className="characters-grid">
-                                                {workCharacters.map(character => (
-                                                    <div className="character-card" key={character.id}>
-                                                        <div className="character-content">
-                                                            <h4 className="character-name">{character.name}</h4>
-                                                            <p className="character-info">
-                                                                <span className="info-label">作品:</span>
-                                                                <span className="info-value">{character.workTitle}</span>
-                                                            </p>
-                                                            {character.birthday && (
-                                                                <p className="character-info">
-                                                                    <span className="info-label">誕生日:</span>
-                                                                    <span className="info-value">{formatBirthday(character.birthday)}</span>
-                                                                </p>
-                                                            )}
-                                                            {character.mediaType && (
-                                                                <span className={`media-type-badge ${character.mediaType.toLowerCase()}`}>
-                                                                    {character.mediaType}
+                                        <div key={groupKey} className="character-group">
+                                            <div className="character-header">
+                                                <h3 className="character-group-name">{characterData.character.name}</h3>
+                                                {characterData.character.birthday && (
+                                                    <p className="character-birthday">
+                                                        <span className="info-label">誕生日:</span>
+                                                        <span className="info-value">{formatBirthday(characterData.character.birthday)}</span>
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="works-grid">
+                                                {filteredWorks.map(work => (
+                                                    <div className="work-card" key={work.workId}>
+                                                        <div className="work-content">
+                                                            <h4 className="work-title">{work.workTitle}</h4>
+                                                            {work.mediaType && (
+                                                                <span className={`media-type-badge ${work.mediaType.toLowerCase()}`}>
+                                                                    {work.mediaType}
                                                                 </span>
+                                                            )}
+                                                            {work.isMainRole && (
+                                                                <span className="main-role-badge">メイン</span>
                                                             )}
                                                         </div>
                                                     </div>

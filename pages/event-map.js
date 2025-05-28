@@ -191,10 +191,19 @@ export default function EventMapPage() {
                           <div className="event-date-badge">
                             <div className="event-year">{new Date(event.date).getFullYear()}</div>
                             <div className="event-month-day">
-                              {new Date(event.date).toLocaleDateString('ja-JP', { 
-                                month: 'short', 
-                                day: 'numeric' 
-                              })}
+                              {(() => {
+                                const date = new Date(event.date);
+                                const month = String(date.getMonth() + 1).padStart(2, '0');
+                                const day = String(date.getDate()).padStart(2, '0');
+                                return `${month}/${day}`;
+                              })()}
+                            </div>
+                            <div className="event-weekday">
+                              {(() => {
+                                const date = new Date(event.date);
+                                const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+                                return weekdays[date.getDay()];
+                              })()}
                             </div>
                           </div>
                           <div className="event-content">

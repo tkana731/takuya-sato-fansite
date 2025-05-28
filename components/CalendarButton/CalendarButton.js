@@ -158,48 +158,8 @@ const CalendarButton = ({ schedule }) => {
       aria-label="Googleカレンダーに登録"
       title="Googleカレンダーに登録"
     >
-      <FaGoogle size={16} />
-      
-      <style jsx>{`
-        .google-calendar-button {
-          position: absolute;
-          bottom: 16px;
-          right: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 36px;
-          height: 36px;
-          background: white;
-          border: 1px solid #e0e0e0;
-          border-radius: 50%;
-          color: #4285F4;
-          cursor: pointer;
-          transition: all 0.2s;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .google-calendar-button:hover {
-          background: #f8f9fa;
-          border-color: #4285F4;
-          box-shadow: 0 3px 6px rgba(66, 133, 244, 0.3);
-          transform: translateY(-1px);
-        }
-        
-        .google-calendar-button:active {
-          transform: translateY(0);
-          box-shadow: 0 2px 4px rgba(66, 133, 244, 0.2);
-        }
-        
-        @media (max-width: 768px) {
-          .google-calendar-button {
-            bottom: 12px;
-            right: 12px;
-            width: 32px;
-            height: 32px;
-          }
-        }
-      `}</style>
+      <FaGoogle />
+      <span className="button-text">カレンダー登録</span>
     </button>
   );
 };

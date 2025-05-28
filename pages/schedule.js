@@ -3,9 +3,8 @@ import { useEffect, useState } from 'react';
 import Layout from '../components/Layout/Layout';
 import SEO from '../components/SEO/SEO';
 import SchemaOrg from '../components/SEO/SchemaOrg';
-import Link from 'next/link';
 import CalendarButton from '../components/CalendarButton/CalendarButton';
-import { FaCalendarAlt } from 'react-icons/fa';
+import { FaCalendarAlt, FaExternalLinkAlt } from 'react-icons/fa';
 
 export default function SchedulePage() {
     const [schedules, setSchedules] = useState([]);
@@ -342,27 +341,69 @@ export default function SchedulePage() {
                                         const isBroadcast = schedule.locationType === '放送/配信';
                                         // 公式リンクが有効かどうかをチェック
                                         const hasValidLink = schedule.link && schedule.link !== '#';
+                                        const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+                                        const dateObj = new Date(schedule.date);
+                                        const weekday = weekdays[dateObj.getDay()];
 
                                         return (
-                                            <li className="schedule-item" key={schedule.id} data-category={schedule.category}>
-                                                <div className="schedule-date">
-                                                    <span className="date-year">{date.year}</span>
-                                                    <span className="date-month">{date.month}</span>
-                                                    <span className="date-day">{date.day}</span>
-                                                    <span className="date-weekday">{schedule.weekday}</span>
+                                            <li className="schedule-card" key={schedule.id} data-category={schedule.category}>
+                                                <div className="schedule-date-badge">
+                                                    <div className="schedule-year">{date.year}</div>
+                                                    <div className="schedule-month-day">
+                                                        {String(date.month).padStart(2, '0')}/{String(date.day).padStart(2, '0')}
+                                                    </div>
+                                                    <div className="schedule-weekday">{weekday}</div>
                                                 </div>
                                                 <div className="schedule-content">
-                                                    <span className={`schedule-category category-${schedule.category}`}>{schedule.categoryName}</span>
                                                     <h3 className="schedule-title">{schedule.title}</h3>
-                                                    <p className="schedule-info">
-                                                        <span className="schedule-time">{schedule.time}</span> / {schedule.location}
-                                                        {isBroadcast && <small className="ml-1 text-gray-600">（{schedule.locationType}）</small>}
-                                                    </p>
-                                                    <p className="schedule-info">{schedule.description}</p>
-                                                    {hasValidLink && (
-                                                        <a href={schedule.link} className="schedule-link" target="_blank" rel="noopener noreferrer">詳細はこちら →</a>
+                                                    <div className="schedule-details">
+                                                        <div className="schedule-detail-item">
+                                                            <span className="detail-icon">🕒</span>
+                                                            <span>{schedule.time}</span>
+                                                        </div>
+                                                        <div className="schedule-detail-item">
+                                                            <span className="detail-icon">{isBroadcast ? '📺' : '📍'}</span>
+                                                            <span>{schedule.location}</span>
+                                                        </div>
+                                                        {isBroadcast ? (
+                                                            <div className="schedule-detail-item">
+                                                                <span className="detail-icon">📡</span>
+                                                                <span>{schedule.locationType}</span>
+                                                            </div>
+                                                        ) : schedule.prefecture && (
+                                                            <div className="schedule-detail-item">
+                                                                <span className="detail-icon">🗾</span>
+                                                                <span>{schedule.prefecture}</span>
+                                                            </div>
+                                                        )}
+                                                        {schedule.categoryName && (
+                                                            <div className="schedule-detail-item">
+                                                                <span className="detail-icon">🏷️</span>
+                                                                <span className="schedule-category-badge">{schedule.categoryName}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {schedule.description && (
+                                                        <div className="schedule-description-wrapper">
+                                                            <p className="schedule-description">{schedule.description}</p>
+                                                        </div>
                                                     )}
-                                                    <CalendarButton schedule={schedule} />
+                                                    <div className="schedule-actions">
+                                                        {hasValidLink && (
+                                                            <a 
+                                                                href={schedule.link} 
+                                                                className="schedule-link-button" 
+                                                                target="_blank" 
+                                                                rel="noopener noreferrer"
+                                                                title="関連リンク（外部サイト）"
+                                                                aria-label="関連リンク（外部サイト）"
+                                                            >
+                                                                <FaExternalLinkAlt />
+                                                                <span className="button-text">関連リンク</span>
+                                                            </a>
+                                                        )}
+                                                        <CalendarButton schedule={schedule} />
+                                                    </div>
                                                 </div>
                                             </li>
                                         );

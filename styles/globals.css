@@ -602,6 +602,186 @@ img {
   list-style: none;
 }
 
+/* 新しいイベントカード風スタイル */
+.schedule-card {
+  display: flex;
+  background-color: white;
+  border-radius: 15px;
+  padding: 20px 20px 12px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+  align-items: flex-start;
+  gap: 20px;
+  position: relative;
+}
+
+.schedule-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-card .schedule-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.schedule-date-badge {
+  flex-shrink: 0;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 12px 15px;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 95px;
+  width: 95px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 95px;
+}
+
+.schedule-year {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.schedule-month-day {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 5px;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+.schedule-weekday {
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 4px;
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.schedule-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin: 12px 0;
+}
+
+.schedule-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  color: var(--gray-dark);
+}
+
+.detail-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.schedule-category-badge {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.location-type {
+  color: var(--gray-dark);
+  margin-left: 4px;
+}
+
+.schedule-description-wrapper {
+  margin: 8px 0 4px 0;
+}
+
+.schedule-description {
+  font-size: 14px;
+  color: var(--gray-dark);
+  line-height: 1.6;
+}
+
+.schedule-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.schedule-link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  height: 42px;
+  background-color: white;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.schedule-link-button:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.schedule-link-button svg {
+  font-size: 18px;
+}
+
+/* カレンダーボタン - styled-jsxのスタイルを上書き */
+.schedule-card .google-calendar-button {
+  position: static !important;
+  bottom: auto !important;
+  right: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 16px !important;
+  height: 42px !important;
+  background-color: white !important;
+  color: var(--primary-color) !important;
+  border: 2px solid var(--primary-color) !important;
+  border-radius: 8px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s !important;
+  white-space: nowrap !important;
+}
+
+.schedule-card .google-calendar-button:hover {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  transform: translateY(-2px) !important;
+}
+
+.schedule-card .google-calendar-button svg {
+  font-size: 18px;
+}
+
 .schedule-item {
   display: flex;
   position: relative;
@@ -660,7 +840,7 @@ img {
 
 .schedule-content {
   flex: 1;
-  padding: 15px 15px 50px 15px;
+  padding: 15px 15px 30px 15px;
   position: relative;
 }
 
@@ -687,7 +867,17 @@ img {
   background-color: var(--broadcast-color);
 }
 
-.schedule-title {
+/* スケジュールカード用タイトル */
+.schedule-card .schedule-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 0;
+  line-height: 1.4;
+}
+
+/* 古いスタイル（後方互換性のため残す） */
+.schedule-item .schedule-title {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 5px;
@@ -1697,8 +1887,62 @@ img {
     margin-bottom: 5px;
   }
 
-  .schedule-title {
+  .schedule-item .schedule-title {
     padding-right: 0;
+  }
+  
+
+  /* スケジュールカードのモバイル対応 */
+  .schedule-card {
+    flex-direction: column;
+    padding: 15px 15px 10px 15px;
+    gap: 15px;
+  }
+
+
+  /* ボタンのテキストを非表示にしてアイコンのみ表示 */
+  .schedule-link-button .button-text,
+  .google-calendar-button .button-text {
+    display: none;
+  }
+
+  .schedule-link-button,
+  .schedule-card .google-calendar-button {
+    width: 42px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+  }
+
+  .schedule-actions {
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .schedule-date-badge {
+    width: 100%;
+    flex-direction: row;
+    min-height: auto;
+    padding: 10px 15px;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .schedule-year,
+  .schedule-month-day,
+  .schedule-weekday {
+    margin: 0;
+  }
+
+  .schedule-month-day {
+    font-size: 18px;
+  }
+
+  .schedule-detail-item {
+    font-size: 13px;
+  }
+
+  .schedule-actions {
+    gap: 10px;
   }
 
   .wave-divider svg,
@@ -2810,11 +3054,77 @@ img {
   position: relative;
 }
 
-.characters-container {
+.characters-page-section .container {
   background-color: rgba(255, 255, 255, 0.9);
   border-radius: 10px;
   padding: 30px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.characters-container {
+  margin-top: 0;
+}
+
+/* キャラクターページ用フィルター */
+.characters-page-section .filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: var(--gray-light);
+  border-radius: 10px;
+}
+
+.characters-page-section .filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.characters-page-section .filter-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+.characters-page-section .filter-select {
+  padding: 8px 15px;
+  border: 2px solid var(--primary-color);
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary-color);
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 150px;
+}
+
+.characters-page-section .filter-select:hover {
+  background-color: var(--primary-light);
+}
+
+.characters-page-section .filter-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(28, 126, 214, 0.2);
+}
+
+.characters-page-section .filter-result {
+  margin-left: auto;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+.characters-page-section .result-count {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-right: 5px;
 }
 
 .filter-tabs-wrapper {
@@ -2883,6 +3193,7 @@ img {
   width: 100%;
 }
 
+/* 作品グループ用のスタイル（後方互換性のため残す） */
 .work-group {
   margin-bottom: 40px;
 }
@@ -2901,6 +3212,80 @@ img {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
+}
+
+/* キャラクターグループ用のスタイル */
+.character-group {
+  margin-bottom: 40px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 15px;
+  padding: 25px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.character-header {
+  margin-bottom: 20px;
+}
+
+.character-group-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+}
+
+.character-birthday {
+  font-size: 14px;
+  color: var(--gray-dark);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.work-card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.work-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.work-content {
+  position: relative;
+  z-index: 1;
+}
+
+.work-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.main-role-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  background-color: var(--accent-color);
+  color: white;
+  margin-left: 8px;
+  text-transform: uppercase;
 }
 
 .character-card {
@@ -2986,8 +3371,29 @@ img {
     padding: 40px 0;
   }
 
-  .characters-container {
+  .characters-page-section .container {
     padding: 20px;
+  }
+
+  /* フィルターのモバイル対応 */
+  .characters-page-section .filters-container {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .characters-page-section .filter-group {
+    width: 100%;
+  }
+
+  .characters-page-section .filter-select {
+    width: 100%;
+  }
+
+  .characters-page-section .filter-result {
+    margin-left: 0;
+    text-align: center;
+    width: 100%;
   }
 
   .filter-tabs {
@@ -3014,6 +3420,29 @@ img {
 
   .character-name {
     font-size: 16px;
+  }
+
+  /* キャラクターグループのモバイル対応 */
+  .character-group {
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+
+  .character-group-name {
+    font-size: 20px;
+  }
+
+  .works-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .work-card {
+    padding: 12px;
+  }
+
+  .work-title {
+    font-size: 14px;
   }
 }
 
@@ -3154,6 +3583,7 @@ img {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s, box-shadow 0.3s;
   gap: 20px;
+  position: relative;
 }
 
 .event-card:hover {
@@ -3165,10 +3595,16 @@ img {
   flex-shrink: 0;
   background-color: var(--primary-color);
   color: white;
-  padding: 15px;
+  padding: 12px 15px;
   border-radius: 10px;
   text-align: center;
-  min-width: 80px;
+  min-width: 95px;
+  width: 95px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 95px;
 }
 
 .event-year {
@@ -3181,6 +3617,20 @@ img {
   font-size: 20px;
   font-weight: 700;
   margin-top: 5px;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+.event-weekday {
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 4px;
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
 }
 
 .event-content {
@@ -3214,8 +3664,8 @@ img {
 }
 
 .event-category-badge {
-  background-color: var(--accent-light);
-  color: var(--accent-color);
+  background-color: var(--primary-light);
+  color: var(--primary-color);
   padding: 2px 10px;
   border-radius: 12px;
   font-size: 12px;
@@ -3774,16 +4224,19 @@ img {
     gap: 15px;
   }
   
+  
   .event-date-badge {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     width: 100%;
+    flex-direction: row;
+    min-height: auto;
     padding: 10px 15px;
+    justify-content: center;
+    gap: 10px;
   }
   
   .event-year,
-  .event-month-day {
+  .event-month-day,
+  .event-weekday {
     margin: 0;
   }
   

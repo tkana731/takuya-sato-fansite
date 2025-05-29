@@ -66,7 +66,18 @@ export default function Characters({ characters = [] }) {
     // 誕生日のフォーマット
     const formatBirthday = (birthday) => {
         if (!birthday) return '不明';
+        
+        // MM/DD形式の場合の処理
+        if (birthday.includes('/')) {
+            const [month, day] = birthday.split('/');
+            return `${parseInt(month, 10)}月${parseInt(day, 10)}日`;
+        }
+        
+        // その他の形式の場合は従来の処理
         const date = new Date(birthday);
+        if (isNaN(date.getTime())) {
+            return '不明';
+        }
         return `${date.getMonth() + 1}月${date.getDate()}日`;
     };
 

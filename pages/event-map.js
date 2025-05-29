@@ -68,6 +68,11 @@ export default function EventMapPage() {
       item: {
         '@type': 'Event',
         name: event.title,
+        description: event.description || `佐藤拓也さん出演イベント`,
+        startDate: event.date,
+        endDate: event.date,
+        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+        eventStatus: 'https://schema.org/EventScheduled',
         location: {
           '@type': 'Place',
           name: event.location,
@@ -76,7 +81,23 @@ export default function EventMapPage() {
             addressRegion: event.prefecture
           }
         },
-        startDate: event.date
+        performer: {
+          '@type': 'Person',
+          name: '佐藤拓也'
+        },
+        organizer: {
+          '@type': 'Organization',
+          name: event.organizer || '主催者'
+        },
+        offers: {
+          '@type': 'Offer',
+          availability: 'https://schema.org/InStock',
+          price: event.price || '0',
+          priceCurrency: 'JPY',
+          url: event.link || null
+        },
+        image: event.image || 'https://takuya-sato-fansite.vercel.app/takuya-sato-default.jpg',
+        url: event.link || null
       }
     }))
   };

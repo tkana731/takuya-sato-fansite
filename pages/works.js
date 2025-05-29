@@ -16,6 +16,7 @@ export default function WorksPage() {
         other: {
             special: [],
             drama: [],
+            dramaCD: [],
             radio: [],
             voice: [],
             comic: []
@@ -93,7 +94,8 @@ export default function WorksPage() {
                 ...(works.other?.drama || []),
                 ...(works.other?.radio || []),
                 ...(works.other?.voice || []),
-                ...(works.other?.comic || [])
+                ...(works.other?.comic || []),
+                ...(works.other?.dramaCD || [])
             ];
         }
 
@@ -379,7 +381,7 @@ export default function WorksPage() {
                                         <p className="text-center text-gray-600 mt-4">現在データがありません</p>
                                     )}
 
-                                    <h3 className="list-title">テレビドラマ</h3>
+                                    <h3 className="list-title">ドラマ</h3>
                                     <ul className="list-items">
                                         {works.other && works.other.drama && works.other.drama.map(item => (
                                             <li className="list-item" key={item.id}>
@@ -390,6 +392,26 @@ export default function WorksPage() {
                                         ))}
                                     </ul>
                                     {works.other && works.other.drama && works.other.drama.length === 0 && (
+                                        <p className="text-center text-gray-600 mt-4">現在データがありません</p>
+                                    )}
+
+                                    <h3 className="list-title">ドラマCD</h3>
+                                    <ul className="list-items">
+                                        {works.other && works.other.dramaCD && works.other.dramaCD.map(item => (
+                                            <li className="list-item" key={item.id}>
+                                                <span className="item-title">{item.title}</span>
+                                                {item.roles ? (
+                                                    item.roles.map((role, index) => (
+                                                        <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                    ))
+                                                ) : (
+                                                    <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                                )}
+                                                {item.year && <span className="item-year">{item.year}</span>}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    {works.other && works.other.dramaCD && works.other.dramaCD.length === 0 && (
                                         <p className="text-center text-gray-600 mt-4">現在データがありません</p>
                                     )}
                                 </div>

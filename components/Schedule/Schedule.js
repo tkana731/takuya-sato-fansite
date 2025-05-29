@@ -176,10 +176,12 @@ const Schedule = forwardRef((props, ref) => {
                                             <div className="schedule-content">
                                                 <h3 className="schedule-title">{schedule.title}</h3>
                                                 <div className="schedule-details">
-                                                    <div className="schedule-detail-item">
-                                                        <span className="detail-icon">🕒</span>
-                                                        <span>{schedule.time}</span>
-                                                    </div>
+                                                    {!schedule.isAllDay && (
+                                                        <div className="schedule-detail-item">
+                                                            <span className="detail-icon">🕒</span>
+                                                            <span>{schedule.time}</span>
+                                                        </div>
+                                                    )}
                                                     <div className="schedule-detail-item">
                                                         <span className="detail-icon">{isBroadcast ? '📺' : '📍'}</span>
                                                         <span>{schedule.location}</span>

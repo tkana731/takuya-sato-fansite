@@ -159,6 +159,7 @@ export default async function handler(req, res) {
                 categoryName: schedule.category?.name || '',
                 title: schedule.title,
                 time: timeInfo,
+                isAllDay: schedule.is_all_day || false,
                 location: location,
                 locationType: isBroadcast ? '放送/配信' : '会場',
                 prefecture: prefecture,

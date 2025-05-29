@@ -250,7 +250,13 @@ const Works = forwardRef((props, ref) => {
                                     {works.other.comic.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
                                             <span className="item-title">{item.title}</span>
-                                            {item.role && <span className="item-role">{item.role}</span>}
+                                            {item.roles ? (
+                                                item.roles.map((role, index) => (
+                                                    <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                ))
+                                            ) : (
+                                                <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                            )}
                                             {item.year && <span className="item-year">{item.year}</span>}
                                         </li>
                                     ))}
@@ -265,7 +271,7 @@ const Works = forwardRef((props, ref) => {
 
                         {works.other && works.other.drama && works.other.drama.length > 0 && (
                             <>
-                                <h3 className="list-title">テレビドラマ</h3>
+                                <h3 className="list-title">ドラマ</h3>
                                 <ul className="list-items">
                                     {works.other.drama.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
@@ -278,6 +284,32 @@ const Works = forwardRef((props, ref) => {
                                 {works.other.drama.length > 5 && (
                                     <div className="more-indicator">
                                         <p className="text-center text-gray-600 mt-2">...他 {works.other.drama.length - 5}作品</p>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {works.other && works.other.dramaCD && works.other.dramaCD.length > 0 && (
+                            <>
+                                <h3 className="list-title">ドラマCD</h3>
+                                <ul className="list-items">
+                                    {works.other.dramaCD.slice(0, 5).map(item => (
+                                        <li className="list-item" key={item.id}>
+                                            <span className="item-title">{item.title}</span>
+                                            {item.roles ? (
+                                                item.roles.map((role, index) => (
+                                                    <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                ))
+                                            ) : (
+                                                <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                            )}
+                                            {item.year && <span className="item-year">{item.year}</span>}
+                                        </li>
+                                    ))}
+                                </ul>
+                                {works.other.dramaCD.length > 5 && (
+                                    <div className="more-indicator">
+                                        <p className="text-center text-gray-600 mt-2">...他 {works.other.dramaCD.length - 5}作品</p>
                                     </div>
                                 )}
                             </>

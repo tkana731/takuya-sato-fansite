@@ -35,7 +35,8 @@ export default async function handler(req, res) {
         const radioCategory = categories.find(c => c.name === 'ラジオ')?.id;
         const specialCategory = categories.find(c => c.name === '特撮')?.id;
         const stageCategory = categories.find(c => c.name === '舞台')?.id;
-        const dramaCategory = categories.find(c => c.name === 'テレビドラマ')?.id;
+        const dramaCategory = categories.find(c => c.name === 'ドラマ')?.id;
+        const dramaCDCategory = categories.find(c => c.name === 'ドラマCD')?.id;
         const comicCategory = categories.find(c => c.name === 'ボイスコミック')?.id;
         const webCategory = categories.find(c => c.name === 'WEB')?.id;
 
@@ -341,7 +342,7 @@ export default async function handler(req, res) {
             fetchPromises.push({ data: [] });
         }
 
-        // テレビドラマ
+        // ドラマ
         if (dramaCategory) {
             fetchPromises.push(
                 supabase
@@ -363,6 +364,35 @@ export default async function handler(req, res) {
                         )
                     `)
                     .eq('category_id', dramaCategory)
+                    .order('year', { ascending: false })
+                    .order('title')
+            );
+        } else {
+            fetchPromises.push({ data: [] });
+        }
+
+        // ドラマCD
+        if (dramaCDCategory) {
+            fetchPromises.push(
+                supabase
+                    .from('works')
+                    .select(`
+                        id,
+                        title,
+                        year,
+                        description,
+                        category_id,
+                        workRoles:rel_work_roles(
+                            id,
+                            is_main_role,
+                            role:role_id (
+                                id,
+                                name,
+                                actor:voice_actor_id (id, name)
+                            )
+                        )
+                    `)
+                    .eq('category_id', dramaCDCategory)
                     .order('year', { ascending: false })
                     .order('title')
             );
@@ -431,12 +461,13 @@ export default async function handler(req, res) {
             specialResult,
             stageResult,
             dramaResult,
+            dramaCDResult,
             comicResult,
             webResult
         ] = await Promise.all(fetchPromises);
 
         // エラーチェック
-        const results = [animeResult, gameResult, dubMovieResult, dubDramaResult, dubAnimeResult, narrationResult, radioResult, specialResult, stageResult, dramaResult, comicResult, webResult];
+        const results = [animeResult, gameResult, dubMovieResult, dubDramaResult, dubAnimeResult, narrationResult, radioResult, specialResult, stageResult, dramaResult, dramaCDResult, comicResult, webResult];
         for (const result of results) {
             if (result.error) throw result.error;
         }
@@ -487,6 +518,11 @@ export default async function handler(req, res) {
             return formatWork(work, takuyaRoles);
         }).filter(work => work.role || work.roles) || [];
 
+        const formattedDramaCD = dramaCDResult.data?.map(work => {
+            const takuyaRoles = filterTakuyaSatoRoles(work);
+            return formatWork(work, takuyaRoles);
+        }).filter(work => work.role || work.roles) || [];
+
         const formattedComic = comicResult.data?.map(work => {
             const takuyaRoles = filterTakuyaSatoRoles(work);
             return formatWork(work, takuyaRoles);
@@ -508,7 +544,8 @@ export default async function handler(req, res) {
                 radio: [...formattedRadio, ...formattedWeb], // ラジオとWEBを統合
                 voice: formattedNarration, // ナレーションをvoiceとして配置
                 comic: formattedComic,
-                drama: formattedDrama
+                drama: formattedDrama,
+                dramaCD: formattedDramaCD
             }
         };
 
@@ -516,7 +553,7 @@ export default async function handler(req, res) {
         console.log(`アニメ: ${formattedAnime.length}件, ゲーム: ${formattedGame.length}件`);
         console.log(`映画吹替: ${formattedDubMovie.length}件, ドラマ吹替: ${formattedDubDrama.length}件, アニメ吹替: ${formattedDubAnime.length}件`);
         console.log(`特撮/舞台: ${formattedSpecial.length}件, ラジオ: ${formattedRadio.length + formattedWeb.length}件, ナレーション: ${formattedNarration.length}件`);
-        console.log(`ボイスコミック: ${formattedComic.length}件, テレビドラマ: ${formattedDrama.length}件`);
+        console.log(`ボイスコミック: ${formattedComic.length}件, ドラマ: ${formattedDrama.length}件, ドラマCD: ${formattedDramaCD.length}件`);
 
         return res.status(200).json(formattedWorks);
     } catch (error) {

@@ -1,56 +1,13 @@
 // pages/works.js
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Layout from '../components/Layout/Layout';
 import SEO from '../components/SEO/SEO';
 import SchemaOrg from '../components/SEO/SchemaOrg';
 
-export default function WorksPage() {
-    const [works, setWorks] = useState({
-        anime: [],
-        game: [],
-        dub: {
-            movie: [],
-            drama: [],
-            anime: []
-        },
-        other: {
-            special: [],
-            drama: [],
-            dramaCD: [],
-            radio: [],
-            voice: [],
-            comic: []
-        }
-    });
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+export default function WorksPage({ works }) {
     const [activeTab, setActiveTab] = useState('anime');
 
-    // データ取得
-    useEffect(() => {
-        async function fetchWorks() {
-            setLoading(true);
-            try {
-                console.log('WORKSページ: データ取得開始');
-                const response = await fetch('/api/works');
-                if (!response.ok) {
-                    throw new Error('出演作品データの取得に失敗しました');
-                }
-                const data = await response.json();
-                console.log('WORKSページ: 取得したデータ:', data);
-                console.log('ボイスコミックデータ:', data.other?.comic);
-
-                setWorks(data);
-            } catch (err) {
-                console.error('出演作品の取得エラー:', err);
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchWorks();
-    }, []);
+    // データはSSGで事前取得済み
 
     // タブ切り替え処理
     const handleTabChange = (tab) => {
@@ -177,25 +134,8 @@ export default function WorksPage() {
                         </div>
                     </div>
 
-                    {loading ? (
-                        <div className="loading-container">
-                            <div className="audio-wave">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                            <p className="loading-text">LOADING...</p>
-                        </div>
-                    ) : error ? (
-                        <div className="error-message">
-                            <p>{error}</p>
-                            <button onClick={() => window.location.reload()} className="retry-button">再読み込み</button>
-                        </div>
-                    ) : (
-                        <>
-                            {/* アニメタブ - トップページと同じ構造 */}
+                    <>
+                        {/* アニメタブ - トップページと同じ構造 */}
                             <div id="anime-content" className={`works-content ${activeTab === 'anime' ? 'active' : ''}`}>
                                 <div className="works-list">
                                     <h3 className="list-title">アニメ出演作品一覧</h3>
@@ -417,9 +357,56 @@ export default function WorksPage() {
                                 </div>
                             </div>
                         </>
-                    )}
                 </div>
             </section>
         </Layout>
     );
+}
+
+// SSG (Static Site Generation) の実装
+export async function getStaticProps() {
+    try {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+        
+        const response = await fetch(`${baseUrl}/api/works`);
+        
+        if (!response.ok) {
+            throw new Error('Works data fetch failed');
+        }
+        
+        const works = await response.json();
+        
+        return {
+            props: {
+                works
+            },
+            revalidate: 3600 // 1時間ごとに再生成
+        };
+    } catch (error) {
+        console.error('Static props generation error:', error);
+        
+        // エラー時のフォールバック
+        return {
+            props: {
+                works: {
+                    anime: [],
+                    game: [],
+                    dub: {
+                        movie: [],
+                        drama: [],
+                        anime: []
+                    },
+                    other: {
+                        special: [],
+                        drama: [],
+                        dramaCD: [],
+                        radio: [],
+                        voice: [],
+                        comic: []
+                    }
+                }
+            },
+            revalidate: 300 // エラー時は5分後に再試行
+        };
+    }
 }

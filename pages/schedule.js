@@ -6,9 +6,9 @@ import SchemaOrg from '../components/SEO/SchemaOrg';
 import CalendarButton from '../components/CalendarButton/CalendarButton';
 import { FaCalendarAlt, FaExternalLinkAlt } from 'react-icons/fa';
 
-export default function SchedulePage() {
-    const [schedules, setSchedules] = useState([]);
-    const [loading, setLoading] = useState(true);
+export default function SchedulePage({ initialSchedules, initialYearRange }) {
+    const [schedules, setSchedules] = useState(initialSchedules || []);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     // 日本時間の現在日時を取得する関数
@@ -34,8 +34,8 @@ export default function SchedulePage() {
     const [tempYear, setTempYear] = useState(displayDate.year);
     const [tempMonth, setTempMonth] = useState(displayDate.month);
     
-    // 選択可能な年の範囲
-    const [yearRange, setYearRange] = useState({
+    // 選択可能な年の範囲（SSGで取得済み）
+    const [yearRange, setYearRange] = useState(initialYearRange || {
         minYear: currentYear - 1,
         maxYear: currentYear + 1
     });
@@ -87,22 +87,7 @@ export default function SchedulePage() {
         yearOptions.push(i);
     }
 
-    // 日付範囲を取得
-    useEffect(() => {
-        async function fetchDateRange() {
-            try {
-                const response = await fetch('/api/schedules/date-range');
-                if (response.ok) {
-                    const data = await response.json();
-                    setYearRange(data);
-                }
-            } catch (error) {
-                console.error('日付範囲の取得エラー:', error);
-            }
-        }
-        
-        fetchDateRange();
-    }, []);
+    // 日付範囲はSSGで事前取得済み
 
     // 選択された月に基づいてスケジュールを取得
     useEffect(() => {
@@ -147,7 +132,10 @@ export default function SchedulePage() {
             }
         }
 
-        fetchSchedulesByMonth();
+        // 初期表示時はSSGデータを使用、月切り替え時のみフェッチ
+        if (displayDate.year !== currentYear || displayDate.month !== currentMonth + 1) {
+            fetchSchedulesByMonth();
+        }
     }, [displayDate]);
 
     // カテゴリフィルタリングの状態
@@ -486,4 +474,60 @@ export default function SchedulePage() {
             </section>
         </Layout>
     );
+}
+
+// SSG (Static Site Generation) の実装
+export async function getStaticProps() {
+    try {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+        
+        // 現在月のスケジュールデータを取得
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth(); // 0-11
+        
+        // 現在月の初日と最終日を取得
+        const firstDay = new Date(Date.UTC(currentYear, currentMonth, 1));
+        const lastDay = new Date(Date.UTC(currentYear, currentMonth + 1, 0));
+        
+        const fromDateStr = firstDay.toISOString().split('T')[0];
+        const toDateStr = lastDay.toISOString().split('T')[0];
+        
+        // 並列でデータを取得
+        const [schedulesRes, yearRangeRes] = await Promise.allSettled([
+            fetch(`${baseUrl}/api/schedules?from=${fromDateStr}&to=${toDateStr}`),
+            fetch(`${baseUrl}/api/schedules/date-range`)
+        ]);
+        
+        const initialSchedules = schedulesRes.status === 'fulfilled' && schedulesRes.value.ok
+            ? await schedulesRes.value.json() : [];
+        const initialYearRange = yearRangeRes.status === 'fulfilled' && yearRangeRes.value.ok
+            ? await yearRangeRes.value.json() : {
+                minYear: currentYear - 1,
+                maxYear: currentYear + 1
+            };
+        
+        return {
+            props: {
+                initialSchedules,
+                initialYearRange
+            },
+            revalidate: 1800 // 30分ごとに再生成（スケジュールは更新頻度が高いため）
+        };
+    } catch (error) {
+        console.error('Static props generation error:', error);
+        
+        // エラー時のフォールバック
+        const currentYear = new Date().getFullYear();
+        return {
+            props: {
+                initialSchedules: [],
+                initialYearRange: {
+                    minYear: currentYear - 1,
+                    maxYear: currentYear + 1
+                }
+            },
+            revalidate: 300 // エラー時は5分後に再試行
+        };
+    }
 }

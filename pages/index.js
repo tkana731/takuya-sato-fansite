@@ -12,38 +12,9 @@ import Works from '../components/Works/Works';
 import VideoSection from '../components/Video/VideoSection';
 import Links from '../components/Links/Links';
 
-export default function Home() {
-  // データ状態
-  const [birthdays, setBirthdays] = useState([]);
-  const [onAirContent, setOnAirContent] = useState([]);
-  const [schedules, setSchedules] = useState([]);
-  const [works, setWorks] = useState({
-    anime: [],
-    game: [],
-    dub: {
-      movie: [],
-      drama: [],
-      anime: []
-    },
-    other: {
-      special: [],
-      drama: [],
-      radio: [],
-      voice: [],
-      comic: []
-    }
-  });
-  const [videos, setVideos] = useState([]);
-
-  // UI状態
-  const [loading, setLoading] = useState(true);
-  const [dataLoaded, setDataLoaded] = useState({
-    birthdays: false,
-    onAir: false,
-    schedules: false,
-    works: false,
-    videos: false
-  });
+export default function Home({ birthdays, onAirContent, schedules, works, videos }) {
+  // UI状態のみ（データは props から取得）
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
   const homeRef = useRef(null);
@@ -121,88 +92,7 @@ export default function Home() {
     }
   }, [router.isReady, loading, router.asPath]);
 
-  // データのフェッチを実行
-  useEffect(() => {
-    const fetchDataWithTimeout = async (url, dataType, timeout = 5000) => {
-      try {
-        // タイムアウト処理を追加
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-        const response = await fetch(url, { signal: controller.signal });
-        clearTimeout(timeoutId);
-
-        if (!response.ok) throw new Error(`${dataType}データの取得に失敗しました: ${response.status}`);
-
-        const data = await response.json();
-        return { success: true, data };
-      } catch (err) {
-        console.error(`${dataType}データの取得エラー:`, err);
-        return { success: false, error: err.message };
-      }
-    };
-
-    // データを並列に取得
-    const fetchAllData = async () => {
-      // 日付パラメータの準備
-      const today = new Date();
-      const thirtyDaysLater = new Date();
-      thirtyDaysLater.setDate(today.getDate() + 30);
-      const fromParam = today.toISOString().split('T')[0];
-      const toParam = thirtyDaysLater.toISOString().split('T')[0];
-
-      try {
-        const [birthdaysResult, onAirResult, schedulesResult, videosResult, worksResult] = await Promise.allSettled([
-          fetchDataWithTimeout('/api/birthdays', 'birthdays'),
-          fetchDataWithTimeout('/api/on-air', 'onAir'),
-          fetchDataWithTimeout(`/api/schedules?from=${fromParam}&to=${toParam}`, 'schedules'),
-          fetchDataWithTimeout('/api/videos', 'videos'),
-          fetchDataWithTimeout('/api/works', 'works')
-        ]);
-
-        // 結果を処理
-        if (birthdaysResult.value?.success) {
-          setBirthdays(birthdaysResult.value.data);
-        }
-        setDataLoaded(prev => ({ ...prev, birthdays: true }));
-
-        if (onAirResult.value?.success) {
-          setOnAirContent(onAirResult.value.data);
-        }
-        setDataLoaded(prev => ({ ...prev, onAir: true }));
-
-        if (schedulesResult.value?.success) {
-          setSchedules(schedulesResult.value.data);
-        }
-        setDataLoaded(prev => ({ ...prev, schedules: true }));
-
-        if (videosResult.value?.success) {
-          setVideos(videosResult.value.data);
-        }
-        setDataLoaded(prev => ({ ...prev, videos: true }));
-
-        if (worksResult.value?.success) {
-          setWorks(worksResult.value.data);
-        }
-        setDataLoaded(prev => ({ ...prev, works: true }));
-
-      } catch (error) {
-        console.error('データ取得中のエラー:', error);
-        // エラーが発生した場合でも、ローディングを終了
-        setLoading(false);
-      }
-    };
-
-    fetchAllData();
-  }, []);
-
-  // 全データがロードされたかチェック
-  useEffect(() => {
-    if (dataLoaded.birthdays && dataLoaded.onAir && dataLoaded.schedules && dataLoaded.works && dataLoaded.videos) {
-      // 全データがロードされたらローディングを終了
-      setLoading(false);
-    }
-  }, [dataLoaded]);
+  // データはSSGで事前取得済みなので、ローディング関連のuseEffectは削除
 
   // 各セクションの表示判定用
   const hasData = {
@@ -225,48 +115,105 @@ export default function Home() {
       <SchemaOrg type="Person" />
 
       <div ref={homeRef}>
-        {loading ? (
-          <div className="loading-container">
-            <div className="audio-wave">
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-            <p className="loading-text">LOADING...</p>
+        <>
+          {/* ヒーローセクション（最初に表示） */}
+          <Hero />
+
+          {/* 誕生日キャラクター */}
+          {hasData.birthdays && <Birthday characters={birthdays} />}
+
+          {/* 放送中コンテンツ */}
+          <OnAir content={onAirContent} />
+
+          {/* スケジュール */}
+          <div id="schedule" ref={(ref) => registerSectionRef('schedule', ref)}>
+            <Schedule schedules={schedules} />
           </div>
-        ) : (
-          <>
-            {/* ヒーローセクション（最初に表示） */}
-            <Hero />
 
-            {/* 誕生日キャラクター */}
-            {hasData.birthdays && <Birthday characters={birthdays} />}
+          {/* 作品 */}
+          <div id="works" ref={(ref) => registerSectionRef('works', ref)}>
+            <Works works={works} />
+          </div>
 
-            {/* 放送中コンテンツ */}
-            <OnAir content={onAirContent} />
+          {/* 動画 */}
+          <VideoSection videos={videos} />
 
-            {/* スケジュール */}
-            <div id="schedule" ref={(ref) => registerSectionRef('schedule', ref)}>
-              <Schedule schedules={schedules} />
-            </div>
-
-            {/* 作品 */}
-            <div id="works" ref={(ref) => registerSectionRef('works', ref)}>
-              <Works works={works} />
-            </div>
-
-            {/* 動画 */}
-            <VideoSection videos={videos} />
-
-            {/* リンク - 静的データなので常に表示 */}
-            <div id="links" ref={(ref) => registerSectionRef('links', ref)}>
-              <Links />
-            </div>
-          </>
-        )}
+          {/* リンク - 静的データなので常に表示 */}
+          <div id="links" ref={(ref) => registerSectionRef('links', ref)}>
+            <Links />
+          </div>
+        </>
       </div>
     </Layout>
   );
+}
+
+// SSG (Static Site Generation) の実装
+export async function getStaticProps() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    
+    // 日付パラメータの準備
+    const today = new Date();
+    const thirtyDaysLater = new Date();
+    thirtyDaysLater.setDate(today.getDate() + 30);
+    const fromParam = today.toISOString().split('T')[0];
+    const toParam = thirtyDaysLater.toISOString().split('T')[0];
+
+    // 並列でデータを取得
+    const [birthdaysRes, onAirRes, schedulesRes, videosRes, worksRes] = await Promise.allSettled([
+      fetch(`${baseUrl}/api/birthdays`),
+      fetch(`${baseUrl}/api/on-air`),
+      fetch(`${baseUrl}/api/schedules?from=${fromParam}&to=${toParam}`),
+      fetch(`${baseUrl}/api/videos`),
+      fetch(`${baseUrl}/api/works`)
+    ]);
+
+    // レスポンスをパース
+    const birthdays = birthdaysRes.status === 'fulfilled' && birthdaysRes.value.ok 
+      ? await birthdaysRes.value.json() : [];
+    const onAirContent = onAirRes.status === 'fulfilled' && onAirRes.value.ok 
+      ? await onAirRes.value.json() : [];
+    const schedules = schedulesRes.status === 'fulfilled' && schedulesRes.value.ok 
+      ? await schedulesRes.value.json() : [];
+    const videos = videosRes.status === 'fulfilled' && videosRes.value.ok 
+      ? await videosRes.value.json() : [];
+    const works = worksRes.status === 'fulfilled' && worksRes.value.ok 
+      ? await worksRes.value.json() : {
+        anime: [],
+        game: [],
+        dub: { movie: [], drama: [], anime: [] },
+        other: { special: [], drama: [], radio: [], voice: [], comic: [] }
+      };
+
+    return {
+      props: {
+        birthdays,
+        onAirContent,
+        schedules,
+        works,
+        videos
+      },
+      revalidate: 3600 // 1時間ごとに再生成
+    };
+  } catch (error) {
+    console.error('Static props generation error:', error);
+    
+    // エラー時のフォールバック
+    return {
+      props: {
+        birthdays: [],
+        onAirContent: [],
+        schedules: [],
+        works: {
+          anime: [],
+          game: [],
+          dub: { movie: [], drama: [], anime: [] },
+          other: { special: [], drama: [], radio: [], voice: [], comic: [] }
+        },
+        videos: []
+      },
+      revalidate: 300 // エラー時は5分後に再試行
+    };
+  }
 }

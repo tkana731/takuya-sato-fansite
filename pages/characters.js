@@ -1,35 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Layout from '../components/Layout/Layout';
 import SEO from '../components/SEO/SEO';
 import SchemaOrg from '../components/SEO/SchemaOrg';
 
-export default function CharactersPage() {
-    const [characters, setCharacters] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+export default function CharactersPage({ characters }) {
     const [activeFilter, setActiveFilter] = useState('all');
 
-    // キャラクターデータを取得
-    useEffect(() => {
-        async function fetchCharacters() {
-            setLoading(true);
-            try {
-                const response = await fetch('/api/characters');
-                if (!response.ok) {
-                    throw new Error('キャラクターデータの取得に失敗しました');
-                }
-                const data = await response.json();
-                setCharacters(data || []);
-            } catch (err) {
-                console.error('キャラクターの取得エラー:', err);
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchCharacters();
-    }, []);
+    // キャラクターデータはSSGで事前取得済み
 
     // キャラクター名でグルーピング（同名でも別IDは別キャラとして扱う、ただし「（役名なし）」は例外）
     const groupedCharacters = characters.reduce((acc, character) => {
@@ -195,24 +172,7 @@ export default function CharactersPage() {
                         </div>
                     )}
 
-                    {loading ? (
-                        <div className="loading-container">
-                            <div className="audio-wave">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                            <p className="loading-text">LOADING...</p>
-                        </div>
-                    ) : error ? (
-                        <div className="error-message">
-                            <p>{error}</p>
-                            <button onClick={() => window.location.reload()} className="retry-button">再読み込み</button>
-                        </div>
-                    ) : (
-                        <div className="characters-container">
+                    <div className="characters-container">
                             {filteredCharacterNames.length > 0 ? (
                                 filteredCharacterNames.map(groupKey => {
                                     const characterData = groupedCharacters[groupKey];
@@ -256,10 +216,41 @@ export default function CharactersPage() {
                             ) : (
                                 <div className="no-characters">該当するキャラクターがありません。</div>
                             )}
-                        </div>
-                    )}
+                    </div>
                 </div>
             </section>
         </Layout>
     );
+}
+
+// SSG (Static Site Generation) の実装
+export async function getStaticProps() {
+    try {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+        
+        const response = await fetch(`${baseUrl}/api/characters`);
+        
+        if (!response.ok) {
+            throw new Error('Characters data fetch failed');
+        }
+        
+        const characters = await response.json();
+        
+        return {
+            props: {
+                characters: characters || []
+            },
+            revalidate: 3600 // 1時間ごとに再生成
+        };
+    } catch (error) {
+        console.error('Static props generation error:', error);
+        
+        // エラー時のフォールバック
+        return {
+            props: {
+                characters: []
+            },
+            revalidate: 300 // エラー時は5分後に再試行
+        };
+    }
 }

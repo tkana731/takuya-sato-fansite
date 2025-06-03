@@ -3,38 +3,20 @@ import Layout from '../components/Layout/Layout';
 import SEO from '../components/SEO/SEO';
 import SchemaOrg from '../components/SEO/SchemaOrg';
 
-export default function EventMapPage() {
-  const [eventData, setEventData] = useState(null);
+export default function EventMapPage({ eventData }) {
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const [selectedPrefecture, setSelectedPrefecture] = useState('all');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'stats'
 
+  // 初期化時に現在年のイベントを設定
   useEffect(() => {
-    async function fetchEventData() {
-      try {
-        const response = await fetch('/api/event-map');
-        if (!response.ok) {
-          throw new Error('データの取得に失敗しました');
-        }
-        const data = await response.json();
-        setEventData(data);
-        // 初期表示時は現在年のイベントのみ表示
-        const currentYear = new Date().getFullYear();
-        const currentYearEvents = (data.allEvents || []).filter(event => event.year === currentYear);
-        setFilteredEvents(currentYearEvents);
-      } catch (err) {
-        console.error('Event map data fetch error:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+    if (eventData && eventData.allEvents) {
+      const currentYear = new Date().getFullYear();
+      const currentYearEvents = (eventData.allEvents || []).filter(event => event.year === currentYear);
+      setFilteredEvents(currentYearEvents);
     }
-
-    fetchEventData();
-  }, []);
+  }, [eventData]);
 
   // フィルタリング処理
   useEffect(() => {
@@ -123,24 +105,7 @@ export default function EventMapPage() {
             <p className="section-subtitle">イベント一覧・開催統計</p>
           </div>
 
-          {loading ? (
-            <div className="loading-container">
-              <div className="audio-wave">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-              <p className="loading-text">LOADING...</p>
-            </div>
-          ) : error ? (
-            <div className="error-message">
-              <p>{error}</p>
-              <button onClick={() => window.location.reload()} className="retry-button">再読み込み</button>
-            </div>
-          ) : (
-            <>
+          <>
               {/* 表示モード切り替え */}
               <div className="view-mode-toggle">
                 <button 
@@ -330,10 +295,46 @@ export default function EventMapPage() {
                   </div>
                 </div>
               )}
-            </>
-          )}
+          </>
         </div>
       </section>
     </Layout>
   );
+}
+
+// SSG (Static Site Generation) の実装
+export async function getStaticProps() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    
+    const response = await fetch(`${baseUrl}/api/event-map`);
+    
+    if (!response.ok) {
+      throw new Error('Event map data fetch failed');
+    }
+    
+    const eventData = await response.json();
+    
+    return {
+      props: {
+        eventData
+      },
+      revalidate: 3600 // 1時間ごとに再生成
+    };
+  } catch (error) {
+    console.error('Static props generation error:', error);
+    
+    // エラー時のフォールバック
+    return {
+      props: {
+        eventData: {
+          allEvents: [],
+          prefectures: [],
+          availableYears: [],
+          yearlyData: {}
+        }
+      },
+      revalidate: 300 // エラー時は5分後に再試行
+    };
+  }
 }

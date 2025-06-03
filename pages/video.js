@@ -5,9 +5,9 @@ import SEO from '../components/SEO/SEO';
 import SchemaOrg from '../components/SEO/SchemaOrg';
 import Link from 'next/link';
 
-export default function VideoPage() {
-    const [videos, setVideos] = useState([]);
-    const [loading, setLoading] = useState(true);
+export default function VideoPage({ initialVideos, initialYear }) {
+    const [videos, setVideos] = useState(initialVideos || []);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     // 現在の年を取得
@@ -16,8 +16,8 @@ export default function VideoPage() {
     // 固定の年リスト（2018年から現在まで、降順）
     const years = Array.from({ length: currentYear - 2018 + 1 }, (_, i) => currentYear - i);
 
-    // 初期値は現在の年
-    const [selectedYear, setSelectedYear] = useState(currentYear);
+    // 初期値は現在の年（SSGから取得）
+    const [selectedYear, setSelectedYear] = useState(initialYear || currentYear);
 
     // 選択された年に基づいて動画を取得
     useEffect(() => {
@@ -38,7 +38,10 @@ export default function VideoPage() {
             }
         }
 
-        fetchVideosByYear();
+        // 初期表示時はSSGデータを使用、年切り替え時のみフェッチ
+        if (selectedYear !== (initialYear || currentYear)) {
+            fetchVideosByYear();
+        }
     }, [selectedYear]);
 
     // YouTube動画IDを抽出する関数
@@ -201,4 +204,42 @@ export default function VideoPage() {
             </section>
         </Layout>
     );
+}
+
+// SSG (Static Site Generation) の実装
+export async function getStaticProps() {
+    try {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+        
+        // 現在の年の動画データを取得
+        const currentYear = new Date().getFullYear();
+        
+        const response = await fetch(`${baseUrl}/api/videos?limit=100&year=${currentYear}`);
+        
+        if (!response.ok) {
+            throw new Error('Videos data fetch failed');
+        }
+        
+        const initialVideos = await response.json();
+        
+        return {
+            props: {
+                initialVideos,
+                initialYear: currentYear
+            },
+            revalidate: 3600 // 1時間ごとに再生成
+        };
+    } catch (error) {
+        console.error('Static props generation error:', error);
+        
+        // エラー時のフォールバック
+        const currentYear = new Date().getFullYear();
+        return {
+            props: {
+                initialVideos: [],
+                initialYear: currentYear
+            },
+            revalidate: 300 // エラー時は5分後に再試行
+        };
+    }
 }

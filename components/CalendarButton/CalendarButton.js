@@ -7,36 +7,39 @@ const CalendarButton = ({ schedule }) => {
     // If we have datetime field, use it directly
     if (schedule.datetime) {
       const startDate = new Date(schedule.datetime);
+      let endDate;
       
-      // Parse time (first time if multiple) for end time calculation
-      const timeStr = schedule.time ? schedule.time.split(' / ')[0] : '';
-      const timeRangeMatch = timeStr.match(/(\d+):(\d+)-(\d+):(\d+)/);
-      
-      if (timeRangeMatch) {
-        // Time range format: "19:00-21:00"
-        const endHours = parseInt(timeRangeMatch[3]);
-        const endMinutes = parseInt(timeRangeMatch[4]);
-        
-        // Create end date based on start date
-        const endDate = new Date(startDate);
-        endDate.setHours(endHours, endMinutes, 0, 0);
-        
-        // Handle cases where end time might be on the next day
-        if (endDate < startDate) {
-          endDate.setDate(endDate.getDate() + 1);
-        }
-        
-        return {
-          startDate: startDate,
-          endDate: endDate
-        };
+      // Use endDatetime if available, otherwise fallback to time parsing
+      if (schedule.endDatetime) {
+        endDate = new Date(schedule.endDatetime);
       } else {
-        // No range, use same time for start and end
-        return {
-          startDate: startDate,
-          endDate: new Date(startDate)
-        };
+        // Parse time (first time if multiple) for end time calculation
+        const timeStr = schedule.time ? schedule.time.split(' / ')[0] : '';
+        const timeRangeMatch = timeStr.match(/(\d+):(\d+)-(\d+):(\d+)/);
+        
+        if (timeRangeMatch) {
+          // Time range format: "19:00-21:00"
+          const endHours = parseInt(timeRangeMatch[3]);
+          const endMinutes = parseInt(timeRangeMatch[4]);
+          
+          // Create end date based on start date
+          endDate = new Date(startDate);
+          endDate.setHours(endHours, endMinutes, 0, 0);
+          
+          // Handle cases where end time might be on the next day
+          if (endDate < startDate) {
+            endDate.setDate(endDate.getDate() + 1);
+          }
+        } else {
+          // No range, use same time for start and end
+          endDate = new Date(startDate);
+        }
       }
+      
+      return {
+        startDate: startDate,
+        endDate: endDate
+      };
     }
     
     // Fallback to old logic if no datetime field
@@ -120,7 +123,7 @@ const CalendarButton = ({ schedule }) => {
     let startStr, endStr;
     
     if (schedule.datetime) {
-      // startDate is already a proper Date object with correct timezone
+      // startDate and endDate are already proper Date objects with correct timezone
       // Format directly for Google Calendar (which expects UTC)
       const startYear = startDate.getUTCFullYear();
       const startMonth = String(startDate.getUTCMonth() + 1).padStart(2, '0');

@@ -154,6 +154,7 @@ export default async function handler(req, res) {
                 id: schedule.id,
                 date: formattedDate,
                 datetime: schedule.start_datetime,
+                endDatetime: schedule.end_datetime,
                 weekday: weekday,
                 category: categoryCode,
                 categoryName: schedule.category?.name || '',

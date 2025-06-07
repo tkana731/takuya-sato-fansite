@@ -42,6 +42,7 @@ model Work {
   parentRelations      RelatedWork[]    @relation("ParentWork")
   childRelations       RelatedWork[]    @relation("ChildWork")
   workSeries           WorkSeries[]
+  socialPosts          SocialPost[]
 
   @@map("works")
 }
@@ -176,7 +177,6 @@ model Venue {
   postal_code          String?
   prefectureId         String             @map("prefecture_id")
   address              String?
-  capacity             String?
   officialUrl          String?            @map("official_url")
   google_maps_url      String?
   displayOrder         Int                @map("display_order")
@@ -208,6 +208,7 @@ model Schedule {
   venue                Venue?                @relation(fields: [venueId], references: [id])
   broadcastStation     BroadcastStation?     @relation(fields: [broadcastStationId], references: [id])
   performers           SchedulePerformer[]
+  socialPosts          SocialPostSchedule[]
 
   @@map("schedules")
 }
@@ -353,4 +354,31 @@ model RelatedWork {
   relationType         WorkRelationType   @relation(fields: [relationTypeId], references: [id])
 
   @@map("rel_related_works")
+}
+
+model SocialPost {
+  id                   String                  @id @default(uuid())
+  workId               String?                 @map("work_id")
+  platform             String                  // 'x' or 'instagram'
+  postUrl              String                  @map("post_url")
+  hasPhoto             Boolean                 @map("has_photo") @default(false)
+  hasVideo             Boolean                 @map("has_video") @default(false)
+  publishedAt          DateTime                @map("published_at")
+  createdAt            DateTime                @map("created_at") @default(now())
+  work                 Work?                   @relation(fields: [workId], references: [id])
+  schedules            SocialPostSchedule[]
+
+  @@map("social_posts")
+}
+
+model SocialPostSchedule {
+  id                   String             @id @default(uuid())
+  socialPostId         String             @map("social_post_id")
+  scheduleId           String             @map("schedule_id")
+  createdAt            DateTime           @map("created_at") @default(now())
+  socialPost           SocialPost         @relation(fields: [socialPostId], references: [id], onDelete: Cascade)
+  schedule             Schedule           @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@unique([socialPostId, scheduleId])
+  @@map("rel_social_post_schedules")
 }

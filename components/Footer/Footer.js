@@ -33,6 +33,7 @@ export default function Footer() {
                             <li><Link href="/video">VIDEO</Link></li>
                             <li><Link href="/characters">CHARACTERS</Link></li>
                             <li><Link href="/event-map">EVENT MAP</Link></li>
+                            <li><Link href="/social-posts">SOCIAL</Link></li>
                             <li><Link href={isHomePage ? "#links" : "/#links"}>LINKS</Link></li>
                         </ul>
                     </div>

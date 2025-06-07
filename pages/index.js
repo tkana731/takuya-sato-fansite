@@ -11,8 +11,9 @@ import Schedule from '../components/Schedule/Schedule';
 import Works from '../components/Works/Works';
 import VideoSection from '../components/Video/VideoSection';
 import Links from '../components/Links/Links';
+import SocialPosts from '../components/SocialPosts/SocialPosts';
 
-export default function Home({ birthdays, onAirContent, schedules, works, videos }) {
+export default function Home({ onAirContent, schedules, works, videos, socialPosts }) {
   // UI状態のみ（データは props から取得）
   const [loading, setLoading] = useState(false);
 
@@ -94,14 +95,6 @@ export default function Home({ birthdays, onAirContent, schedules, works, videos
 
   // データはSSGで事前取得済みなので、ローディング関連のuseEffectは削除
 
-  // 各セクションの表示判定用
-  const hasData = {
-    birthdays: birthdays && birthdays.length > 0,
-    onAir: onAirContent && (onAirContent.anime?.length > 0 || onAirContent.radio?.length > 0 || onAirContent.web?.length > 0),
-    schedules: schedules && schedules.schedules && schedules.schedules.length > 0,
-    works: works && (works.anime?.length > 0 || works.game?.length > 0),
-    videos: videos && videos.length > 0
-  };
 
   return (
     <Layout title="佐藤拓也（声優）非公式ファンサイト - 出演作品・最新情報まとめ">
@@ -120,7 +113,7 @@ export default function Home({ birthdays, onAirContent, schedules, works, videos
           <Hero />
 
           {/* 誕生日キャラクター */}
-          {hasData.birthdays && <Birthday characters={birthdays} />}
+          <Birthday />
 
           {/* 放送中コンテンツ */}
           <OnAir content={onAirContent} />
@@ -137,6 +130,11 @@ export default function Home({ birthdays, onAirContent, schedules, works, videos
 
           {/* 動画 */}
           <VideoSection videos={videos} />
+
+          {/* ソーシャルメディア投稿 */}
+          <div id="social-posts" ref={(ref) => registerSectionRef('social-posts', ref)}>
+            <SocialPosts posts={socialPosts} limit={3} />
+          </div>
 
           {/* リンク - 静的データなので常に表示 */}
           <div id="links" ref={(ref) => registerSectionRef('links', ref)}>
@@ -161,17 +159,15 @@ export async function getStaticProps() {
     const toParam = thirtyDaysLater.toISOString().split('T')[0];
 
     // 並列でデータを取得
-    const [birthdaysRes, onAirRes, schedulesRes, videosRes, worksRes] = await Promise.allSettled([
-      fetch(`${baseUrl}/api/birthdays`),
+    const [onAirRes, schedulesRes, videosRes, worksRes, socialPostsRes] = await Promise.allSettled([
       fetch(`${baseUrl}/api/on-air`),
       fetch(`${baseUrl}/api/schedules?from=${fromParam}&to=${toParam}`),
       fetch(`${baseUrl}/api/videos`),
-      fetch(`${baseUrl}/api/works`)
+      fetch(`${baseUrl}/api/works`),
+      fetch(`${baseUrl}/api/social-posts`)
     ]);
 
     // レスポンスをパース
-    const birthdays = birthdaysRes.status === 'fulfilled' && birthdaysRes.value.ok 
-      ? await birthdaysRes.value.json() : [];
     const onAirContent = onAirRes.status === 'fulfilled' && onAirRes.value.ok 
       ? await onAirRes.value.json() : [];
     const schedules = schedulesRes.status === 'fulfilled' && schedulesRes.value.ok 
@@ -185,14 +181,16 @@ export async function getStaticProps() {
         dub: { movie: [], drama: [], anime: [] },
         other: { special: [], drama: [], radio: [], voice: [], comic: [] }
       };
+    const socialPosts = socialPostsRes.status === 'fulfilled' && socialPostsRes.value.ok 
+      ? await socialPostsRes.value.json() : [];
 
     return {
       props: {
-        birthdays,
         onAirContent,
         schedules,
         works,
-        videos
+        videos,
+        socialPosts
       },
       revalidate: 3600 // 1時間ごとに再生成
     };
@@ -202,7 +200,6 @@ export async function getStaticProps() {
     // エラー時のフォールバック
     return {
       props: {
-        birthdays: [],
         onAirContent: [],
         schedules: [],
         works: {
@@ -211,7 +208,8 @@ export async function getStaticProps() {
           dub: { movie: [], drama: [], anime: [] },
           other: { special: [], drama: [], radio: [], voice: [], comic: [] }
         },
-        videos: []
+        videos: [],
+        socialPosts: []
       },
       revalidate: 300 // エラー時は5分後に再試行
     };

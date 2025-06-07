@@ -1,6 +1,33 @@
-// components/Birthday/Birthday.js
-export default function Birthday({ characters = [] }) {
-    // 誕生日キャラクターがいない場合はコンポーネント自体を表示しない
+import { useState, useEffect } from 'react';
+
+export default function Birthday() {
+    const [characters, setCharacters] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchBirthdays = async () => {
+            try {
+                const response = await fetch('/api/birthdays');
+                if (!response.ok) {
+                    throw new Error('データの取得に失敗しました');
+                }
+                const data = await response.json();
+                setCharacters(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBirthdays();
+    }, []);
+
+    if (loading) return null;
+
+    if (error) return null;
+
     if (characters.length === 0) {
         return null;
     }

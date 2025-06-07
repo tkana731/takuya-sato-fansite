@@ -128,6 +128,11 @@ export default function Navbar() {
                             </Link>
                         </li>
                         <li>
+                            <Link href="/social-posts" className={router.pathname === '/social-posts' ? "active" : ""}>
+                                SOCIAL
+                            </Link>
+                        </li>
+                        <li>
                             {isHomePage ? (
                                 <a href="#links" onClick={(e) => handleHashLinkClick(e, "#links")}>LINKS</a>
                             ) : (
@@ -171,6 +176,9 @@ export default function Navbar() {
                         </li>
                         <li>
                             <Link href="/event-map" onClick={handleLinkClick}>EVENT MAP</Link>
+                        </li>
+                        <li>
+                            <Link href="/social-posts" onClick={handleLinkClick}>SOCIAL</Link>
                         </li>
                         <li>
                             {isHomePage ? (

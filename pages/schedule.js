@@ -135,8 +135,17 @@ export default function SchedulePage({ initialSchedules, initialYearRange }) {
         // 初期表示時はSSGデータを使用、月切り替え時のみフェッチ
         if (displayDate.year !== currentYear || displayDate.month !== currentMonth + 1) {
             fetchSchedulesByMonth();
+        } else {
+            // 現在の月に戻った場合、初期データが既にある場合はそれを使用
+            if (initialSchedules && initialSchedules.schedules) {
+                setSchedules(initialSchedules);
+                setLoading(false);
+            } else {
+                // 初期データがない場合は再フェッチ
+                fetchSchedulesByMonth();
+            }
         }
-    }, [displayDate]);
+    }, [displayDate, currentYear, currentMonth, initialSchedules]);
 
     // カテゴリフィルタリングの状態
     const [activeFilter, setActiveFilter] = useState('all');

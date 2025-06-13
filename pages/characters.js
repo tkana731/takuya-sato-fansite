@@ -20,7 +20,8 @@ export default function CharactersPage({ characters }) {
                 character: {
                     id: character.id.split('-')[0], // 元のキャラクターIDを取得
                     name: character.name,
-                    birthday: character.birthday
+                    birthday: character.birthday,
+                    height: character.height
                 },
                 works: []
             };
@@ -93,6 +94,12 @@ export default function CharactersPage({ characters }) {
             return '不明';
         }
         return `${date.getMonth() + 1}月${date.getDate()}日`;
+    };
+
+    // 身長のフォーマット
+    const formatHeight = (height) => {
+        if (!height) return '不明';
+        return `${height}cm`;
     };
 
     // ページのメタデータ
@@ -190,6 +197,12 @@ export default function CharactersPage({ characters }) {
                                                     <p className="character-birthday">
                                                         <span className="info-label">誕生日:</span>
                                                         <span className="info-value">{formatBirthday(characterData.character.birthday)}</span>
+                                                    </p>
+                                                )}
+                                                {characterData.character.height && (
+                                                    <p className="character-height">
+                                                        <span className="info-label">身長:</span>
+                                                        <span className="info-value">{formatHeight(characterData.character.height)}</span>
                                                     </p>
                                                 )}
                                             </div>

@@ -108,6 +108,7 @@ model Role {
   voiceActorId         String?            @map("voice_actor_id")
   actorId              String?            @map("actor_id")
   birthday             String?
+  height               Int?
   seriesName           String?            @map("series_name")
   createdAt            DateTime           @map("created_at") @default(now())
   voiceActor           Actor?             @relation("VoiceActorRoles", fields: [voiceActorId], references: [id])

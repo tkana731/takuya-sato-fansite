@@ -13,6 +13,7 @@ export default async function handler(req, res) {
                 id,
                 name,
                 birthday,
+                height,
                 rel_work_roles (
                     work_id,
                     is_main_role,
@@ -44,6 +45,7 @@ export default async function handler(req, res) {
                             id: `${character.id}-${workRole.work_id}`,
                             name: character.name,
                             birthday: character.birthday,
+                            height: character.height,
                             mediaType: workRole.works.mst_work_categories?.name || null,
                             mediaTypeOrder: workRole.works.mst_work_categories?.display_order || 999,
                             workId: workRole.works.id,
@@ -58,6 +60,7 @@ export default async function handler(req, res) {
                     id: character.id,
                     name: character.name,
                     birthday: character.birthday,
+                    height: character.height,
                     mediaType: null,
                     mediaTypeOrder: 999,
                     workId: null,

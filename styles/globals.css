@@ -3242,6 +3242,14 @@ img {
   gap: 8px;
 }
 
+.character-height {
+  font-size: 14px;
+  color: var(--gray-dark);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
 .works-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));

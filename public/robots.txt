@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://takuya-sato-fansite.vercel.app/sitemap.xml
+Sitemap: https://takuya-sato-fansite.com/sitemap.xml

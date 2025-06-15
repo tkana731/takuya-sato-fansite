@@ -37,6 +37,7 @@ export default async function handler(req, res) {
         const stageCategory = categories.find(c => c.name === '舞台')?.id;
         const dramaCategory = categories.find(c => c.name === 'ドラマ')?.id;
         const dramaCDCategory = categories.find(c => c.name === 'ドラマCD')?.id;
+        const blcdCategory = categories.find(c => c.name === 'BLCD')?.id;
         const comicCategory = categories.find(c => c.name === 'ボイスコミック')?.id;
         const webCategory = categories.find(c => c.name === 'WEB')?.id;
 
@@ -255,7 +256,16 @@ export default async function handler(req, res) {
                         title,
                         year,
                         description,
-                        category_id
+                        category_id,
+                        workRoles:rel_work_roles(
+                            id,
+                            is_main_role,
+                            role:role_id (
+                                id,
+                                name,
+                                actor:voice_actor_id (id, name)
+                            )
+                        )
                     `)
                     .eq('category_id', narrationCategory)
                     .order('year', { ascending: false })
@@ -400,6 +410,35 @@ export default async function handler(req, res) {
             fetchPromises.push({ data: [] });
         }
 
+        // BLCD
+        if (blcdCategory) {
+            fetchPromises.push(
+                supabase
+                    .from('works')
+                    .select(`
+                        id,
+                        title,
+                        year,
+                        description,
+                        category_id,
+                        workRoles:rel_work_roles(
+                            id,
+                            is_main_role,
+                            role:role_id (
+                                id,
+                                name,
+                                actor:voice_actor_id (id, name)
+                            )
+                        )
+                    `)
+                    .eq('category_id', blcdCategory)
+                    .order('year', { ascending: false })
+                    .order('title')
+            );
+        } else {
+            fetchPromises.push({ data: [] });
+        }
+
         // ボイスコミック
         if (comicCategory) {
             fetchPromises.push(
@@ -462,12 +501,13 @@ export default async function handler(req, res) {
             stageResult,
             dramaResult,
             dramaCDResult,
+            blcdResult,
             comicResult,
             webResult
         ] = await Promise.all(fetchPromises);
 
         // エラーチェック
-        const results = [animeResult, gameResult, dubMovieResult, dubDramaResult, dubAnimeResult, narrationResult, radioResult, specialResult, stageResult, dramaResult, dramaCDResult, comicResult, webResult];
+        const results = [animeResult, gameResult, dubMovieResult, dubDramaResult, dubAnimeResult, narrationResult, radioResult, specialResult, stageResult, dramaResult, dramaCDResult, blcdResult, comicResult, webResult];
         for (const result of results) {
             if (result.error) throw result.error;
         }
@@ -498,7 +538,10 @@ export default async function handler(req, res) {
             return formatWork(work, takuyaRoles);
         }).filter(work => work.role || work.roles) || [];
 
-        const formattedNarration = narrationResult.data?.map(work => formatSpecialWork(work)) || [];
+        const formattedNarration = narrationResult.data?.map(work => {
+            const takuyaRoles = filterTakuyaSatoRoles(work);
+            return formatWork(work, takuyaRoles);
+        }).filter(work => work.role || work.roles) || [];
         const formattedRadio = radioResult.data?.map(work => formatRadioWork(work)) || [];
 
         // 特撮と舞台を統合
@@ -519,6 +562,11 @@ export default async function handler(req, res) {
         }).filter(work => work.role || work.roles) || [];
 
         const formattedDramaCD = dramaCDResult.data?.map(work => {
+            const takuyaRoles = filterTakuyaSatoRoles(work);
+            return formatWork(work, takuyaRoles);
+        }).filter(work => work.role || work.roles) || [];
+
+        const formattedBLCD = blcdResult.data?.map(work => {
             const takuyaRoles = filterTakuyaSatoRoles(work);
             return formatWork(work, takuyaRoles);
         }).filter(work => work.role || work.roles) || [];
@@ -545,7 +593,8 @@ export default async function handler(req, res) {
                 voice: formattedNarration, // ナレーションをvoiceとして配置
                 comic: formattedComic,
                 drama: formattedDrama,
-                dramaCD: formattedDramaCD
+                dramaCD: formattedDramaCD,
+                blcd: formattedBLCD
             }
         };
 
@@ -553,7 +602,7 @@ export default async function handler(req, res) {
         console.log(`アニメ: ${formattedAnime.length}件, ゲーム: ${formattedGame.length}件`);
         console.log(`映画吹替: ${formattedDubMovie.length}件, ドラマ吹替: ${formattedDubDrama.length}件, アニメ吹替: ${formattedDubAnime.length}件`);
         console.log(`特撮/舞台: ${formattedSpecial.length}件, ラジオ: ${formattedRadio.length + formattedWeb.length}件, ナレーション: ${formattedNarration.length}件`);
-        console.log(`ボイスコミック: ${formattedComic.length}件, ドラマ: ${formattedDrama.length}件, ドラマCD: ${formattedDramaCD.length}件`);
+        console.log(`ボイスコミック: ${formattedComic.length}件, ドラマ: ${formattedDrama.length}件, ドラマCD: ${formattedDramaCD.length}件, BLCD: ${formattedBLCD.length}件`);
 
         return res.status(200).json(formattedWorks);
     } catch (error) {

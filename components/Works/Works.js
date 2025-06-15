@@ -230,7 +230,13 @@ const Works = forwardRef((props, ref) => {
                                     {works.other.voice.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
                                             <span className="item-title">{item.title}</span>
-                                            {item.role && <span className="item-role">{item.role}</span>}
+                                            {item.roles ? (
+                                                item.roles.map((role, index) => (
+                                                    <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                ))
+                                            ) : (
+                                                item.role && <span className="item-role">{item.role}</span>
+                                            )}
                                             {item.year && <span className="item-year">{item.year}</span>}
                                         </li>
                                     ))}
@@ -310,6 +316,32 @@ const Works = forwardRef((props, ref) => {
                                 {works.other.dramaCD.length > 5 && (
                                     <div className="more-indicator">
                                         <p className="text-center text-gray-600 mt-2">...他 {works.other.dramaCD.length - 5}作品</p>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {works.other && works.other.blcd && works.other.blcd.length > 0 && (
+                            <>
+                                <h3 className="list-title">BLCD</h3>
+                                <ul className="list-items">
+                                    {works.other.blcd.slice(0, 5).map(item => (
+                                        <li className="list-item" key={item.id}>
+                                            <span className="item-title">{item.title}</span>
+                                            {item.roles ? (
+                                                item.roles.map((role, index) => (
+                                                    <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
+                                                ))
+                                            ) : (
+                                                <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
+                                            )}
+                                            {item.year && <span className="item-year">{item.year}</span>}
+                                        </li>
+                                    ))}
+                                </ul>
+                                {works.other.blcd.length > 5 && (
+                                    <div className="more-indicator">
+                                        <p className="text-center text-gray-600 mt-2">...他 {works.other.blcd.length - 5}作品</p>
                                     </div>
                                 )}
                             </>

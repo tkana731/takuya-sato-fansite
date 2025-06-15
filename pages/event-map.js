@@ -78,7 +78,7 @@ export default function EventMapPage({ eventData }) {
           priceCurrency: 'JPY',
           url: event.link || null
         },
-        image: event.image || 'https://takuya-sato-fansite.vercel.app/takuya-sato-default.jpg',
+        image: event.image || 'https://takuya-sato-fansite.com/takuya-sato-default.jpg',
         url: event.link || null
       }
     }))

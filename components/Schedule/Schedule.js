@@ -39,8 +39,6 @@ const Schedule = forwardRef((props, ref) => {
                 const fromDateStr = firstDay.toISOString().split('T')[0];
                 const toDateStr = lastDay.toISOString().split('T')[0];
 
-                console.log(`スケジュール取得: ${year}年${month}月 (${fromDateStr} 〜 ${toDateStr})`);
-
                 // データが渡されていない場合はAPIから取得
                 if (!schedules || !schedules.schedules || schedules.schedules.length === 0) {
                     const response = await fetch(`/api/schedules?from=${fromDateStr}&to=${toDateStr}`);
@@ -211,10 +209,10 @@ const Schedule = forwardRef((props, ref) => {
                                                 )}
                                                 <div className="schedule-actions">
                                                     {hasValidLink && (
-                                                        <a 
-                                                            href={schedule.link} 
-                                                            className="schedule-link-button" 
-                                                            target="_blank" 
+                                                        <a
+                                                            href={schedule.link}
+                                                            className="schedule-link-button"
+                                                            target="_blank"
                                                             rel="noopener noreferrer"
                                                             title="関連リンク（外部サイト）"
                                                             aria-label="関連リンク（外部サイト）"

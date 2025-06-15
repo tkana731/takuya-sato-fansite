@@ -33,7 +33,7 @@ export default function SchedulePage({ initialSchedules, initialYearRange }) {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [tempYear, setTempYear] = useState(displayDate.year);
     const [tempMonth, setTempMonth] = useState(displayDate.month);
-    
+
     // 選択可能な年の範囲（SSGで取得済み）
     const [yearRange, setYearRange] = useState(initialYearRange || {
         minYear: currentYear - 1,
@@ -103,8 +103,6 @@ export default function SchedulePage({ initialSchedules, initialYearRange }) {
                 // ISO形式に変換
                 const fromDateStr = firstDay.toISOString().split('T')[0]; // 月初日
                 const toDateStr = lastDay.toISOString().split('T')[0];    // 月末日
-
-                console.log(`スケジュール取得: ${displayDate.year}年${displayDate.month}月 (${fromDateStr} 〜 ${toDateStr})`);
 
                 const response = await fetch(`/api/schedules?from=${fromDateStr}&to=${toDateStr}`);
                 if (!response.ok) {
@@ -227,7 +225,7 @@ export default function SchedulePage({ initialSchedules, initialYearRange }) {
                             priceCurrency: 'JPY',
                             url: event.link && event.link !== '#' ? event.link : null
                         },
-                        image: event.image || 'https://takuya-sato-fansite.vercel.app/takuya-sato-default.jpg',
+                        image: event.image || 'https://takuya-sato-fansite.com/takuya-sato-default.jpg',
                         url: event.link && event.link !== '#' ? event.link : null
                     }
                 };
@@ -404,10 +402,10 @@ export default function SchedulePage({ initialSchedules, initialYearRange }) {
                                                     )}
                                                     <div className="schedule-actions">
                                                         {hasValidLink && (
-                                                            <a 
-                                                                href={schedule.link} 
-                                                                className="schedule-link-button" 
-                                                                target="_blank" 
+                                                            <a
+                                                                href={schedule.link}
+                                                                className="schedule-link-button"
+                                                                target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 title="関連リンク（外部サイト）"
                                                                 aria-label="関連リンク（外部サイト）"
@@ -489,25 +487,25 @@ export default function SchedulePage({ initialSchedules, initialYearRange }) {
 export async function getStaticProps() {
     try {
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-        
+
         // 現在月のスケジュールデータを取得
         const today = new Date();
         const currentYear = today.getFullYear();
         const currentMonth = today.getMonth(); // 0-11
-        
+
         // 現在月の初日と最終日を取得
         const firstDay = new Date(Date.UTC(currentYear, currentMonth, 1));
         const lastDay = new Date(Date.UTC(currentYear, currentMonth + 1, 0));
-        
+
         const fromDateStr = firstDay.toISOString().split('T')[0];
         const toDateStr = lastDay.toISOString().split('T')[0];
-        
+
         // 並列でデータを取得
         const [schedulesRes, yearRangeRes] = await Promise.allSettled([
             fetch(`${baseUrl}/api/schedules?from=${fromDateStr}&to=${toDateStr}`),
             fetch(`${baseUrl}/api/schedules/date-range`)
         ]);
-        
+
         const initialSchedules = schedulesRes.status === 'fulfilled' && schedulesRes.value.ok
             ? await schedulesRes.value.json() : [];
         const initialYearRange = yearRangeRes.status === 'fulfilled' && yearRangeRes.value.ok
@@ -515,7 +513,7 @@ export async function getStaticProps() {
                 minYear: currentYear - 1,
                 maxYear: currentYear + 1
             };
-        
+
         return {
             props: {
                 initialSchedules,
@@ -525,7 +523,7 @@ export async function getStaticProps() {
         };
     } catch (error) {
         console.error('Static props generation error:', error);
-        
+
         // エラー時のフォールバック
         const currentYear = new Date().getFullYear();
         return {

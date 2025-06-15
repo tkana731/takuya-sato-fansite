@@ -8,7 +8,7 @@ export default function SchemaOrg({
         WebSite: {
             '@context': 'https://schema.org',
             '@type': 'WebSite',
-            url: 'https://takuya-sato-fansite.vercel.app/',
+            url: 'https://takuya-sato-fansite.com/',
             name: '佐藤拓也さん非公式ファンサイト',
             description: '声優・佐藤拓也さんの出演作品、スケジュール、最新情報をまとめた非公式ファンサイトです。',
             ...data
@@ -18,7 +18,7 @@ export default function SchemaOrg({
             '@type': 'Person',
             name: '佐藤拓也',
             alternateName: ['さとう たくや', 'Sato Takuya', 'SATO TAKUYA'],
-            url: 'https://takuya-sato-fansite.vercel.app/',
+            url: 'https://takuya-sato-fansite.com/',
             jobTitle: '声優',
             description: '声優・佐藤拓也（さとう たくや）。賢プロダクション所属。多数のアニメ、ゲーム、吹き替え作品で主要キャラクターを演じる人気声優。代表作は「アイドリッシュセブン」十龍之介役、「キャプテン翼」日向小次郎役など。',
             worksFor: {

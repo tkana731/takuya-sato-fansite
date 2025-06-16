@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { FaGlasses } from 'react-icons/fa';
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -87,7 +88,10 @@ export default function Navbar() {
                 <div className="logo">
                     <Link href="/" className="logo-text">
                         <div className="site-title-wrapper">
-                            <span className="site-title-main">TAKUYA SATO</span>
+                            <div className="site-title-main-container">
+                                <FaGlasses className="glasses-icon" />
+                                <span className="site-title-main">TAKUYA SATO</span>
+                            </div>
                             <span className="site-title-sub">非公式ファンサイト</span>
                             <div className="logo-accent"></div>
                         </div>

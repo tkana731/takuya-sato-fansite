@@ -6,6 +6,7 @@ export default function Document() {
       <Head>
         <meta name="google-site-verification" content="1lM1ljGc3DT3pPl1rMmrZgr01LwlF38rPmRx6KcY8IE" />
         <meta charSet="utf-8" />
+        <link rel="canonical" href="https://takuya-sato-fansite.com/" />
         
         {/* 基本的なファビコン設定 */}
         <link rel="icon" href="/favicon.ico?v=2" />

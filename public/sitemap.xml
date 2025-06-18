@@ -2,38 +2,44 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://takuya-sato-fansite.com/</loc>
-    <lastmod>2025-05-28</lastmod>
+    <lastmod>2025-06-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://takuya-sato-fansite.vercel.app/schedule</loc>
-    <lastmod>2025-05-28</lastmod>
+    <loc>https://takuya-sato-fansite.com/schedule</loc>
+    <lastmod>2025-06-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://takuya-sato-fansite.vercel.app/works</loc>
-    <lastmod>2025-05-28</lastmod>
+    <loc>https://takuya-sato-fansite.com/works</loc>
+    <lastmod>2025-06-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://takuya-sato-fansite.vercel.app/video</loc>
-    <lastmod>2025-05-28</lastmod>
+    <loc>https://takuya-sato-fansite.com/video</loc>
+    <lastmod>2025-06-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://takuya-sato-fansite.vercel.app/event-map</loc>
-    <lastmod>2025-05-28</lastmod>
+    <loc>https://takuya-sato-fansite.com/characters</loc>
+    <lastmod>2025-06-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://takuya-sato-fansite.com/event-map</loc>
+    <lastmod>2025-06-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://takuya-sato-fansite.vercel.app/characters</loc>
-    <lastmod>2025-05-28</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://takuya-sato-fansite.com/social-posts</loc>
+    <lastmod>2025-06-18</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 </urlset>

@@ -1106,8 +1106,9 @@ img {
   padding: 15px 0;
   border-bottom: 1px solid var(--gray-color);
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   flex-wrap: wrap;
-  align-items: center;
 }
 
 .list-item:last-child {
@@ -1127,6 +1128,7 @@ img {
   background-color: var(--primary-light);
   padding: 5px 15px;
   border-radius: 20px;
+  margin-top: 8px;
   margin-right: 10px;
 }
 
@@ -1138,6 +1140,13 @@ img {
 .item-year {
   color: var(--gray-dark);
   font-size: 14px;
+  margin-top: 8px;
+}
+
+.item-detail {
+  color: var(--gray-dark);
+  font-size: 14px;
+  margin-top: 8px;
 }
 
 /* YouTubeセクション */
@@ -1856,14 +1865,8 @@ img {
     white-space: nowrap;
   }
 
-  .list-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .item-role,
   .item-year {
-    margin-top: 5px;
+    margin-top: 8px;
   }
 
   .footer-grid {

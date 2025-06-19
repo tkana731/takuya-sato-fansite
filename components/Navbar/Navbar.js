@@ -7,7 +7,6 @@ import { FaGlasses } from 'react-icons/fa';
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const router = useRouter();
-    const isHomePage = router.pathname === '/';
 
     // トグルボタンのクリックハンドラ
     const toggleMenu = () => {
@@ -26,36 +25,6 @@ export default function Navbar() {
         }
     };
 
-    // ハッシュリンクの処理を改善
-    const handleHashLinkClick = (e, hash) => {
-        // モバイルメニューを閉じる
-        handleLinkClick();
-
-        if (isHomePage && hash) {
-            e.preventDefault();
-
-            // ターゲット要素を取得
-            const targetElement = document.querySelector(hash);
-            if (!targetElement) return;
-
-            // ヘッダーの高さを取得（余白なし）
-            const header = document.querySelector('.header');
-            const headerHeight = header ? header.offsetHeight : 80;
-
-            // スクロール位置を計算（余白を調整）
-            const elementPosition = targetElement.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
-
-            // スクロール実行
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
-
-            // URLのハッシュを更新
-            history.pushState(null, null, hash);
-        }
-    };
 
     // ESCキーでメニューを閉じる
     useEffect(() => {
@@ -132,16 +101,14 @@ export default function Navbar() {
                             </Link>
                         </li>
                         <li>
-                            <Link href="/social-posts" className={router.pathname === '/social-posts' ? "active" : ""}>
-                                SOCIAL
+                            <Link href="/songs" className={router.pathname === '/songs' ? "active" : ""}>
+                                SONGS
                             </Link>
                         </li>
                         <li>
-                            {isHomePage ? (
-                                <a href="#links" onClick={(e) => handleHashLinkClick(e, "#links")}>LINKS</a>
-                            ) : (
-                                <Link href="/#links">LINKS</Link>
-                            )}
+                            <Link href="/social-posts" className={router.pathname === '/social-posts' ? "active" : ""}>
+                                SOCIAL
+                            </Link>
                         </li>
                     </ul>
                 </nav>
@@ -182,14 +149,10 @@ export default function Navbar() {
                             <Link href="/event-map" onClick={handleLinkClick}>EVENT MAP</Link>
                         </li>
                         <li>
-                            <Link href="/social-posts" onClick={handleLinkClick}>SOCIAL</Link>
+                            <Link href="/songs" onClick={handleLinkClick}>SONGS</Link>
                         </li>
                         <li>
-                            {isHomePage ? (
-                                <a href="#links" onClick={(e) => handleHashLinkClick(e, "#links")}>LINKS</a>
-                            ) : (
-                                <Link href="/#links" onClick={handleLinkClick}>LINKS</Link>
-                            )}
+                            <Link href="/social-posts" onClick={handleLinkClick}>SOCIAL</Link>
                         </li>
                     </ul>
                 </nav>

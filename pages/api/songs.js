@@ -18,17 +18,17 @@ export default async function handler(req, res) {
           song_type,
           release_date,
           description,
-          lyricist:lyricist_id (
-            id,
-            name
-          ),
-          composer:composer_id (
-            id,
-            name
-          ),
-          arranger:arranger_id (
-            id,
-            name
+          rel_song_staff!inner (
+            song_staff_role_id,
+            display_order,
+            mst_staff!inner (
+              id,
+              name
+            ),
+            mst_song_staff_roles!inner (
+              id,
+              name
+            )
           )
         `,
         order: { release_date: 'desc' } // リリース日の降順
@@ -47,23 +47,60 @@ export default async function handler(req, res) {
     const characterSongTypes = ['character', 'op', 'ed', 'insert'];
     const personalSongTypes = ['solo', 'duet', 'group', 'cover', 'original', 'theme'];
     
-    songs.forEach(song => {
+    // 楽曲データを整理（複数のrel_song_staffレコードを統合）
+    const songsMap = new Map();
+    
+    songs.forEach(songRecord => {
+      const songId = songRecord.id;
+      
+      if (!songsMap.has(songId)) {
+        songsMap.set(songId, {
+          id: songRecord.id,
+          title: songRecord.title,
+          artist: songRecord.artist,
+          songType: songRecord.song_type,
+          releaseDate: songRecord.release_date,
+          description: songRecord.description,
+          releaseYear: songRecord.release_date ? new Date(songRecord.release_date).getFullYear() : null,
+          staff: []
+        });
+      }
+      
+      // スタッフ情報を追加
+      if (songRecord.rel_song_staff && songRecord.rel_song_staff.length > 0) {
+        songRecord.rel_song_staff.forEach(staffRecord => {
+          songsMap.get(songId).staff.push({
+            name: staffRecord.mst_staff.name,
+            role: staffRecord.mst_song_staff_roles.name,
+            displayOrder: staffRecord.display_order
+          });
+        });
+      }
+    });
+    
+    // 統合された楽曲データを分類
+    Array.from(songsMap.values()).forEach(song => {
+      // スタッフを役割別に整理
+      const lyricists = song.staff.filter(s => s.role === '作詞').sort((a, b) => a.displayOrder - b.displayOrder).map(s => s.name);
+      const composers = song.staff.filter(s => s.role === '作曲').sort((a, b) => a.displayOrder - b.displayOrder).map(s => s.name);
+      const arrangers = song.staff.filter(s => s.role === '編曲').sort((a, b) => a.displayOrder - b.displayOrder).map(s => s.name);
+      
       const songData = {
         id: song.id,
         title: song.title,
         artist: song.artist,
-        songType: song.song_type,
-        releaseDate: song.release_date,
+        songType: song.songType,
+        releaseDate: song.releaseDate,
         description: song.description,
-        lyricist: song.lyricist?.name || null,
-        composer: song.composer?.name || null,
-        arranger: song.arranger?.name || null,
-        releaseYear: song.release_date ? new Date(song.release_date).getFullYear() : null
+        lyricists: lyricists.length > 0 ? lyricists : [],
+        composers: composers.length > 0 ? composers : [],
+        arrangers: arrangers.length > 0 ? arrangers : [],
+        releaseYear: song.releaseYear
       };
       
-      if (characterSongTypes.includes(song.song_type)) {
+      if (characterSongTypes.includes(song.songType)) {
         characterSongs.push(songData);
-      } else if (personalSongTypes.includes(song.song_type)) {
+      } else if (personalSongTypes.includes(song.songType)) {
         personalSongs.push(songData);
       } else {
         // 分類が不明な場合は本人名義に含める

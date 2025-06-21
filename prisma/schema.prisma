@@ -272,6 +272,7 @@ model Staff {
   arrangerSongs Song[]      @relation("SongArranger")
   composerSongs Song[]      @relation("SongComposer")
   lyricistSongs Song[]      @relation("SongLyricist")
+  songStaff     SongStaff[] @relation("SongStaffMember")
 
   @@map("mst_staff")
 }
@@ -400,20 +401,46 @@ model SocialPostSchedule {
   @@map("rel_social_post_schedules")
 }
 
+model SongStaffRole {
+  id           String     @id @default(dbgenerated("uuid_generate_v4()"))
+  name         String
+  displayOrder Int        @map("display_order")
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  songStaff    SongStaff[]
+
+  @@map("mst_song_staff_roles")
+}
+
+model SongStaff {
+  id               String        @id @default(uuid())
+  songId           String        @map("song_id")
+  staffId          String        @map("staff_id")
+  songStaffRoleId  String        @map("song_staff_role_id")
+  description      String?
+  displayOrder     Int           @map("display_order")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  song             Song          @relation(fields: [songId], references: [id])
+  staff            Staff         @relation("SongStaffMember", fields: [staffId], references: [id])
+  songStaffRole    SongStaffRole @relation(fields: [songStaffRoleId], references: [id])
+
+  @@map("rel_song_staff")
+}
+
 model Song {
-  id          String    @id @default(dbgenerated("uuid_generate_v4()"))
+  id          String     @id @default(dbgenerated("uuid_generate_v4()"))
   title       String
   artist      String
-  songType    String    @map("song_type")
-  lyricistId  String?   @map("lyricist_id")
-  composerId  String?   @map("composer_id")
-  arrangerId  String?   @map("arranger_id")
-  releaseDate DateTime? @map("release_date") @db.Date
+  songType    String     @map("song_type")
+  lyricistId  String?    @map("lyricist_id")
+  composerId  String?    @map("composer_id")
+  arrangerId  String?    @map("arranger_id")
+  releaseDate DateTime?  @map("release_date") @db.Date
   description String?
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  arranger    Staff?    @relation("SongArranger", fields: [arrangerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  composer    Staff?    @relation("SongComposer", fields: [composerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  lyricist    Staff?    @relation("SongLyricist", fields: [lyricistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  arranger    Staff?     @relation("SongArranger", fields: [arrangerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  composer    Staff?     @relation("SongComposer", fields: [composerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  lyricist    Staff?     @relation("SongLyricist", fields: [lyricistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  songStaff   SongStaff[]
 
   @@index([arrangerId], map: "idx_songs_arranger_id")
   @@index([composerId], map: "idx_songs_composer_id")

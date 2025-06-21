@@ -140,14 +140,29 @@ export default function SongsPage({ songData }) {
                         <span className="item-role">{song.artist}</span>
                       )}
                       {song.releaseYear && <span className="item-year">{song.releaseYear}年</span>}
-                      {song.lyricist && (
-                        <span className="item-detail">作詞: {song.lyricist}</span>
+                      {song.lyricists && song.lyricists.length > 0 && (
+                        <div className="item-detail">
+                          <span>作詞:</span>
+                          {song.lyricists.map((lyricist, index) => (
+                            <span key={index} className="staff-name">{lyricist}</span>
+                          ))}
+                        </div>
                       )}
-                      {song.composer && (
-                        <span className="item-detail">作曲: {song.composer}</span>
+                      {song.composers && song.composers.length > 0 && (
+                        <div className="item-detail">
+                          <span>作曲:</span>
+                          {song.composers.map((composer, index) => (
+                            <span key={index} className="staff-name">{composer}</span>
+                          ))}
+                        </div>
                       )}
-                      {song.arranger && (
-                        <span className="item-detail">編曲: {song.arranger}</span>
+                      {song.arrangers && song.arrangers.length > 0 && (
+                        <div className="item-detail">
+                          <span>編曲:</span>
+                          {song.arrangers.map((arranger, index) => (
+                            <span key={index} className="staff-name">{arranger}</span>
+                          ))}
+                        </div>
                       )}
                     </li>
                   ))}
@@ -170,14 +185,29 @@ export default function SongsPage({ songData }) {
                         <span className="item-role">{song.artist}</span>
                       )}
                       {song.releaseYear && <span className="item-year">{song.releaseYear}年</span>}
-                      {song.lyricist && (
-                        <span className="item-detail">作詞: {song.lyricist}</span>
+                      {song.lyricists && song.lyricists.length > 0 && (
+                        <div className="item-detail">
+                          <span>作詞:</span>
+                          {song.lyricists.map((lyricist, index) => (
+                            <span key={index} className="staff-name">{lyricist}</span>
+                          ))}
+                        </div>
                       )}
-                      {song.composer && (
-                        <span className="item-detail">作曲: {song.composer}</span>
+                      {song.composers && song.composers.length > 0 && (
+                        <div className="item-detail">
+                          <span>作曲:</span>
+                          {song.composers.map((composer, index) => (
+                            <span key={index} className="staff-name">{composer}</span>
+                          ))}
+                        </div>
                       )}
-                      {song.arranger && (
-                        <span className="item-detail">編曲: {song.arranger}</span>
+                      {song.arrangers && song.arrangers.length > 0 && (
+                        <div className="item-detail">
+                          <span>編曲:</span>
+                          {song.arrangers.map((arranger, index) => (
+                            <span key={index} className="staff-name">{arranger}</span>
+                          ))}
+                        </div>
                       )}
                     </li>
                   ))}

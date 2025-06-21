@@ -64,6 +64,14 @@ const Works = forwardRef((props, ref) => {
                                         <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
                                     )}
                                     <span className="item-year">{item.year}</span>
+                                    {item.soundDirectors && item.soundDirectors.length > 0 && (
+                                        <div className="item-detail">
+                                            <span>音響監督:</span>
+                                            {item.soundDirectors.map((director, index) => (
+                                                <span key={index} className="staff-name">{director}</span>
+                                            ))}
+                                        </div>
+                                    )}
                                 </li>
                             ))}
                         </ul>
@@ -90,6 +98,14 @@ const Works = forwardRef((props, ref) => {
                                         <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
                                     )}
                                     {item.year && <span className="item-year">{item.year}</span>}
+                                    {item.soundDirectors && item.soundDirectors.length > 0 && (
+                                        <div className="item-detail">
+                                            <span>音響監督:</span>
+                                            {item.soundDirectors.map((director, index) => (
+                                                <span key={index} className="staff-name">{director}</span>
+                                            ))}
+                                        </div>
+                                    )}
                                 </li>
                             ))}
                         </ul>
@@ -116,6 +132,14 @@ const Works = forwardRef((props, ref) => {
                                         <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
                                     )}
                                     {item.year && <span className="item-year">{item.year}</span>}
+                                    {item.soundDirectors && item.soundDirectors.length > 0 && (
+                                        <div className="item-detail">
+                                            <span>音響監督:</span>
+                                            {item.soundDirectors.map((director, index) => (
+                                                <span key={index} className="staff-name">{director}</span>
+                                            ))}
+                                        </div>
+                                    )}
                                 </li>
                             ))}
                         </ul>
@@ -138,6 +162,14 @@ const Works = forwardRef((props, ref) => {
                                         <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
                                     )}
                                     {item.year && <span className="item-year">{item.year}</span>}
+                                    {item.soundDirectors && item.soundDirectors.length > 0 && (
+                                        <div className="item-detail">
+                                            <span>音響監督:</span>
+                                            {item.soundDirectors.map((director, index) => (
+                                                <span key={index} className="staff-name">{director}</span>
+                                            ))}
+                                        </div>
+                                    )}
                                 </li>
                             ))}
                         </ul>
@@ -162,6 +194,9 @@ const Works = forwardRef((props, ref) => {
                                                 <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
                                             )}
                                             {item.year && <span className="item-year">{item.year}</span>}
+                                            {item.soundDirectors && item.soundDirectors.length > 0 && (
+                                                <span className="item-sound-director">音響監督: {item.soundDirectors.join('、')}</span>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>
@@ -192,6 +227,9 @@ const Works = forwardRef((props, ref) => {
                                                 <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
                                             )}
                                             {item.year && <span className="item-year">{item.year}</span>}
+                                            {item.soundDirectors && item.soundDirectors.length > 0 && (
+                                                <span className="item-sound-director">音響監督: {item.soundDirectors.join('、')}</span>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>
@@ -212,6 +250,9 @@ const Works = forwardRef((props, ref) => {
                                             <span className="item-title">{item.title}</span>
                                             {item.role && <span className="item-role">{item.role}</span>}
                                             {item.year && <span className="item-year">{item.year}</span>}
+                                            {item.soundDirectors && item.soundDirectors.length > 0 && (
+                                                <span className="item-sound-director">音響監督: {item.soundDirectors.join('、')}</span>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>
@@ -238,6 +279,9 @@ const Works = forwardRef((props, ref) => {
                                                 item.role && <span className="item-role">{item.role}</span>
                                             )}
                                             {item.year && <span className="item-year">{item.year}</span>}
+                                            {item.soundDirectors && item.soundDirectors.length > 0 && (
+                                                <span className="item-sound-director">音響監督: {item.soundDirectors.join('、')}</span>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>
@@ -264,6 +308,9 @@ const Works = forwardRef((props, ref) => {
                                                 <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
                                             )}
                                             {item.year && <span className="item-year">{item.year}</span>}
+                                            {item.soundDirectors && item.soundDirectors.length > 0 && (
+                                                <span className="item-sound-director">音響監督: {item.soundDirectors.join('、')}</span>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>
@@ -284,6 +331,9 @@ const Works = forwardRef((props, ref) => {
                                             <span className="item-title">{item.title}</span>
                                             {item.role && <span className="item-role">{item.role}</span>}
                                             {item.year && <span className="item-year">{item.year}</span>}
+                                            {item.soundDirectors && item.soundDirectors.length > 0 && (
+                                                <span className="item-sound-director">音響監督: {item.soundDirectors.join('、')}</span>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>
@@ -310,6 +360,9 @@ const Works = forwardRef((props, ref) => {
                                                 <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
                                             )}
                                             {item.year && <span className="item-year">{item.year}</span>}
+                                            {item.soundDirectors && item.soundDirectors.length > 0 && (
+                                                <span className="item-sound-director">音響監督: {item.soundDirectors.join('、')}</span>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>
@@ -336,6 +389,9 @@ const Works = forwardRef((props, ref) => {
                                                 <span className={`item-role ${item.isMain ? 'main' : ''}`}>{item.role}</span>
                                             )}
                                             {item.year && <span className="item-year">{item.year}</span>}
+                                            {item.soundDirectors && item.soundDirectors.length > 0 && (
+                                                <span className="item-sound-director">音響監督: {item.soundDirectors.join('、')}</span>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>

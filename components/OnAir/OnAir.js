@@ -21,7 +21,7 @@ export default function OnAir({ content = [] }) {
                 <div className="on-air-container">
                     {content.anime && content.anime.length > 0 && (
                         <div className="on-air-category">
-                            <h3 className="category-title">アニメ</h3>
+                            <h3 className="category-title">TVアニメ</h3>
                             <ul className="on-air-list">
                                 {content.anime.map(item => (
                                     <li className="on-air-item" key={item.id}>

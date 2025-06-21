@@ -26,7 +26,7 @@ export default async function handler(req, res) {
         });
 
         // 各カテゴリーIDを特定
-        const animeCategory = categories.find(c => c.name === 'アニメ')?.id;
+        const animeCategory = categories.find(c => c.name === 'TVアニメ')?.id;
         const gameCategory = categories.find(c => c.name === 'ゲーム')?.id;
         const dubMovieCategory = categories.find(c => c.name === '吹き替え（映画）')?.id;
         const dubDramaCategory = categories.find(c => c.name === '吹き替え（ドラマ）')?.id;
@@ -56,6 +56,18 @@ export default async function handler(req, res) {
             );
         };
 
+        // 音響監督を抽出する関数
+        const getSoundDirectors = (work) => {
+            if (!work.workStaff || work.workStaff.length === 0) {
+                return [];
+            }
+
+            return work.workStaff
+                .filter(workStaff => workStaff.role?.name === '音響監督')
+                .map(workStaff => workStaff.staff?.name)
+                .filter(Boolean);
+        };
+
         // 整形したデータを生成する関数
         const formatWork = (work, takuyaRoles) => {
             // すべての役割名を抽出（配列）
@@ -67,6 +79,9 @@ export default async function handler(req, res) {
             // メイン役割が1つでもあるかどうかをチェック
             const hasMainRole = takuyaRoles.some(r => r.is_main_role);
 
+            // 音響監督を取得
+            const soundDirectors = getSoundDirectors(work);
+
             // 複数の役がある場合は roles 配列として返す
             if (roleNames.length > 1) {
                 return {
@@ -76,7 +91,8 @@ export default async function handler(req, res) {
                         name: r.role?.name,
                         isMain: r.is_main_role
                     })),
-                    year: work.year ? `${work.year}年` : ''
+                    year: work.year ? `${work.year}年` : '',
+                    soundDirectors: soundDirectors
                 };
             }
 
@@ -85,7 +101,8 @@ export default async function handler(req, res) {
                 title: work.title,
                 role: rolesText,
                 isMain: hasMainRole,
-                year: work.year ? `${work.year}年` : ''
+                year: work.year ? `${work.year}年` : '',
+                soundDirectors: soundDirectors
             };
         };
 
@@ -94,13 +111,15 @@ export default async function handler(req, res) {
             id: work.id,
             title: work.title,
             role: work.description || '',
-            year: work.year ? `${work.year}年` : ''
+            year: work.year ? `${work.year}年` : '',
+            soundDirectors: getSoundDirectors(work)
         });
 
         const formatRadioWork = (work) => ({
             id: work.id,
             title: work.title,
-            year: work.year ? `${work.year}年～` : ''
+            year: work.year ? `${work.year}年～` : '',
+            soundDirectors: getSoundDirectors(work)
         });
 
         // 並列処理でカテゴリごとのデータを取得
@@ -123,6 +142,17 @@ export default async function handler(req, res) {
                                 id,
                                 name,
                                 actor:voice_actor_id (id, name)
+                            )
+                        ),
+                        workStaff:rel_work_staff(
+                            id,
+                            staff:staff_id (
+                                id,
+                                name
+                            ),
+                            role:staff_role_id (
+                                id,
+                                name
                             )
                         )
                     `)
@@ -152,6 +182,17 @@ export default async function handler(req, res) {
                                 name,
                                 actor:voice_actor_id (id, name)
                             )
+                        ),
+                        workStaff:rel_work_staff(
+                            id,
+                            staff:staff_id (
+                                id,
+                                name
+                            ),
+                            role:staff_role_id (
+                                id,
+                                name
+                            )
                         )
                     `)
                     .eq('category_id', gameCategory)
@@ -179,6 +220,17 @@ export default async function handler(req, res) {
                                 id,
                                 name,
                                 actor:voice_actor_id (id, name)
+                            )
+                        ),
+                        workStaff:rel_work_staff(
+                            id,
+                            staff:staff_id (
+                                id,
+                                name
+                            ),
+                            role:staff_role_id (
+                                id,
+                                name
                             )
                         )
                     `)
@@ -208,6 +260,17 @@ export default async function handler(req, res) {
                                 name,
                                 actor:voice_actor_id (id, name)
                             )
+                        ),
+                        workStaff:rel_work_staff(
+                            id,
+                            staff:staff_id (
+                                id,
+                                name
+                            ),
+                            role:staff_role_id (
+                                id,
+                                name
+                            )
                         )
                     `)
                     .eq('category_id', dubDramaCategory)
@@ -235,6 +298,17 @@ export default async function handler(req, res) {
                                 id,
                                 name,
                                 actor:voice_actor_id (id, name)
+                            )
+                        ),
+                        workStaff:rel_work_staff(
+                            id,
+                            staff:staff_id (
+                                id,
+                                name
+                            ),
+                            role:staff_role_id (
+                                id,
+                                name
                             )
                         )
                     `)

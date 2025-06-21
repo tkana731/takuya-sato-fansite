@@ -34,7 +34,7 @@ export default async function handler(req, res) {
                     )
                 )
             `)
-            .eq('category.name', 'アニメ')
+            .eq('category.name', 'TVアニメ')
             .order('title');
 
         if (animeError) {
@@ -202,7 +202,7 @@ export default async function handler(req, res) {
                     wr.role?.actor?.name === '佐藤拓也'
                 );
             })
-            .filter(work => work.category?.name === 'アニメ')  // 再度カテゴリ確認
+            .filter(work => work.category?.name === 'TVアニメ')  // 再度カテゴリ確認
             .filter(work => isCurrentlyBroadcasting(work, currentDate))  // 放送中かチェック
             .map(formatBroadcastInfo);
 

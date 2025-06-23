@@ -1,6 +1,7 @@
 // components/Works/Works.js
 import { useState, useRef, forwardRef } from 'react';
 import Link from 'next/link';
+import { FaExternalLinkAlt } from 'react-icons/fa';
 
 const Works = forwardRef((props, ref) => {
     const { works = [] } = props;
@@ -55,7 +56,14 @@ const Works = forwardRef((props, ref) => {
                         <ul className="list-items">
                             {works.anime && works.anime.slice(0, 10).map(item => (
                                 <li className="list-item" key={item.id}>
-                                    <span className="item-title">{item.title}</span>
+                                    <div className="item-header">
+                                        <span className="item-title">{item.title}</span>
+                                        {item.officialUrl && (
+                                            <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                <FaExternalLinkAlt />
+                                            </a>
+                                        )}
+                                    </div>
                                     {item.roles ? (
                                         item.roles.map((role, index) => (
                                             <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -89,7 +97,14 @@ const Works = forwardRef((props, ref) => {
                         <ul className="list-items">
                             {works.game && works.game.slice(0, 10).map(item => (
                                 <li className="list-item" key={item.id}>
-                                    <span className="item-title">{item.title}</span>
+                                    <div className="item-header">
+                                        <span className="item-title">{item.title}</span>
+                                        {item.officialUrl && (
+                                            <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                <FaExternalLinkAlt />
+                                            </a>
+                                        )}
+                                    </div>
                                     {item.roles ? (
                                         item.roles.map((role, index) => (
                                             <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -123,7 +138,14 @@ const Works = forwardRef((props, ref) => {
                         <ul className="list-items">
                             {works.dub && works.dub.movie && works.dub.movie.slice(0, 5).map(item => (
                                 <li className="list-item" key={item.id}>
-                                    <span className="item-title">{item.title}</span>
+                                    <div className="item-header">
+                                        <span className="item-title">{item.title}</span>
+                                        {item.officialUrl && (
+                                            <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                <FaExternalLinkAlt />
+                                            </a>
+                                        )}
+                                    </div>
                                     {item.roles ? (
                                         item.roles.map((role, index) => (
                                             <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -153,7 +175,14 @@ const Works = forwardRef((props, ref) => {
                         <ul className="list-items">
                             {works.dub && works.dub.drama && works.dub.drama.slice(0, 5).map(item => (
                                 <li className="list-item" key={item.id}>
-                                    <span className="item-title">{item.title}</span>
+                                    <div className="item-header">
+                                        <span className="item-title">{item.title}</span>
+                                        {item.officialUrl && (
+                                            <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                <FaExternalLinkAlt />
+                                            </a>
+                                        )}
+                                    </div>
                                     {item.roles ? (
                                         item.roles.map((role, index) => (
                                             <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -185,7 +214,14 @@ const Works = forwardRef((props, ref) => {
                                 <ul className="list-items">
                                     {works.dub.anime.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -218,7 +254,14 @@ const Works = forwardRef((props, ref) => {
                                 <ul className="list-items">
                                     {works.other.special.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -247,7 +290,14 @@ const Works = forwardRef((props, ref) => {
                                 <ul className="list-items">
                                     {works.other.radio.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.role && <span className="item-role">{item.role}</span>}
                                             {item.year && <span className="item-year">{item.year}</span>}
                                             {item.soundDirectors && item.soundDirectors.length > 0 && (
@@ -270,7 +320,14 @@ const Works = forwardRef((props, ref) => {
                                 <ul className="list-items">
                                     {works.other.voice.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -299,7 +356,14 @@ const Works = forwardRef((props, ref) => {
                                 <ul className="list-items">
                                     {works.other.comic.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -328,7 +392,14 @@ const Works = forwardRef((props, ref) => {
                                 <ul className="list-items">
                                     {works.other.drama.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.role && <span className="item-role">{item.role}</span>}
                                             {item.year && <span className="item-year">{item.year}</span>}
                                             {item.soundDirectors && item.soundDirectors.length > 0 && (
@@ -351,7 +422,14 @@ const Works = forwardRef((props, ref) => {
                                 <ul className="list-items">
                                     {works.other.dramaCD.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -380,7 +458,14 @@ const Works = forwardRef((props, ref) => {
                                 <ul className="list-items">
                                     {works.other.blcd.slice(0, 5).map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>

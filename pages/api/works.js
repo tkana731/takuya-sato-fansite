@@ -92,7 +92,8 @@ export default async function handler(req, res) {
                         isMain: r.is_main_role
                     })),
                     year: work.year ? `${work.year}年` : '',
-                    soundDirectors: soundDirectors
+                    soundDirectors: soundDirectors,
+                    officialUrl: work.official_url
                 };
             }
 
@@ -102,7 +103,8 @@ export default async function handler(req, res) {
                 role: rolesText,
                 isMain: hasMainRole,
                 year: work.year ? `${work.year}年` : '',
-                soundDirectors: soundDirectors
+                soundDirectors: soundDirectors,
+                officialUrl: work.official_url
             };
         };
 
@@ -112,14 +114,16 @@ export default async function handler(req, res) {
             title: work.title,
             role: work.description || '',
             year: work.year ? `${work.year}年` : '',
-            soundDirectors: getSoundDirectors(work)
+            soundDirectors: getSoundDirectors(work),
+            officialUrl: work.official_url
         });
 
         const formatRadioWork = (work) => ({
             id: work.id,
             title: work.title,
             year: work.year ? `${work.year}年～` : '',
-            soundDirectors: getSoundDirectors(work)
+            soundDirectors: getSoundDirectors(work),
+            officialUrl: work.official_url
         });
 
         // 並列処理でカテゴリごとのデータを取得
@@ -134,6 +138,7 @@ export default async function handler(req, res) {
                         id,
                         title,
                         year,
+                        official_url,
                         category_id,
                         workRoles:rel_work_roles(
                             id,
@@ -173,6 +178,7 @@ export default async function handler(req, res) {
                         id,
                         title,
                         year,
+                        official_url,
                         category_id,
                         workRoles:rel_work_roles(
                             id,
@@ -212,6 +218,7 @@ export default async function handler(req, res) {
                         id,
                         title,
                         year,
+                        official_url,
                         category_id,
                         workRoles:rel_work_roles(
                             id,
@@ -251,6 +258,7 @@ export default async function handler(req, res) {
                         id,
                         title,
                         year,
+                        official_url,
                         category_id,
                         workRoles:rel_work_roles(
                             id,
@@ -290,6 +298,7 @@ export default async function handler(req, res) {
                         id,
                         title,
                         year,
+                        official_url,
                         category_id,
                         workRoles:rel_work_roles(
                             id,
@@ -330,6 +339,7 @@ export default async function handler(req, res) {
                         title,
                         year,
                         description,
+                        official_url,
                         category_id,
                         workRoles:rel_work_roles(
                             id,
@@ -358,6 +368,7 @@ export default async function handler(req, res) {
                         id,
                         title,
                         year,
+                        official_url,
                         category_id
                     `)
                     .eq('category_id', radioCategory)
@@ -378,6 +389,7 @@ export default async function handler(req, res) {
                         title,
                         year,
                         description,
+                        official_url,
                         category_id,
                         workRoles:rel_work_roles(
                             id,
@@ -407,6 +419,7 @@ export default async function handler(req, res) {
                         title,
                         year,
                         description,
+                        official_url,
                         category_id,
                         workRoles:rel_work_roles(
                             id,
@@ -436,6 +449,7 @@ export default async function handler(req, res) {
                         title,
                         year,
                         description,
+                        official_url,
                         category_id,
                         workRoles:rel_work_roles(
                             id,
@@ -465,6 +479,7 @@ export default async function handler(req, res) {
                         title,
                         year,
                         description,
+                        official_url,
                         category_id,
                         workRoles:rel_work_roles(
                             id,
@@ -494,6 +509,7 @@ export default async function handler(req, res) {
                         title,
                         year,
                         description,
+                        official_url,
                         category_id,
                         workRoles:rel_work_roles(
                             id,
@@ -523,6 +539,7 @@ export default async function handler(req, res) {
                         title,
                         year,
                         description,
+                        official_url,
                         category_id,
                         workRoles:rel_work_roles(
                             id,
@@ -552,6 +569,7 @@ export default async function handler(req, res) {
                         title,
                         year,
                         description,
+                        official_url,
                         category_id
                     `)
                     .eq('category_id', webCategory)

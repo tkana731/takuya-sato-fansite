@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Layout from '../components/Layout/Layout';
 import SEO from '../components/SEO/SEO';
 import SchemaOrg from '../components/SEO/SchemaOrg';
+import { FaExternalLinkAlt } from 'react-icons/fa';
 
 export default function WorksPage({ works }) {
     const [activeTab, setActiveTab] = useState('anime');
@@ -142,7 +143,14 @@ export default function WorksPage({ works }) {
                                 <ul className="list-items">
                                     {works.anime && works.anime.map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -172,7 +180,14 @@ export default function WorksPage({ works }) {
                                 <ul className="list-items">
                                     {works.game && works.game.map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -202,7 +217,14 @@ export default function WorksPage({ works }) {
                                 <ul className="list-items">
                                     {works.dub && works.dub.movie && works.dub.movie.map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -230,7 +252,14 @@ export default function WorksPage({ works }) {
                                 <ul className="list-items">
                                     {works.dub && works.dub.drama && works.dub.drama.map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -258,7 +287,14 @@ export default function WorksPage({ works }) {
                                 <ul className="list-items">
                                     {works.dub && works.dub.anime && works.dub.anime.map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -291,7 +327,14 @@ export default function WorksPage({ works }) {
                                 <ul className="list-items">
                                     {works.other && works.other.special && works.other.special.map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -319,7 +362,14 @@ export default function WorksPage({ works }) {
                                 <ul className="list-items">
                                     {works.other && works.other.radio && works.other.radio.map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.role && <span className="item-role">{item.role}</span>}
                                             {item.year && <span className="item-year">{item.year}</span>}
                                             {item.soundDirectors && item.soundDirectors.length > 0 && (
@@ -341,7 +391,14 @@ export default function WorksPage({ works }) {
                                 <ul className="list-items">
                                     {works.other && works.other.voice && works.other.voice.map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -362,7 +419,14 @@ export default function WorksPage({ works }) {
                                     {works.other && works.other.comic && works.other.comic.map(item => {
                                         return (
                                             <li className="list-item" key={item.id}>
-                                                <span className="item-title">{item.title}</span>
+                                                <div className="item-header">
+                                                    <span className="item-title">{item.title}</span>
+                                                    {item.officialUrl && (
+                                                        <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                            <FaExternalLinkAlt />
+                                                        </a>
+                                                    )}
+                                                </div>
                                                 {item.roles ? (
                                                     item.roles.map((role, index) => {
                                                         return (
@@ -385,7 +449,14 @@ export default function WorksPage({ works }) {
                                 <ul className="list-items">
                                     {works.other && works.other.drama && works.other.drama.map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.role && <span className="item-role">{item.role}</span>}
                                             {item.year && <span className="item-year">{item.year}</span>}
                                             {item.soundDirectors && item.soundDirectors.length > 0 && (
@@ -407,7 +478,14 @@ export default function WorksPage({ works }) {
                                 <ul className="list-items">
                                     {works.other && works.other.dramaCD && works.other.dramaCD.map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>
@@ -435,7 +513,14 @@ export default function WorksPage({ works }) {
                                 <ul className="list-items">
                                     {works.other && works.other.blcd && works.other.blcd.map(item => (
                                         <li className="list-item" key={item.id}>
-                                            <span className="item-title">{item.title}</span>
+                                            <div className="item-header">
+                                                <span className="item-title">{item.title}</span>
+                                                {item.officialUrl && (
+                                                    <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                                        <FaExternalLinkAlt />
+                                                    </a>
+                                                )}
+                                            </div>
                                             {item.roles ? (
                                                 item.roles.map((role, index) => (
                                                     <span key={index} className={`item-role ${role.isMain ? 'main' : ''}`}>{role.name}</span>

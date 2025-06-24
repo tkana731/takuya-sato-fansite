@@ -4968,3 +4968,119 @@ img {
   margin-left: 12px;
   line-height: 1.4;
 }
+
+/* 長期開催スケジュール用のスタイル */
+.long-term-schedules {
+  margin-bottom: 40px;
+}
+
+.schedule-subsection-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--primary-color);
+  text-align: center;
+}
+
+.schedule-items.long-term {
+  margin-bottom: 0;
+}
+
+.schedule-card.long-term-card {
+  background: linear-gradient(135deg, #fff5f5 0%, #f0f8ff 100%);
+  border-left: 4px solid var(--accent-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-date-badge.long-term-badge {
+  background: linear-gradient(135deg, var(--accent-color), #ff6b8a);
+  color: white;
+  min-width: 140px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.long-term-period-badge {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--accent-color);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+}
+
+.long-term-period-badge.ongoing {
+  background: rgba(76, 175, 80, 0.9);
+  color: white;
+}
+
+.long-term-period-badge.upcoming {
+  background: rgba(33, 150, 243, 0.9);
+  color: white;
+}
+
+.long-term-period-badge.ended {
+  background: rgba(158, 158, 158, 0.9);
+  color: white;
+}
+
+.schedule-date-range {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  width: 100%;
+}
+
+.date-start,
+.date-end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.date-label {
+  font-size: 10px;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.date-value {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.date-separator {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 2px 0;
+}
+
+@media (max-width: 768px) {
+  .schedule-subsection-title {
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+  
+  .schedule-date-badge.long-term-badge {
+    min-width: 120px;
+    padding: 12px;
+  }
+  
+  .date-value {
+    font-size: 11px;
+  }
+  
+  .date-separator {
+    font-size: 12px;
+  }
+}

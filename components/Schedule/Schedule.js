@@ -95,6 +95,11 @@ const Schedule = forwardRef((props, ref) => {
 
     // フィルタリングされたスケジュール
     const filteredSchedules = filterSchedules(processedSchedules);
+    
+    // 長期開催と通常のスケジュールを分離
+    const longTermSchedules = filteredSchedules.filter(schedule => schedule.isLongTerm);
+    const regularSchedules = filteredSchedules.filter(schedule => !schedule.isLongTerm);
+    
 
     return (
         <section className="schedule-section" id="schedule" ref={ref || scheduleRef}>
@@ -134,6 +139,12 @@ const Schedule = forwardRef((props, ref) => {
                             >
                                 <span className="tab-text">生放送</span>
                             </button>
+                            <button
+                                className={`schedule-tab ${activeFilter === 'voice_guide' ? 'active' : ''}`}
+                                onClick={() => setActiveFilter('voice_guide')}
+                            >
+                                <span className="tab-text">音声ガイド</span>
+                            </button>
                         </div>
                     </div>
 
@@ -149,9 +160,104 @@ const Schedule = forwardRef((props, ref) => {
                             <p className="loading-text">LOADING...</p>
                         </div>
                     ) : (
-                        <ul className="schedule-items">
-                            {filteredSchedules.length > 0 ? (
-                                filteredSchedules.map(schedule => {
+                        <>
+                            {/* 長期開催スケジュール */}
+                            {longTermSchedules.length > 0 && (
+                                <div className="long-term-schedules">
+                                    <ul className="schedule-items long-term">
+                                        {longTermSchedules.map(schedule => {
+                                            const startDate = formatDate(schedule.date);
+                                            const endDate = formatDate(schedule.endDate);
+                                            const isBroadcast = schedule.locationType === '放送/配信';
+                                            const hasValidLink = schedule.link && schedule.link !== '#';
+
+                                            const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+                                            const startDateObj = new Date(schedule.date);
+                                            const endDateObj = new Date(schedule.endDate);
+                                            const startWeekday = weekdays[startDateObj.getDay()];
+                                            const endWeekday = weekdays[endDateObj.getDay()];
+
+                                            return (
+                                                <li className="schedule-card long-term-card" key={schedule.id} data-category={schedule.category}>
+                                                    <div className="schedule-date-badge long-term-badge">
+                                                        <div className={`long-term-period-badge ${schedule.periodStatus}`}>
+                                                            {schedule.periodStatus === 'ongoing' ? '会期中' : 
+                                                             schedule.periodStatus === 'upcoming' ? '開催予定' : '終了'}
+                                                        </div>
+                                                        <div className="schedule-date-range">
+                                                            <div className="date-start">
+                                                                <span className="date-label">開始</span>
+                                                                <span className="date-value">
+                                                                    {String(startDate.month).padStart(2, '0')}/{String(startDate.day).padStart(2, '0')}({startWeekday})
+                                                                </span>
+                                                            </div>
+                                                            <div className="date-separator">〜</div>
+                                                            <div className="date-end">
+                                                                <span className="date-label">終了</span>
+                                                                <span className="date-value">
+                                                                    {String(endDate.month).padStart(2, '0')}/{String(endDate.day).padStart(2, '0')}({endWeekday})
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="schedule-content">
+                                                        <h3 className="schedule-title">{schedule.title}</h3>
+                                                        <div className="schedule-details">
+                                                            <div className="schedule-detail-item">
+                                                                <span className="detail-icon">{isBroadcast ? '📺' : '📍'}</span>
+                                                                <span>{schedule.location}</span>
+                                                            </div>
+                                                            {isBroadcast ? (
+                                                                <div className="schedule-detail-item">
+                                                                    <span className="detail-icon">📡</span>
+                                                                    <span>{schedule.locationType}</span>
+                                                                </div>
+                                                            ) : schedule.prefecture && (
+                                                                <div className="schedule-detail-item">
+                                                                    <span className="detail-icon">🗾</span>
+                                                                    <span>{schedule.prefecture}</span>
+                                                                </div>
+                                                            )}
+                                                            {schedule.categoryName && (
+                                                                <div className="schedule-detail-item">
+                                                                    <span className="detail-icon">🏷️</span>
+                                                                    <span className="schedule-category-badge">{schedule.categoryName}</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        {schedule.description && (
+                                                            <div className="schedule-description-wrapper">
+                                                                <p className="schedule-description">{schedule.description}</p>
+                                                            </div>
+                                                        )}
+                                                        <div className="schedule-actions">
+                                                            {hasValidLink && (
+                                                                <a
+                                                                    href={schedule.link}
+                                                                    className="schedule-link-button"
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    title="関連リンク（外部サイト）"
+                                                                    aria-label="関連リンク（外部サイト）"
+                                                                >
+                                                                    <FaExternalLinkAlt />
+                                                                    <span className="button-text">関連リンク</span>
+                                                                </a>
+                                                            )}
+                                                            <CalendarButton schedule={schedule} />
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {/* 通常のスケジュール */}
+                            <ul className="schedule-items">
+                                {regularSchedules.length > 0 ? (
+                                    regularSchedules.map(schedule => {
                                     const date = formatDate(schedule.date);
                                     // ロケーションが会場か放送局かによって表示アイコンやスタイルを変更できる
                                     const isBroadcast = schedule.locationType === '放送/配信';
@@ -227,10 +333,11 @@ const Schedule = forwardRef((props, ref) => {
                                         </li>
                                     );
                                 })
-                            ) : (
-                                <div className="no-schedule">該当する予定はありません。</div>
-                            )}
-                        </ul>
+                                ) : (
+                                    <div className="no-schedule">該当する予定はありません。</div>
+                                )}
+                            </ul>
+                        </>
                     )}
 
                     <div className="view-all-container">

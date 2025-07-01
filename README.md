@@ -1,3 +1,19 @@
+# 佐藤拓也ファンサイト
+
+声優・佐藤拓也さんの非公式ファンサイトです。出演作品、スケジュール、楽曲、キャラクター情報などを網羅的に提供しています。
+
+🌐 **ライブサイト**: [https://takuya-sato-fansite.com/](https://takuya-sato-fansite.com/)
+
+## 主な機能
+
+- **スケジュール**: イベント、舞台、生放送、音声ガイドなどの最新情報
+- **出演作品**: アニメ、ゲーム、吹き替え作品などの詳細情報
+- **楽曲一覧**: キャラクターソングと本人名義楽曲の情報
+- **キャラクター**: 演じたキャラクターの詳細情報
+- **動画**: 公式動画コンテンツの集約
+
+## 技術スタック
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
 ## Getting Started

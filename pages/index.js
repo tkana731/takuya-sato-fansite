@@ -12,10 +12,11 @@ import Works from '../components/Works/Works';
 import VideoSection from '../components/Video/VideoSection';
 import Links from '../components/Links/Links';
 import SocialPosts from '../components/SocialPosts/SocialPosts';
+import Products from '../components/Products/Products';
 
-export default function Home({ onAirContent, schedules, works, videos, socialPosts }) {
+export default function Home({ onAirContent, schedules, works, videos, socialPosts, products }) {
   // UI状態のみ（データは props から取得）
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   const router = useRouter();
   const homeRef = useRef(null);
@@ -131,6 +132,11 @@ export default function Home({ onAirContent, schedules, works, videos, socialPos
           {/* 動画 */}
           <VideoSection videos={videos} />
 
+          {/* 商品 */}
+          <div id="products" ref={(ref) => registerSectionRef('products', ref)}>
+            <Products products={products} />
+          </div>
+
           {/* ソーシャルメディア投稿 */}
           <div id="social-posts" ref={(ref) => registerSectionRef('social-posts', ref)}>
             <SocialPosts posts={socialPosts} limit={3} />
@@ -159,12 +165,13 @@ export async function getStaticProps() {
     const toParam = thirtyDaysLater.toISOString().split('T')[0];
 
     // 並列でデータを取得
-    const [onAirRes, schedulesRes, videosRes, worksRes, socialPostsRes] = await Promise.allSettled([
+    const [onAirRes, schedulesRes, videosRes, worksRes, socialPostsRes, productsRes] = await Promise.allSettled([
       fetch(`${baseUrl}/api/on-air`),
       fetch(`${baseUrl}/api/schedules?from=${fromParam}&to=${toParam}`),
       fetch(`${baseUrl}/api/videos`),
       fetch(`${baseUrl}/api/works`),
-      fetch(`${baseUrl}/api/social-posts`)
+      fetch(`${baseUrl}/api/social-posts`),
+      fetch(`${baseUrl}/api/products?category=upcoming`)
     ]);
 
     // レスポンスをパース
@@ -183,6 +190,8 @@ export async function getStaticProps() {
       };
     const socialPosts = socialPostsRes.status === 'fulfilled' && socialPostsRes.value.ok 
       ? await socialPostsRes.value.json() : [];
+    const products = productsRes.status === 'fulfilled' && productsRes.value.ok 
+      ? await productsRes.value.json() : [];
 
     return {
       props: {
@@ -190,7 +199,8 @@ export async function getStaticProps() {
         schedules,
         works,
         videos,
-        socialPosts
+        socialPosts,
+        products
       },
       revalidate: 3600 // 1時間ごとに再生成
     };
@@ -209,7 +219,8 @@ export async function getStaticProps() {
           other: { special: [], drama: [], radio: [], voice: [], comic: [] }
         },
         videos: [],
-        socialPosts: []
+        socialPosts: [],
+        products: []
       },
       revalidate: 300 // エラー時は5分後に再試行
     };

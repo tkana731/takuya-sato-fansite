@@ -34,6 +34,7 @@ export default function Footer() {
                             <li><Link href="/characters">CHARACTERS</Link></li>
                             <li><Link href="/event-map">EVENT MAP</Link></li>
                             <li><Link href="/songs">SONGS</Link></li>
+                            <li><Link href="/products">PRODUCTS</Link></li>
                             <li><Link href="/social-posts">SOCIAL</Link></li>
                         </ul>
                     </div>

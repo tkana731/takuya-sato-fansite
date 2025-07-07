@@ -38,6 +38,7 @@ model Work {
   schedules         Schedule[]
   socialPosts       SocialPost[]
   videos            Video[]
+  workProducts      WorkProduct[]
   category          WorkCategory       @relation(fields: [categoryId], references: [id])
 
   @@index([categoryId], map: "idx_works_category_id")
@@ -209,6 +210,7 @@ model Schedule {
   endDateTime        DateTime?            @map("end_datetime") @db.Timestamptz(6)
   performers         SchedulePerformer[]
   socialPosts        SocialPostSchedule[]
+  scheduleProducts   ScheduleProduct[]
   broadcastStation   BroadcastStation?    @relation(fields: [broadcastStationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   category           ScheduleCategory     @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   venue              Venue?               @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -268,11 +270,11 @@ model Staff {
   instagramUrl  String?     @map("instagram_url")
   createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   staffType     String      @map("staff_type")
+  songStaff     SongStaff[] @relation("SongStaffMember")
   workStaff     WorkStaff[]
   arrangerSongs Song[]      @relation("SongArranger")
   composerSongs Song[]      @relation("SongComposer")
   lyricistSongs Song[]      @relation("SongLyricist")
-  songStaff     SongStaff[] @relation("SongStaffMember")
 
   @@map("mst_staff")
 }
@@ -402,45 +404,45 @@ model SocialPostSchedule {
 }
 
 model SongStaffRole {
-  id           String     @id @default(dbgenerated("uuid_generate_v4()"))
+  id           String      @id @default(dbgenerated("uuid_generate_v4()"))
   name         String
-  displayOrder Int        @map("display_order")
-  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  displayOrder Int         @map("display_order")
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   songStaff    SongStaff[]
 
   @@map("mst_song_staff_roles")
 }
 
 model SongStaff {
-  id               String        @id @default(uuid())
-  songId           String        @map("song_id")
-  staffId          String        @map("staff_id")
-  songStaffRoleId  String        @map("song_staff_role_id")
-  description      String?
-  displayOrder     Int           @map("display_order")
-  createdAt        DateTime      @default(now()) @map("created_at")
-  song             Song          @relation(fields: [songId], references: [id])
-  staff            Staff         @relation("SongStaffMember", fields: [staffId], references: [id])
-  songStaffRole    SongStaffRole @relation(fields: [songStaffRoleId], references: [id])
+  id              String        @id @default(uuid())
+  songId          String        @map("song_id")
+  staffId         String        @map("staff_id")
+  songStaffRoleId String        @map("song_staff_role_id")
+  description     String?
+  displayOrder    Int           @map("display_order")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  song            Song          @relation(fields: [songId], references: [id])
+  songStaffRole   SongStaffRole @relation(fields: [songStaffRoleId], references: [id])
+  staff           Staff         @relation("SongStaffMember", fields: [staffId], references: [id])
 
   @@map("rel_song_staff")
 }
 
 model Song {
-  id          String     @id @default(dbgenerated("uuid_generate_v4()"))
+  id          String      @id @default(dbgenerated("uuid_generate_v4()"))
   title       String
   artist      String
-  songType    String     @map("song_type")
-  lyricistId  String?    @map("lyricist_id")
-  composerId  String?    @map("composer_id")
-  arrangerId  String?    @map("arranger_id")
-  releaseDate DateTime?  @map("release_date") @db.Date
+  songType    String      @map("song_type")
+  lyricistId  String?     @map("lyricist_id")
+  composerId  String?     @map("composer_id")
+  arrangerId  String?     @map("arranger_id")
+  releaseDate DateTime?   @map("release_date") @db.Date
   description String?
-  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
-  arranger    Staff?     @relation("SongArranger", fields: [arrangerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  composer    Staff?     @relation("SongComposer", fields: [composerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  lyricist    Staff?     @relation("SongLyricist", fields: [lyricistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
   songStaff   SongStaff[]
+  arranger    Staff?      @relation("SongArranger", fields: [arrangerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  composer    Staff?      @relation("SongComposer", fields: [composerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  lyricist    Staff?      @relation("SongLyricist", fields: [lyricistId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([arrangerId], map: "idx_songs_arranger_id")
   @@index([composerId], map: "idx_songs_composer_id")
@@ -448,4 +450,158 @@ model Song {
   @@index([releaseDate], map: "idx_songs_release_date")
   @@index([songType], map: "idx_songs_song_type")
   @@map("songs")
+}
+
+// 商品カテゴリマスター
+model ProductCategory {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()"))
+  name         String    // CD、DVD、Blu-ray、フォトブック、パンフレット、グッズ等
+  code         String    @unique // cd, dvd, blu-ray, photobook, pamphlet, goods
+  displayOrder Int       @map("display_order")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  products     Product[]
+
+  @@map("mst_product_categories")
+}
+
+// 商品バリエーショングループ（同じ内容の異なる形態）
+model ProductVariationGroup {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()"))
+  name        String    // グループ名（例：「○○OP主題歌」）
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  products    Product[]
+
+  @@map("product_variation_groups")
+}
+
+// 商品シリーズ（連続する巻物など）
+model ProductSeries {
+  id                  String                   @id @default(dbgenerated("uuid_generate_v4()"))
+  name                String                   // シリーズ名（例：「○○ アニメ」）
+  description         String?
+  hasVariations       Boolean                  @default(false) @map("has_variations") // 形態違いありフラグ
+  createdAt           DateTime                 @default(now()) @map("created_at")
+  seriesProducts      ProductSeriesItem[]
+  seriesVariations    ProductSeriesVariation[] // 形態違いの定義
+
+  @@map("product_series")
+}
+
+// シリーズ内の形態違い定義
+model ProductSeriesVariation {
+  id               String              @id @default(uuid())
+  seriesId         String              @map("series_id")
+  variationName    String              @map("variation_name") // DVD版、Blu-ray版など
+  displayOrder     Int                 @map("display_order")
+  createdAt        DateTime            @default(now()) @map("created_at")
+  series           ProductSeries       @relation(fields: [seriesId], references: [id])
+  seriesItems      ProductSeriesItem[]
+
+  @@map("product_series_variations")
+}
+
+// 商品マスター
+model Product {
+  id                     String                   @id @default(dbgenerated("uuid_generate_v4()"))
+  categoryId             String                   @map("category_id")
+  title                  String
+  productCode            String?                  @map("product_code") // 品番
+  releaseDate            DateTime?                @map("release_date") @db.Date
+  releaseDateDisplay     String?                  @map("release_date_display") // 「2024年1月予定」等の表示用
+  isPreorder             Boolean                  @default(false) @map("is_preorder") // 予約商品フラグ
+  preorderStartDate      DateTime?                @map("preorder_start_date") @db.Date
+  preorderEndDate        DateTime?                @map("preorder_end_date") @db.Date
+  description            String?
+  officialUrl            String?                  @map("official_url")
+  variationGroupId       String?                  @map("variation_group_id") // バリエーショングループ
+  variationDescription   String?                  @map("variation_description") // バリエーション説明（例：「CD版」「配信版」）
+  displayOrder           Int                      @map("display_order")
+  createdAt              DateTime                 @default(now()) @map("created_at")
+  category               ProductCategory          @relation(fields: [categoryId], references: [id])
+  variationGroup         ProductVariationGroup?   @relation(fields: [variationGroupId], references: [id])
+  affiliateLinks         ProductAffiliateLink[]
+  workProducts           WorkProduct[]
+  scheduleProducts       ScheduleProduct[]
+  seriesItems            ProductSeriesItem[]
+
+  @@index([categoryId], map: "idx_products_category_id")
+  @@index([releaseDate], map: "idx_products_release_date")
+  @@index([variationGroupId], map: "idx_products_variation_group_id")
+  @@map("products")
+}
+
+// 商品シリーズアイテム（シリーズ内の各巻）
+model ProductSeriesItem {
+  id           String                  @id @default(uuid())
+  seriesId     String                  @map("series_id")
+  productId    String                  @map("product_id")
+  volumeNumber Int?                    @map("volume_number") // 巻数
+  volumeTitle  String?                 @map("volume_title") // サブタイトル（例：「上巻」「完結編」）
+  variationId  String?                 @map("variation_id") // 形態違いID
+  displayOrder Int                     @map("display_order")
+  createdAt    DateTime                @default(now()) @map("created_at")
+  series       ProductSeries           @relation(fields: [seriesId], references: [id])
+  product      Product                 @relation(fields: [productId], references: [id])
+  variation    ProductSeriesVariation? @relation(fields: [variationId], references: [id])
+
+  @@unique([seriesId, productId])
+  @@map("rel_product_series_items")
+}
+
+// アフィリエイトプラットフォームマスター
+model AffiliatePlatform {
+  id           String                 @id @default(dbgenerated("uuid_generate_v4()"))
+  name         String                 // アニメイト、Amazon、楽天市場
+  code         String                 @unique // animate, amazon, rakuten
+  displayOrder Int                    @map("display_order")
+  createdAt    DateTime               @default(now()) @map("created_at")
+  links        ProductAffiliateLink[]
+
+  @@map("mst_affiliate_platforms")
+}
+
+// 商品アフィリエイトリンク
+model ProductAffiliateLink {
+  id         String            @id @default(uuid())
+  productId  String            @map("product_id")
+  platformId String            @map("platform_id")
+  url        String
+  imageUrl   String?           @map("image_url") // アフィリエイト側の画像URL
+  createdAt  DateTime          @default(now()) @map("created_at")
+  product    Product           @relation(fields: [productId], references: [id])
+  platform   AffiliatePlatform @relation(fields: [platformId], references: [id])
+
+  @@unique([productId, platformId])
+  @@map("rel_product_affiliate_links")
+}
+
+// 作品と商品の関連
+model WorkProduct {
+  id           String   @id @default(uuid())
+  workId       String   @map("work_id")
+  productId    String   @map("product_id")
+  description  String?  // 関連の説明（例：「主題歌CD」「設定資料集」）
+  displayOrder Int      @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  work         Work     @relation(fields: [workId], references: [id])
+  product      Product  @relation(fields: [productId], references: [id])
+
+  @@unique([workId, productId])
+  @@map("rel_work_products")
+}
+
+// スケジュールと商品の関連
+model ScheduleProduct {
+  id           String   @id @default(uuid())
+  scheduleId   String   @map("schedule_id")
+  productId    String   @map("product_id")
+  description  String?  // 関連の説明（例：「イベント限定グッズ」「公演パンフレット」）
+  displayOrder Int      @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  schedule     Schedule @relation(fields: [scheduleId], references: [id])
+  product      Product  @relation(fields: [productId], references: [id])
+
+  @@unique([scheduleId, productId])
+  @@map("rel_schedule_products")
 }

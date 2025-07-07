@@ -106,6 +106,11 @@ export default function Navbar() {
                             </Link>
                         </li>
                         <li>
+                            <Link href="/products" className={router.pathname === '/products' ? "active" : ""}>
+                                PRODUCTS
+                            </Link>
+                        </li>
+                        <li>
                             <Link href="/social-posts" className={router.pathname === '/social-posts' ? "active" : ""}>
                                 SOCIAL
                             </Link>
@@ -150,6 +155,9 @@ export default function Navbar() {
                         </li>
                         <li>
                             <Link href="/songs" onClick={handleLinkClick}>SONGS</Link>
+                        </li>
+                        <li>
+                            <Link href="/products" onClick={handleLinkClick}>PRODUCTS</Link>
                         </li>
                         <li>
                             <Link href="/social-posts" onClick={handleLinkClick}>SOCIAL</Link>

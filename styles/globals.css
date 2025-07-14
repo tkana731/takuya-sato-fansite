@@ -1644,7 +1644,7 @@ img {
 }
 
 .mobile-nav {
-  padding: 100px 20px 20px; /* ヘッダーの高さ分+余白を上部に追加 */
+  padding: 80px 20px 20px; /* ヘッダーの高さ分+余白を上部に追加 */
 }
 
 .mobile-nav-menu {
@@ -1656,19 +1656,19 @@ img {
 
 /* 最初のメニュー項目に追加の上部マージン */
 .mobile-nav-menu li:first-child {
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 .mobile-nav-menu li {
-  margin: 15px 0;
+  margin: 10px 0;
 }
 
 .mobile-nav-menu a {
   color: var(--primary-color);
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   display: inline-block;
-  padding: 8px;
+  padding: 6px;
   position: relative;
   transition: color 0.3s;
 }

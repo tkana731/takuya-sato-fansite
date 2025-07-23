@@ -22,6 +22,7 @@ export default function ProductsPage({ productData }) {
       'photobook': 'フォトブック',
       'pamphlet': 'パンフレット',
       'magazine': '雑誌',
+      'clear_card': 'クリアカード',
       'goods': 'グッズ'
     };
     return categoryLabels[code] || code;
@@ -90,6 +91,7 @@ export default function ProductsPage({ productData }) {
     { code: 'photobook', label: 'フォトブック' },
     { code: 'pamphlet', label: 'パンフレット' },
     { code: 'magazine', label: '雑誌' },
+    { code: 'clear_card', label: 'クリアカード' },
     { code: 'goods', label: 'グッズ' }
   ];
 
@@ -288,7 +290,7 @@ export async function getStaticProps() {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     
     // 各カテゴリのデータを並行で取得
-    const categories = ['cd', 'dvd', 'blu-ray', 'photobook', 'pamphlet', 'magazine', 'goods'];
+    const categories = ['cd', 'dvd', 'blu-ray', 'photobook', 'pamphlet', 'magazine', 'clear_card', 'goods'];
     const productPromises = categories.map(async (category) => {
       const response = await fetch(`${baseUrl}/api/products?tab=${category}`);
       if (!response.ok) {
@@ -327,6 +329,7 @@ export async function getStaticProps() {
           'photobook': emptyData,
           'pamphlet': emptyData,
           'magazine': emptyData,
+          'clear_card': emptyData,
           'goods': emptyData
         }
       },

@@ -42,3 +42,4 @@ next-env.d.ts
 
 # Claude project instructions
 CLAUDE.md
+components/Breadcrumb/BreadcrumbExamples.md

@@ -32,13 +32,13 @@ model Work {
   childRelations    RelatedWork[]      @relation("ChildWork")
   parentRelations   RelatedWork[]      @relation("ParentWork")
   workPerformers    WorkPerformer[]
+  workProducts      WorkProduct[]
   workRoles         WorkRole[]
   workSeries        WorkSeries[]
   workStaff         WorkStaff[]
   schedules         Schedule[]
   socialPosts       SocialPost[]
   videos            Video[]
-  workProducts      WorkProduct[]
   category          WorkCategory       @relation(fields: [categoryId], references: [id])
 
   @@index([categoryId], map: "idx_works_category_id")
@@ -209,8 +209,8 @@ model Schedule {
   startDateTime      DateTime?            @map("start_datetime") @db.Timestamptz(6)
   endDateTime        DateTime?            @map("end_datetime") @db.Timestamptz(6)
   performers         SchedulePerformer[]
-  socialPosts        SocialPostSchedule[]
   scheduleProducts   ScheduleProduct[]
+  socialPosts        SocialPostSchedule[]
   broadcastStation   BroadcastStation?    @relation(fields: [broadcastStationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   category           ScheduleCategory     @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   venue              Venue?               @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -310,6 +310,7 @@ model Video {
   title       String
   videoUrl    String   @map("video_url")
   publishedAt DateTime @map("published_at") @db.Date
+  isSaved     Boolean  @default(false) @map("is_saved")
   createdAt   DateTime @default(now()) @map("created_at")
   work        Work?    @relation(fields: [workId], references: [id])
 
@@ -452,11 +453,10 @@ model Song {
   @@map("songs")
 }
 
-// 商品カテゴリマスター
 model ProductCategory {
   id           String    @id @default(dbgenerated("uuid_generate_v4()"))
-  name         String    // CD、DVD、Blu-ray、フォトブック、パンフレット、グッズ等
-  code         String    @unique // cd, dvd, blu-ray, photobook, pamphlet, goods
+  name         String
+  code         String    @unique
   displayOrder Int       @map("display_order")
   createdAt    DateTime  @default(now()) @map("created_at")
   products     Product[]
@@ -464,10 +464,9 @@ model ProductCategory {
   @@map("mst_product_categories")
 }
 
-// 商品バリエーショングループ（同じ内容の異なる形態）
 model ProductVariationGroup {
   id          String    @id @default(dbgenerated("uuid_generate_v4()"))
-  name        String    // グループ名（例：「○○OP主題歌」）
+  name        String
   description String?
   createdAt   DateTime  @default(now()) @map("created_at")
   products    Product[]
@@ -475,55 +474,52 @@ model ProductVariationGroup {
   @@map("product_variation_groups")
 }
 
-// 商品シリーズ（連続する巻物など）
 model ProductSeries {
-  id                  String                   @id @default(dbgenerated("uuid_generate_v4()"))
-  name                String                   // シリーズ名（例：「○○ アニメ」）
-  description         String?
-  hasVariations       Boolean                  @default(false) @map("has_variations") // 形態違いありフラグ
-  createdAt           DateTime                 @default(now()) @map("created_at")
-  seriesProducts      ProductSeriesItem[]
-  seriesVariations    ProductSeriesVariation[] // 形態違いの定義
+  id               String                   @id @default(dbgenerated("uuid_generate_v4()"))
+  name             String
+  description      String?
+  hasVariations    Boolean                  @default(false) @map("has_variations")
+  createdAt        DateTime                 @default(now()) @map("created_at")
+  seriesVariations ProductSeriesVariation[]
+  seriesProducts   ProductSeriesItem[]
 
   @@map("product_series")
 }
 
-// シリーズ内の形態違い定義
 model ProductSeriesVariation {
-  id               String              @id @default(uuid())
-  seriesId         String              @map("series_id")
-  variationName    String              @map("variation_name") // DVD版、Blu-ray版など
-  displayOrder     Int                 @map("display_order")
-  createdAt        DateTime            @default(now()) @map("created_at")
-  series           ProductSeries       @relation(fields: [seriesId], references: [id])
-  seriesItems      ProductSeriesItem[]
+  id            String              @id @default(dbgenerated("uuid_generate_v4()"))
+  seriesId      String              @map("series_id")
+  variationName String              @map("variation_name")
+  displayOrder  Int                 @map("display_order")
+  createdAt     DateTime            @default(now()) @map("created_at")
+  series        ProductSeries       @relation(fields: [seriesId], references: [id])
+  seriesItems   ProductSeriesItem[]
 
   @@map("product_series_variations")
 }
 
-// 商品マスター
 model Product {
-  id                     String                   @id @default(dbgenerated("uuid_generate_v4()"))
-  categoryId             String                   @map("category_id")
-  title                  String
-  productCode            String?                  @map("product_code") // 品番
-  releaseDate            DateTime?                @map("release_date") @db.Date
-  releaseDateDisplay     String?                  @map("release_date_display") // 「2024年1月予定」等の表示用
-  isPreorder             Boolean                  @default(false) @map("is_preorder") // 予約商品フラグ
-  preorderStartDate      DateTime?                @map("preorder_start_date") @db.Date
-  preorderEndDate        DateTime?                @map("preorder_end_date") @db.Date
-  description            String?
-  officialUrl            String?                  @map("official_url")
-  variationGroupId       String?                  @map("variation_group_id") // バリエーショングループ
-  variationDescription   String?                  @map("variation_description") // バリエーション説明（例：「CD版」「配信版」）
-  displayOrder           Int                      @map("display_order")
-  createdAt              DateTime                 @default(now()) @map("created_at")
-  category               ProductCategory          @relation(fields: [categoryId], references: [id])
-  variationGroup         ProductVariationGroup?   @relation(fields: [variationGroupId], references: [id])
-  affiliateLinks         ProductAffiliateLink[]
-  workProducts           WorkProduct[]
-  scheduleProducts       ScheduleProduct[]
-  seriesItems            ProductSeriesItem[]
+  id                   String                 @id @default(dbgenerated("uuid_generate_v4()"))
+  categoryId           String                 @map("category_id")
+  title                String
+  productCode          String?                @map("product_code")
+  releaseDate          DateTime?              @map("release_date") @db.Date
+  releaseDateDisplay   String?                @map("release_date_display")
+  isPreorder           Boolean                @default(false) @map("is_preorder")
+  preorderStartDate    DateTime?              @map("preorder_start_date") @db.Date
+  preorderEndDate      DateTime?              @map("preorder_end_date") @db.Date
+  description          String?
+  officialUrl          String?                @map("official_url")
+  variationGroupId     String?                @map("variation_group_id")
+  variationDescription String?                @map("variation_description")
+  displayOrder         Int                    @map("display_order")
+  createdAt            DateTime               @default(now()) @map("created_at")
+  category             ProductCategory        @relation(fields: [categoryId], references: [id])
+  variationGroup       ProductVariationGroup? @relation(fields: [variationGroupId], references: [id])
+  affiliateLinks       ProductAffiliateLink[]
+  seriesItems          ProductSeriesItem[]
+  scheduleProducts     ScheduleProduct[]
+  workProducts         WorkProduct[]
 
   @@index([categoryId], map: "idx_products_category_id")
   @@index([releaseDate], map: "idx_products_release_date")
@@ -531,29 +527,27 @@ model Product {
   @@map("products")
 }
 
-// 商品シリーズアイテム（シリーズ内の各巻）
 model ProductSeriesItem {
-  id           String                  @id @default(uuid())
+  id           String                  @id @default(dbgenerated("uuid_generate_v4()"))
   seriesId     String                  @map("series_id")
   productId    String                  @map("product_id")
-  volumeNumber Int?                    @map("volume_number") // 巻数
-  volumeTitle  String?                 @map("volume_title") // サブタイトル（例：「上巻」「完結編」）
-  variationId  String?                 @map("variation_id") // 形態違いID
+  volumeNumber Int?                    @map("volume_number")
+  volumeTitle  String?                 @map("volume_title")
+  variationId  String?                 @map("variation_id")
   displayOrder Int                     @map("display_order")
   createdAt    DateTime                @default(now()) @map("created_at")
-  series       ProductSeries           @relation(fields: [seriesId], references: [id])
   product      Product                 @relation(fields: [productId], references: [id])
+  series       ProductSeries           @relation(fields: [seriesId], references: [id])
   variation    ProductSeriesVariation? @relation(fields: [variationId], references: [id])
 
   @@unique([seriesId, productId])
   @@map("rel_product_series_items")
 }
 
-// アフィリエイトプラットフォームマスター
 model AffiliatePlatform {
   id           String                 @id @default(dbgenerated("uuid_generate_v4()"))
-  name         String                 // アニメイト、Amazon、楽天市場
-  code         String                 @unique // animate, amazon, rakuten
+  name         String
+  code         String                 @unique
   displayOrder Int                    @map("display_order")
   createdAt    DateTime               @default(now()) @map("created_at")
   links        ProductAffiliateLink[]
@@ -561,46 +555,43 @@ model AffiliatePlatform {
   @@map("mst_affiliate_platforms")
 }
 
-// 商品アフィリエイトリンク
 model ProductAffiliateLink {
-  id         String            @id @default(uuid())
+  id         String            @id @default(dbgenerated("uuid_generate_v4()"))
   productId  String            @map("product_id")
   platformId String            @map("platform_id")
   url        String
-  imageUrl   String?           @map("image_url") // アフィリエイト側の画像URL
+  imageUrl   String?           @map("image_url")
   createdAt  DateTime          @default(now()) @map("created_at")
-  product    Product           @relation(fields: [productId], references: [id])
   platform   AffiliatePlatform @relation(fields: [platformId], references: [id])
+  product    Product           @relation(fields: [productId], references: [id])
 
   @@unique([productId, platformId])
   @@map("rel_product_affiliate_links")
 }
 
-// 作品と商品の関連
 model WorkProduct {
-  id           String   @id @default(uuid())
+  id           String   @id @default(dbgenerated("uuid_generate_v4()"))
   workId       String   @map("work_id")
   productId    String   @map("product_id")
-  description  String?  // 関連の説明（例：「主題歌CD」「設定資料集」）
+  description  String?
   displayOrder Int      @map("display_order")
   createdAt    DateTime @default(now()) @map("created_at")
-  work         Work     @relation(fields: [workId], references: [id])
   product      Product  @relation(fields: [productId], references: [id])
+  work         Work     @relation(fields: [workId], references: [id])
 
   @@unique([workId, productId])
   @@map("rel_work_products")
 }
 
-// スケジュールと商品の関連
 model ScheduleProduct {
-  id           String   @id @default(uuid())
+  id           String   @id @default(dbgenerated("uuid_generate_v4()"))
   scheduleId   String   @map("schedule_id")
   productId    String   @map("product_id")
-  description  String?  // 関連の説明（例：「イベント限定グッズ」「公演パンフレット」）
+  description  String?
   displayOrder Int      @map("display_order")
   createdAt    DateTime @default(now()) @map("created_at")
-  schedule     Schedule @relation(fields: [scheduleId], references: [id])
   product      Product  @relation(fields: [productId], references: [id])
+  schedule     Schedule @relation(fields: [scheduleId], references: [id])
 
   @@unique([scheduleId, productId])
   @@map("rel_schedule_products")

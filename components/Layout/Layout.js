@@ -2,10 +2,11 @@
 import Head from 'next/head';
 import Navbar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
+import Breadcrumb from '../Breadcrumb/Breadcrumb';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 
-export default function Layout({ children, title = '佐藤拓也さん非公式ファンサイト' }) {
+export default function Layout({ children, title = '佐藤拓也さん非公式ファンサイト', customBreadcrumb, showBreadcrumb = true }) {
     const [isBackToTopVisible, setIsBackToTopVisible] = useState(false);
     const router = useRouter();
     const layoutRef = useRef(null);
@@ -206,6 +207,10 @@ export default function Layout({ children, title = '佐藤拓也さん非公式�
             </div>
 
             <Navbar />
+
+            {showBreadcrumb && router.pathname !== '/' && (
+                <Breadcrumb customItems={customBreadcrumb} />
+            )}
 
             <main>{children}</main>
 

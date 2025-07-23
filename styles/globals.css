@@ -5483,3 +5483,95 @@ img {
     font-size: 15px;
   }
 }
+
+/* ==========================================
+   パンくずリスト
+   ========================================== */
+.breadcrumb {
+  padding: 12px 0;
+  background: transparent;
+  font-size: 14px;
+}
+
+.breadcrumb-list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  color: var(--primary-dark);
+}
+
+.breadcrumb-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary-color);
+  transition: all 0.3s ease;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.breadcrumb-link:hover {
+  color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.breadcrumb-icon {
+  font-size: 14px;
+  color: var(--primary-color);
+}
+
+.breadcrumb-separator {
+  margin: 0 8px;
+  color: var(--primary-color);
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.breadcrumb-current {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.breadcrumb-current .breadcrumb-icon {
+  color: var(--primary-color);
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+  .breadcrumb {
+    padding: 10px 0;
+    font-size: 12px;
+  }
+
+  .breadcrumb-list {
+    padding: 0 15px;
+    gap: 6px;
+  }
+
+  .breadcrumb-icon {
+    font-size: 12px;
+  }
+
+  .breadcrumb-separator {
+    margin: 0 6px;
+  }
+
+  .breadcrumb-link {
+    padding: 3px 6px;
+  }
+}

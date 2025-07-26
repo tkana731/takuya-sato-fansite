@@ -5,7 +5,7 @@ import BirthdayCalendar from '../components/BirthdayCalendar/BirthdayCalendar';
 
 export default function BirthdayCalendarPage({ characters }) {
     // ページのメタデータ
-    const pageTitle = 'キャラクター誕生日カレンダー | 佐藤拓也さん非公式ファンサイト';
+    const pageTitle = '誕生日カレンダー | 佐藤拓也さん非公式ファンサイト';
     const pageDescription = '声優・佐藤拓也さんが演じたキャラクターの誕生日を月別カレンダー形式で表示。誕生日が登録されているキャラクターを一覧で確認できます。';
 
     // 構造化データを作成
@@ -18,7 +18,7 @@ export default function BirthdayCalendarPage({ characters }) {
         return {
             '@context': 'https://schema.org',
             '@type': 'ItemList',
-            name: 'キャラクター誕生日カレンダー',
+            name: '誕生日カレンダー',
             description: pageDescription,
             numberOfItems: charactersWithBirthdays.length,
             itemListElement: charactersWithBirthdays.map((character, index) => ({
@@ -56,7 +56,7 @@ export default function BirthdayCalendarPage({ characters }) {
                 <div className="container">
                     <div className="section-header">
                         <h1 className="section-title">BIRTHDAY CALENDAR</h1>
-                        <p className="section-subtitle">キャラクター誕生日カレンダー</p>
+                        <p className="section-subtitle">誕生日カレンダー</p>
                     </div>
 
                     <div className="birthday-calendar-wrapper">

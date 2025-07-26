@@ -39,6 +39,10 @@ const Breadcrumb = ({ customItems }) => {
       case '/search':
         items.push({ label: 'SEARCH', path: '/search' });
         break;
+      case '/birthday-calendar':
+        items.push({ label: 'CHARACTERS', path: '/characters' });
+        items.push({ label: 'BIRTHDAY CALENDAR', path: '/birthday-calendar' });
+        break;
       default:
         break;
     }

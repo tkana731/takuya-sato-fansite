@@ -47,6 +47,21 @@ const BirthdayCalendar = ({ characters }) => {
         return acc;
     }, {});
     
+    // 佐藤拓也さんの誕生日（5月19日）を固定で追加
+    const takuyasBirthday = '5-19';
+    if (!charactersWithBirthdays[takuyasBirthday]) {
+        charactersWithBirthdays[takuyasBirthday] = [];
+    }
+    // 佐藤拓也さんが既に登録されていないかチェック
+    if (!charactersWithBirthdays[takuyasBirthday].some(c => c.name === '佐藤拓也')) {
+        charactersWithBirthdays[takuyasBirthday].push({
+            name: '佐藤拓也',
+            month: 5,
+            day: 19,
+            isVoiceActor: true // 声優本人であることを示すフラグ
+        });
+    }
+    
     // カレンダーのヘルパー関数
     const getMonthName = (date) => {
         const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
@@ -149,11 +164,11 @@ const BirthdayCalendar = ({ characters }) => {
                                     <>
                                         <div className="day-number">{day}</div>
                                         {hasBirthday && (
-                                            <div className="birthday-info">
+                                            <div className={`birthday-info ${birthdayCharacters.some(char => char.isVoiceActor) ? 'voice-actor' : ''}`}>
                                                 <FaBirthdayCake className="birthday-icon" />
                                                 <div className="birthday-characters">
                                                     {birthdayCharacters.map((char, i) => (
-                                                        <div key={i} className="character-name">
+                                                        <div key={i} className={`character-name ${char.isVoiceActor ? 'voice-actor-name' : ''}`}>
                                                             {char.name}
                                                         </div>
                                                     ))}
@@ -191,7 +206,7 @@ const BirthdayCalendar = ({ characters }) => {
                                     </div>
                                     <div className="birthday-names">
                                         {chars.map((char, i) => (
-                                            <span key={i} className="character-chip">
+                                            <span key={i} className={`character-chip ${char.isVoiceActor ? 'voice-actor' : ''}`}>
                                                 {char.name}
                                             </span>
                                         ))}

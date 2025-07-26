@@ -675,10 +675,6 @@ img {
   font-weight: 600;
 }
 
-.location-type {
-  color: var(--gray-dark);
-  margin-left: 4px;
-}
 
 .schedule-description-wrapper {
   margin: 8px 0 4px 0;
@@ -1140,8 +1136,10 @@ img {
 }
 
 .item-role.main {
-  background-color: var(--accent-color);
+  background: linear-gradient(45deg, var(--accent-color), #ff6b9d);
   color: white;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(228, 21, 126, 0.3);
 }
 
 .item-year {
@@ -4181,34 +4179,7 @@ img {
   font-style: italic;
 }
 
-/* 年別内訳 */
-.yearly-breakdown {
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px dashed var(--gray-light);
-}
 
-.breakdown-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--primary-dark);
-  margin-bottom: 8px;
-}
-
-.year-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.year-stat {
-  font-size: 12px;
-  padding: 4px 10px;
-  background-color: var(--primary-light);
-  color: var(--primary-dark);
-  border-radius: 12px;
-  font-weight: 500;
-}
 
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
@@ -4739,12 +4710,6 @@ img {
   font-style: italic;
 }
 
-.no-data {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--gray-dark);
-  font-size: 1.1rem;
-}
 
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
@@ -5830,6 +5795,26 @@ img {
   border-radius: 20px;
   margin-right: 10px;
   display: inline-block;
+}
+
+/* 佐藤拓也さん本人の誕生日のスタイル */
+.character-chip.voice-actor {
+  background: linear-gradient(45deg, var(--accent-color), #ff6b9d);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(228, 21, 126, 0.3);
+}
+
+/* カレンダー内の佐藤拓也さんの名前のスタイル */
+.character-name.voice-actor-name {
+  color: var(--accent-color);
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(228, 21, 126, 0.2);
+}
+
+/* 佐藤拓也さんの誕生日のケーキアイコンをピンクに */
+.birthday-info.voice-actor .birthday-icon {
+  color: var(--accent-color);
 }
 
 .no-birthdays {

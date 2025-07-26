@@ -182,7 +182,7 @@ export default function SchedulePage({ initialSchedules, initialYearRange }) {
     
 
     // スケジュールページのメタデータ
-    const pageTitle = `佐藤拓也さんスケジュール ${monthDisplay} | 非公式ファンサイト`;
+    const pageTitle = `佐藤拓也さんスケジュール ${monthDisplay} | 佐藤拓也さん非公式ファンサイト`;
     const pageDescription = `声優・佐藤拓也さんの${monthDisplay}のイベント、舞台、生放送などの出演スケジュールをまとめています。最新の活動予定をチェックできます。`;
 
     // イベントの構造化データを作成

@@ -65,9 +65,9 @@ export default function SocialPosts() {
 
 
   return (
-    <Layout title="ソーシャルメディア投稿 - 佐藤拓也ファンサイト">
+    <Layout title="SNS投稿 | 佐藤拓也さん非公式ファンサイト">
       <SEO
-        title="ソーシャルメディア投稿 | 佐藤拓也さん非公式ファンサイト"
+        title="SNS投稿 | 佐藤拓也さん非公式ファンサイト"
         description="佐藤拓也さん関連のX（Twitter）・Instagram投稿一覧。写真・動画投稿をまとめて確認できます。"
         type="article"
       />

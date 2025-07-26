@@ -1,6 +1,12 @@
 import { Html, Head, Main, NextScript } from "next/document";
+import { getOrganizationSchema, getPersonSchema, getWebSiteSchema } from "../utils/structuredData";
 
 export default function Document() {
+  // 基本的な構造化データ
+  const organizationSchema = getOrganizationSchema();
+  const personSchema = getPersonSchema();
+  const webSiteSchema = getWebSiteSchema();
+
   return (
     <Html lang="ja">
       <Head>
@@ -29,6 +35,26 @@ export default function Document() {
         {/* その他のファビコン関連 */}
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0078d4" />
         <link rel="shortcut icon" href="/favicon.ico?v=2" />
+        
+        {/* 基本的な構造化データ */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema)
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(personSchema)
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(webSiteSchema)
+          }}
+        />
       </Head>
       <body className="antialiased">
         <Main />

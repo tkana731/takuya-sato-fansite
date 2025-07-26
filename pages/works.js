@@ -25,7 +25,7 @@ export default function WorksPage({ works }) {
         };
 
         const currentTabName = tabNames[activeTab] || 'アニメ';
-        const title = `佐藤拓也さん出演作品一覧 - ${currentTabName} | 非公式ファンサイト`;
+        const title = `佐藤拓也さん出演作品一覧 - ${currentTabName} | 佐藤拓也さん非公式ファンサイト`;
         const description = `声優・佐藤拓也さんの${currentTabName}出演作品を一覧で掲載。役名、放送年などの詳細情報をまとめています。`;
 
         return { title, description };

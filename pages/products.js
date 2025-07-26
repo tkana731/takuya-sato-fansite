@@ -5,7 +5,7 @@ import SchemaOrg from '../components/SEO/SchemaOrg';
 import { FaExternalLinkAlt, FaShoppingCart } from 'react-icons/fa';
 
 export default function ProductsPage({ productData }) {
-  const [activeTab, setActiveTab] = useState('cd');
+  const [activeTab, setActiveTab] = useState('all');
 
   // タブ切り替え処理
   const handleTabChange = (tab) => {
@@ -31,7 +31,7 @@ export default function ProductsPage({ productData }) {
   // メタデータの生成
   const generateMetadata = () => {
     const currentTabName = getCategoryLabel(activeTab);
-    const title = `佐藤拓也さん関連商品一覧 - ${currentTabName} | 非公式ファンサイト`;
+    const title = `佐藤拓也さん関連商品一覧 - ${currentTabName} | 佐藤拓也さん非公式ファンサイト`;
     const description = `声優・佐藤拓也さんの${currentTabName}商品を一覧で掲載。発売日、価格、購入リンクなどの詳細情報をまとめています。`;
 
     return { title, description };
@@ -39,7 +39,34 @@ export default function ProductsPage({ productData }) {
 
   // 構造化データの生成
   const generateSchemaData = () => {
-    const currentProducts = productData?.[activeTab] || { series: [], standalone: [] };
+    let currentProducts;
+    if (activeTab === 'all') {
+      // 全カテゴリのデータを統合
+      const allSeries = [];
+      const allStandalone = [];
+      
+      Object.keys(productData || {}).forEach(categoryCode => {
+        if (categoryCode !== 'all') {
+          const categoryData = productData[categoryCode] || { series: [], standalone: [] };
+          allSeries.push(...(categoryData.series || []));
+          allStandalone.push(...(categoryData.standalone || []));
+        }
+      });
+      
+      // シリーズ商品内の個別商品も発売日でソート
+      const sortedSeries = allSeries.map(series => ({
+        ...series,
+        products: sortByReleaseDate([...series.products])
+      }));
+      
+      // 単独商品を発売日でソート
+      const sortedStandalone = sortByReleaseDate([...allStandalone]);
+      
+      currentProducts = { series: sortedSeries, standalone: sortedStandalone };
+    } else {
+      currentProducts = productData?.[activeTab] || { series: [], standalone: [] };
+    }
+    
     const allProducts = [
       ...currentProducts.standalone || [],
       ...(currentProducts.series?.flatMap(s => s.products) || [])
@@ -81,10 +108,20 @@ export default function ProductsPage({ productData }) {
     return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
   };
 
+  // 発売日でソートする関数（降順）
+  const sortByReleaseDate = (products) => {
+    return products.sort((a, b) => {
+      const dateA = a.releaseDate ? new Date(a.releaseDate) : new Date(0);
+      const dateB = b.releaseDate ? new Date(b.releaseDate) : new Date(0);
+      return dateB - dateA; // 降順（新しい順）
+    });
+  };
+
   const { title: pageTitle, description: pageDescription } = generateMetadata();
 
   // タブのリスト
   const tabs = [
+    { code: 'all', label: 'すべて' },
     { code: 'cd', label: 'CD' },
     { code: 'dvd', label: 'DVD' },
     { code: 'blu-ray', label: 'Blu-ray' },
@@ -116,27 +153,57 @@ export default function ProductsPage({ productData }) {
             <p className="section-subtitle">関連商品一覧</p>
           </div>
 
-          {/* カテゴリタブ - worksページと同じ構造 */}
-          <div className="works-tabs">
-            <div className="works-tabs-container">
-              {tabs.map(tab => (
-                <button
-                  key={tab.code}
-                  className={`works-tab ${activeTab === tab.code ? 'active' : ''}`}
-                  onClick={() => handleTabChange(tab.code)}
-                  role="tab"
-                  aria-selected={activeTab === tab.code}
-                  aria-controls={`${tab.code}-content`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+          {/* カテゴリ選択プルダウン */}
+          <div className="category-select-container">
+            <div className="filter-group">
+              <label htmlFor="category-select" className="category-select-label">
+                カテゴリ：
+              </label>
+              <select
+                id="category-select"
+                value={activeTab}
+                onChange={(e) => handleTabChange(e.target.value)}
+                className="category-select"
+              >
+                {tabs.map(tab => (
+                  <option key={tab.code} value={tab.code}>
+                    {tab.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
           {/* 各タブのコンテンツ */}
           {tabs.map(tab => {
-            const tabData = productData?.[tab.code] || { series: [], standalone: [] };
+            // 「すべて」の場合は全カテゴリのデータを統合
+            let tabData;
+            if (tab.code === 'all') {
+              // 全カテゴリのデータを統合
+              const allSeries = [];
+              const allStandalone = [];
+              
+              Object.keys(productData || {}).forEach(categoryCode => {
+                if (categoryCode !== 'all') {
+                  const categoryData = productData[categoryCode] || { series: [], standalone: [] };
+                  allSeries.push(...(categoryData.series || []));
+                  allStandalone.push(...(categoryData.standalone || []));
+                }
+              });
+              
+              // シリーズ商品内の個別商品も発売日でソート
+              const sortedSeries = allSeries.map(series => ({
+                ...series,
+                products: sortByReleaseDate([...series.products])
+              }));
+              
+              // 単独商品を発売日でソート
+              const sortedStandalone = sortByReleaseDate([...allStandalone]);
+              
+              tabData = { series: sortedSeries, standalone: sortedStandalone };
+            } else {
+              tabData = productData?.[tab.code] || { series: [], standalone: [] };
+            }
             
             return (
               <div 
@@ -217,7 +284,9 @@ export default function ProductsPage({ productData }) {
                   {/* 単独商品 */}
                   {tabData.standalone && tabData.standalone.length > 0 && (
                     <>
-                      <h3 className="list-title">{getCategoryLabel(tab.code)}商品一覧</h3>
+                      <h3 className="list-title">
+                        {tab.code === 'all' ? '全商品一覧' : `${getCategoryLabel(tab.code)}商品一覧`}
+                      </h3>
                       <ul className="list-items">
                         {tabData.standalone.map(product => (
                           <li className="list-item product-item" key={product.id}>

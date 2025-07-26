@@ -36,7 +36,7 @@ export default function SongsPage({ songData }) {
     };
 
     const currentTabName = tabNames[activeTab] || 'キャラクターソング';
-    const title = `佐藤拓也さん 楽曲一覧 - ${currentTabName} | 非公式ファンサイト`;
+    const title = `佐藤拓也さん 楽曲一覧 - ${currentTabName} | 佐藤拓也さん非公式ファンサイト`;
     const description = `声優・佐藤拓也さんの${currentTabName}を一覧で掲載。作詞・作曲・編曲者などの詳細情報をまとめています。`;
 
     return { title, description };

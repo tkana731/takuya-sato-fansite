@@ -36,6 +36,9 @@ const Breadcrumb = ({ customItems }) => {
       case '/social-posts':
         items.push({ label: 'SOCIAL', path: '/social-posts' });
         break;
+      case '/search':
+        items.push({ label: 'SEARCH', path: '/search' });
+        break;
       default:
         break;
     }

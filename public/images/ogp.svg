@@ -1,0 +1,56 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#aed4f3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8f4fd;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- メインアイコン（Sマーク） -->
+  <g transform="translate(100, 130)">
+    <!-- 外枠 -->
+    <rect x="0" y="0" width="200" height="370" fill="#0078d4" rx="10"/>
+    <!-- 内側の切り抜き部分 -->
+    <rect x="40" y="40" width="120" height="120" fill="#aed4f3"/>
+    <rect x="40" y="210" width="120" height="120" fill="#aed4f3"/>
+    <!-- 中央の横棒 -->
+    <rect x="40" y="160" width="120" height="50" fill="#0078d4"/>
+  </g>
+  
+  <!-- メインタイトル -->
+  <text x="400" y="220" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+        font-size="64" font-weight="800" fill="#0078d4" letter-spacing="-1px">
+    佐藤拓也
+  </text>
+  
+  <!-- サブタイトル -->
+  <text x="400" y="280" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+        font-size="32" font-weight="600" fill="#0078d4" opacity="0.8">
+    非公式ファンサイト
+  </text>
+  
+  <!-- 英語タイトル -->
+  <text x="400" y="340" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+        font-size="28" font-weight="500" fill="#666" letter-spacing="1px">
+    TAKUYA SATO
+  </text>
+  
+  <!-- 説明文 -->
+  <text x="400" y="400" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+        font-size="24" font-weight="400" fill="#888">
+    声優・佐藤拓也さんの出演作品、スケジュール、最新情報
+  </text>
+  
+  <!-- アクセントライン -->
+  <rect x="400" y="430" width="300" height="4" fill="url(#bgGradient)" opacity="0.8" rx="2"/>
+  
+  <!-- サイトURL -->
+  <text x="400" y="480" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+        font-size="20" font-weight="400" fill="#0078d4" opacity="0.7">
+    takuya-sato-fansite.com
+  </text>
+</svg>

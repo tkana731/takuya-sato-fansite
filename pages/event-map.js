@@ -87,7 +87,7 @@ export default function EventMapPage({ eventData }) {
   return (
     <Layout>
       <SEO 
-        title="イベント一覧・開催統計 | 佐藤拓也さん非公式ファンサイト"
+        title="イベントマップ | 佐藤拓也さん非公式ファンサイト"
         description="声優・佐藤拓也さんのイベント一覧と都道府県別の開催統計。年別・地域別に絞り込んで検索できます。"
         type="article"
       />

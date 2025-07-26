@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Link from 'next/link';
 import Layout from '../components/Layout/Layout';
 import SEO from '../components/SEO/SEO';
 import SchemaOrg from '../components/SEO/SchemaOrg';
@@ -103,7 +104,7 @@ export default function CharactersPage({ characters }) {
     };
 
     // ページのメタデータ
-    const pageTitle = '佐藤拓也さんが演じるキャラクター一覧 | 非公式ファンサイト';
+    const pageTitle = '佐藤拓也さんが演じるキャラクター一覧 | 佐藤拓也さん非公式ファンサイト';
     const pageDescription = '声優・佐藤拓也さんが演じたアニメ・ゲームキャラクターの一覧です。キャラクター名、作品名、誕生日などの情報をまとめています。';
 
     // 構造化データを作成
@@ -151,6 +152,13 @@ export default function CharactersPage({ characters }) {
                     <div className="section-header">
                         <h1 className="section-title">CHARACTERS</h1>
                         <p className="section-subtitle">キャラクター一覧</p>
+                    </div>
+
+                    {/* 誕生日カレンダーへのリンク */}
+                    <div className="birthday-calendar-link-container">
+                        <Link href="/birthday-calendar" className="birthday-calendar-link">
+                            誕生日カレンダーを見る
+                        </Link>
                     </div>
 
                     {/* フィルタープルダウン */}

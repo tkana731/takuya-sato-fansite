@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { FaGlasses } from 'react-icons/fa';
+import { FaGlasses, FaSearch } from 'react-icons/fa';
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,6 +23,11 @@ export default function Navbar() {
         if (typeof document !== 'undefined') {
             document.body.style.overflow = '';
         }
+    };
+
+    // 検索ページに遷移
+    const goToSearch = () => {
+        router.push('/search');
     };
 
 
@@ -71,11 +76,6 @@ export default function Navbar() {
                 <nav className="desktop-nav">
                     <ul className="nav-menu">
                         <li>
-                            <Link href="/" className={router.pathname === '/' ? "active" : ""}>
-                                HOME
-                            </Link>
-                        </li>
-                        <li>
                             <Link href="/schedule" className={router.pathname === '/schedule' ? "active" : ""}>
                                 SCHEDULE
                             </Link>
@@ -115,8 +115,26 @@ export default function Navbar() {
                                 SOCIAL
                             </Link>
                         </li>
+                        <li>
+                            <button 
+                                onClick={goToSearch}
+                                className="search-toggle"
+                                aria-label="検索ページに移動"
+                            >
+                                <FaSearch />
+                            </button>
+                        </li>
                     </ul>
                 </nav>
+
+                {/* モバイル用検索アイコン */}
+                <button 
+                    onClick={goToSearch}
+                    className="mobile-search-toggle"
+                    aria-label="検索ページに移動"
+                >
+                    <FaSearch />
+                </button>
 
                 {/* ハンバーガーメニューボタン */}
                 <button
@@ -135,9 +153,6 @@ export default function Navbar() {
             <div className={`mobile-menu-overlay ${isMenuOpen ? 'active' : ''}`}>
                 <nav className="mobile-nav">
                     <ul className="mobile-nav-menu">
-                        <li>
-                            <Link href="/" onClick={handleLinkClick}>HOME</Link>
-                        </li>
                         <li>
                             <Link href="/schedule" onClick={handleLinkClick}>SCHEDULE</Link>
                         </li>
@@ -165,6 +180,7 @@ export default function Navbar() {
                     </ul>
                 </nav>
             </div>
+
         </header>
     );
 }

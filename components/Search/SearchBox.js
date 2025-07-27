@@ -1,11 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 
 export default function SearchBox({ onClose, isHeaderSearch = false }) {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
+
+  // モバイル判定
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,7 +53,7 @@ export default function SearchBox({ onClose, isHeaderSearch = false }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="出演作品、スケジュール、キャラクター等を検索..."
+            placeholder={isMobile ? "サイト内を検索..." : "出演作品、スケジュール、キャラクター等を検索..."}
             className="search-input"
             disabled={isLoading}
             autoFocus={!isHeaderSearch}

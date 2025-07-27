@@ -30,6 +30,12 @@ export default function Navbar() {
         router.push('/search');
     };
 
+    // 検索アイコンのクリックハンドラー（フォーカス除去付き）
+    const handleSearchClick = (e) => {
+        e.currentTarget.blur(); // タッチ後にフォーカスを外してホバー状態を解除
+        goToSearch();
+    };
+
 
     // ESCキーでメニューを閉じる
     useEffect(() => {
@@ -117,7 +123,7 @@ export default function Navbar() {
                         </li>
                         <li>
                             <button 
-                                onClick={goToSearch}
+                                onClick={handleSearchClick}
                                 className="search-toggle"
                                 aria-label="検索ページに移動"
                             >
@@ -129,7 +135,7 @@ export default function Navbar() {
 
                 {/* モバイル用検索アイコン */}
                 <button 
-                    onClick={goToSearch}
+                    onClick={handleSearchClick}
                     className="mobile-search-toggle"
                     aria-label="検索ページに移動"
                 >

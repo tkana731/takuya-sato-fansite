@@ -391,21 +391,6 @@ img {
   color: var(--primary-color);
 }
 
-.btn {
-  display: inline-block;
-  padding: 12px 30px;
-  background-color: var(--accent-color);
-  color: white;
-  font-weight: 600;
-  border-radius: 30px;
-  transition: background-color 0.3s, transform 0.3s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.btn:hover {
-  background-color: #c2126b;
-  transform: translateY(-2px);
-}
 
 /* セクション共通 */
 .section {
@@ -427,9 +412,7 @@ img {
 
 /* カードの影を強調 */
 .works-card,
-.youtube-card,
-.schedule-item,
-.links-card {
+.youtube-card {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
@@ -754,61 +737,7 @@ img {
   font-size: 18px;
 }
 
-.schedule-item {
-  display: flex;
-  position: relative;
-  margin-bottom: 15px;
-  background-color: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s, box-shadow 0.3s;
-}
 
-.schedule-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-}
-
-.schedule-date {
-  width: 100px;
-  padding: 15px 10px;
-  background-color: var(--primary-light);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-right: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.date-year {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--primary-color);
-  line-height: 1;
-  margin-bottom: 2px;
-}
-
-.date-month {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--primary-color);
-  line-height: 1;
-  margin-bottom: 2px;
-}
-
-.date-day {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--primary-color);
-  line-height: 1;
-  margin-bottom: 2px;
-}
-
-.date-weekday {
-  font-size: 14px;
-  color: var(--gray-dark);
-}
 
 .schedule-content {
   flex: 1;
@@ -2088,16 +2017,6 @@ img {
 }
 
 /* 以下のコードを既存のglobals.cssの「ローディング関連」部分に追加してください */
-
-/* ローディング関連 */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 50vh;
-  margin: 2rem 0;
-}
 
 /* 音声波形アニメーション */
 .audio-wave {
@@ -5922,9 +5841,17 @@ img {
   transition: all 0.3s ease;
 }
 
-.search-toggle:hover {
+/* ホバー可能なデバイスでのみホバー効果を適用 */
+@media (hover: hover) {
+  .search-toggle:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+  }
+}
+
+.search-toggle:active {
+  transform: scale(0.95);
   background-color: var(--primary-light);
-  color: var(--primary-color);
 }
 
 /* モバイル用検索ボタン */
@@ -5953,14 +5880,18 @@ img {
   }
 }
 
-.mobile-search-toggle:hover {
-  background-color: var(--primary-light);
-  color: var(--primary-color);
-  transform: scale(1.1);
+/* モバイル検索アイコンのホバー効果をホバー可能なデバイスでのみ適用 */
+@media (hover: hover) {
+  .mobile-search-toggle:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    transform: scale(1.1);
+  }
 }
 
 .mobile-search-toggle:active {
   transform: scale(0.95);
+  background-color: var(--primary-light);
 }
 
 /* モバイル検索アイコンに波紋効果を追加 */
@@ -6706,8 +6637,13 @@ img {
   }
   
   .search-input {
-    padding: 14px 42px 14px 48px;
+    padding: 14px 38px 14px 42px;
     font-size: 15px;
+  }
+  
+  /* プレースホルダーのスタイル調整 */
+  .search-input::placeholder {
+    font-size: 14px;
   }
   
   .search-submit {
@@ -6719,5 +6655,28 @@ img {
     width: 36px;
     height: 36px;
     font-size: 15px;
+  }
+}
+
+/* 小画面モバイル用の追加調整 */
+@media (max-width: 380px) {
+  .search-input {
+    padding: 12px 35px 12px 38px;
+    font-size: 14px;
+  }
+  
+  .search-input::placeholder {
+    font-size: 12px;
+  }
+  
+  .search-icon {
+    left: 12px;
+    font-size: 16px;
+  }
+  
+  .clear-button {
+    right: 8px;
+    width: 24px;
+    height: 24px;
   }
 }

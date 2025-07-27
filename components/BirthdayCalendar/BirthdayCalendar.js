@@ -2,7 +2,16 @@ import React, { useState } from 'react';
 import { FaBirthdayCake } from 'react-icons/fa';
 
 const BirthdayCalendar = ({ characters }) => {
-    const [currentDate, setCurrentDate] = useState(new Date());
+    // 日本時間で初期化
+    const getJapanDate = () => {
+        const now = new Date();
+        // UTCから日本時間（UTC+9）に変換
+        const japanTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+        // 日本時間の年月日で新しいDateオブジェクトを作成
+        return new Date(japanTime.getUTCFullYear(), japanTime.getUTCMonth(), japanTime.getUTCDate());
+    };
+    
+    const [currentDate, setCurrentDate] = useState(getJapanDate());
     
     // 誕生日データを月日形式で取得する関数
     const parseBirthday = (birthday) => {
@@ -107,12 +116,24 @@ const BirthdayCalendar = ({ characters }) => {
     const calendarDays = generateCalendarDays();
     const currentMonth = currentDate.getMonth() + 1;
     
-    // 今日の日付を取得
-    const today = new Date();
+    // 今日の日付を日本時間で取得
+    const getJapanToday = () => {
+        const now = new Date();
+        // UTCから日本時間（UTC+9）に変換
+        const japanTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+        // getUTC系メソッドを使って日本時間の日付を取得
+        return {
+            year: japanTime.getUTCFullYear(),
+            month: japanTime.getUTCMonth(),
+            date: japanTime.getUTCDate()
+        };
+    };
+    
+    const japanToday = getJapanToday();
     const isToday = (day) => {
-        return day === today.getDate() && 
-               currentDate.getMonth() === today.getMonth() && 
-               currentDate.getFullYear() === today.getFullYear();
+        return day === japanToday.date && 
+               currentDate.getMonth() === japanToday.month && 
+               currentDate.getFullYear() === japanToday.year;
     };
     
     return (

@@ -597,10 +597,11 @@ export async function getStaticProps() {
     try {
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-        // 現在月のスケジュールデータを取得
-        const today = new Date();
-        const currentYear = today.getFullYear();
-        const currentMonth = today.getMonth(); // 0-11
+        // 現在月のスケジュールデータを取得（日本時間）
+        const now = new Date();
+        const japanTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+        const currentYear = japanTime.getUTCFullYear();
+        const currentMonth = japanTime.getUTCMonth(); // 0-11
 
         // 現在月の初日と最終日を取得
         const firstDay = new Date(Date.UTC(currentYear, currentMonth, 1));
@@ -633,8 +634,10 @@ export async function getStaticProps() {
     } catch (error) {
         console.error('Static props generation error:', error);
 
-        // エラー時のフォールバック
-        const currentYear = new Date().getFullYear();
+        // エラー時のフォールバック（日本時間）
+        const now = new Date();
+        const japanTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+        const currentYear = japanTime.getUTCFullYear();
         return {
             props: {
                 initialSchedules: [],

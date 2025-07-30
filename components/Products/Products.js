@@ -73,21 +73,96 @@ const Products = ({ products }) => {
                     <span className="preorder-badge">予約受付中</span>
                   )}
                 </div>
-                <div className="product-date">
-                  {formatDate(product.releaseDate, product.releaseDateDisplay)}
-                </div>
               </div>
 
               <h3 className="product-title">{product.title}</h3>
+              
+              {/* 発売日を商品名のすぐ下に表示 */}
+              <div className="product-release-date">
+                {formatDate(product.releaseDate, product.releaseDateDisplay)}
+              </div>
 
-              {product.variationDescription && (
-                <div className="product-variation">{product.variationDescription}</div>
+              {/* 複数バリエーションの表示（コンパクト版） */}
+              {product.variants && product.variants.length > 0 && (
+                <div className="product-variants-compact">
+                  {product.variants.map((variant) => (
+                    <div key={variant.id} className="variant-compact">
+                      <div className="variant-info">
+                        <span className="variant-name">{variant.name}</span>
+                        {variant.price && (
+                          <span className="variant-price">¥{variant.price.toLocaleString()}</span>
+                        )}
+                        {variant.productCode && (
+                          <span className="variant-code">({variant.productCode})</span>
+                        )}
+                      </div>
+                      
+                      <div className="variant-actions">
+                        {variant.officialUrl && (
+                          <a
+                            href={variant.officialUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="official-link-compact"
+                            title="公式サイト"
+                          >
+                            <FaExternalLinkAlt />
+                          </a>
+                        )}
+                        
+                        {variant.affiliateLinks && variant.affiliateLinks.map((link) => (
+                          <a
+                            key={link.code}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`affiliate-link-compact ${link.code}`}
+                            title={`${link.platform}で購入`}
+                          >
+                            {getPlatformIcon(link.code)}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
 
-              {product.productCode && (
-                <div className="product-code">品番: {product.productCode}</div>
+              {/* 単一商品の場合のフォールバック */}
+              {(!product.variants || product.variants.length === 0) && (
+                <>
+                  {product.productCode && (
+                    <div className="product-code">品番: {product.productCode}</div>
+                  )}
+                  
+                  <div className="product-links">
+                    {product.officialUrl && (
+                      <a
+                        href={product.officialUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="official-link product-link-button"
+                        title="公式サイト"
+                      >
+                        <FaExternalLinkAlt />
+                      </a>
+                    )}
+                    
+                    {product.affiliateLinks && product.affiliateLinks.map((link) => (
+                      <a
+                        key={link.code}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`affiliate-link product-link-button ${link.code}`}
+                        title={`${link.platform}で購入`}
+                      >
+                        {getPlatformIcon(link.code)}
+                      </a>
+                    ))}
+                  </div>
+                </>
               )}
-
 
               {product.relatedWorks && product.relatedWorks.length > 0 && (
                 <div className="product-related">
@@ -100,33 +175,6 @@ const Products = ({ products }) => {
                   ))}
                 </div>
               )}
-
-              <div className="product-links">
-                {product.officialUrl && (
-                  <a
-                    href={product.officialUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="official-link product-link-button"
-                    title="公式サイト"
-                  >
-                    <FaExternalLinkAlt />
-                  </a>
-                )}
-                
-                {product.affiliateLinks && product.affiliateLinks.map((link) => (
-                  <a
-                    key={link.code}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`affiliate-link product-link-button ${link.code}`}
-                    title={`${link.platform}で購入`}
-                  >
-                    {getPlatformIcon(link.code)}
-                  </a>
-                ))}
-              </div>
             </div>
           ))}
         </div>

@@ -214,102 +214,158 @@ export default function ProductsPage({ productData }) {
                 aria-labelledby={`${tab.code}-tab`}
               >
                 <div className="works-list">
-                  {/* シリーズ商品 */}
-                  {tabData.series && tabData.series.length > 0 && (
-                    <>
-                      {tabData.series.map(series => (
-                        <div key={series.id} className="product-series">
-                          <h3 className="list-title">{series.name}</h3>
-                          {series.description && (
-                            <p className="series-description">{series.description}</p>
-                          )}
-                          <ul className="list-items">
-                            {series.products.map(product => (
-                              <li className="list-item product-item" key={product.id}>
-                                <div className="item-header">
-                                  <span className="item-title">
-                                    {product.volumeTitle ? 
-                                      `${product.title} ${product.volumeTitle}` : 
-                                      product.title
-                                    }
-                                  </span>
-                                  {product.officialUrl && (
-                                    <a href={product.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
-                                      <FaExternalLinkAlt />
-                                    </a>
+                <h3 className="list-title">
+                  {tab.code === 'all' ? '全商品一覧' : `${getCategoryLabel(tab.code)}商品一覧`}
+                </h3>
+                <ul className="list-items">
+                  {/* シリーズ商品を統一リストに統合 */}
+                  {tabData.series && tabData.series.length > 0 && 
+                    tabData.series.map(series => 
+                      series.products.map(product => (
+                        <li className="list-item product-item" key={product.id}>
+                          <div className="item-header">
+                            <span className="item-title">{product.title}</span>
+                            {product.officialUrl && (
+                              <a href={product.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                                <FaExternalLinkAlt />
+                              </a>
+                            )}
+                          </div>
+
+                          {/* 発売日を商品名のすぐ下に表示 */}
+                          <div className="item-release-date">
+                            {formatDate(product.releaseDate, product.releaseDateDisplay)}
+                          </div>
+                          
+                          {/* 複数バリエーションの表示（コンパクト版） */}
+                          {product.variants && product.variants.length > 0 && (
+                            <div className="product-variants-list">
+                              {product.variants.map((variant) => (
+                                <div key={variant.id} className="variant-list-item">
+                                  <div className="variant-summary">
+                                    <span className="variant-name">{variant.name}</span>
+                                    {variant.price && (
+                                      <span className="variant-price">¥{variant.price.toLocaleString()}</span>
+                                    )}
+                                    {variant.productCode && (
+                                      <span className="variant-code">({variant.productCode})</span>
+                                    )}
+                                  </div>
+                                  {variant.affiliateLinks && variant.affiliateLinks.length > 0 && (
+                                    <div className="variant-links-inline">
+                                      {variant.affiliateLinks.map(link => (
+                                        <a 
+                                          key={link.platform}
+                                          href={link.url} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer" 
+                                          className="affiliate-link-inline"
+                                          title={`${link.platform}で購入`}
+                                        >
+                                          <FaShoppingCart />
+                                        </a>
+                                      ))}
+                                    </div>
                                   )}
                                 </div>
-                                {product.variation && (
-                                  <span className="item-variation">{product.variation.variationName}</span>
-                                )}
-                                {product.productCode && (
-                                  <span className="item-code">品番: {product.productCode}</span>
-                                )}
-                                <div className="item-date-section">
-                                  <span className="item-date">
-                                    {product.isPreorder && <span className="preorder-badge">予約受付中</span>}
-                                    {formatDate(product.releaseDate, product.releaseDateDisplay)}
-                                  </span>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {/* 単一商品の場合のフォールバック */}
+                          {(!product.variants || product.variants.length === 0) && (
+                            <>
+                              {product.productCode && (
+                                <span className="item-code">品番: {product.productCode}</span>
+                              )}
+                              {product.description && (
+                                <div className="item-detail">
+                                  <span>{product.description}</span>
                                 </div>
-                                {product.description && (
-                                  <div className="item-detail">
-                                    <span>{product.description}</span>
-                                  </div>
-                                )}
-                                {product.affiliateLinks && product.affiliateLinks.length > 0 && (
-                                  <div className="affiliate-links">
-                                    {product.affiliateLinks.map(link => (
+                              )}
+                              {product.affiliateLinks && product.affiliateLinks.length > 0 && (
+                                <div className="affiliate-links">
+                                  {product.affiliateLinks.map(link => (
+                                    <a 
+                                      key={link.platform}
+                                      href={link.url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className="affiliate-link"
+                                      title={`${link.platform}で購入`}
+                                    >
+                                      <FaShoppingCart />
+                                      <span>{link.platform}</span>
+                                    </a>
+                                  ))}
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </li>
+                      ))
+                    )
+                  }
+
+                  {/* 単独商品を統一リストに統合 */}
+                  {tabData.standalone && tabData.standalone.length > 0 && 
+                    tabData.standalone.map(product => (
+                      <li className="list-item product-item" key={product.id}>
+                        <div className="item-header">
+                          <span className="item-title">{product.title}</span>
+                          {product.officialUrl && (
+                            <a href={product.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
+                              <FaExternalLinkAlt />
+                            </a>
+                          )}
+                        </div>
+
+                        {/* 発売日を商品名のすぐ下に表示 */}
+                        <div className="item-release-date">
+                          {formatDate(product.releaseDate, product.releaseDateDisplay)}
+                        </div>
+                        
+                        {/* 複数バリエーションの表示（コンパクト版） */}
+                        {product.variants && product.variants.length > 0 && (
+                          <div className="product-variants-list">
+                            {product.variants.map((variant) => (
+                              <div key={variant.id} className="variant-list-item">
+                                <div className="variant-summary">
+                                  <span className="variant-name">{variant.name}</span>
+                                  {variant.price && (
+                                    <span className="variant-price">¥{variant.price.toLocaleString()}</span>
+                                  )}
+                                  {variant.productCode && (
+                                    <span className="variant-code">({variant.productCode})</span>
+                                  )}
+                                </div>
+                                {variant.affiliateLinks && variant.affiliateLinks.length > 0 && (
+                                  <div className="variant-links-inline">
+                                    {variant.affiliateLinks.map(link => (
                                       <a 
                                         key={link.platform}
                                         href={link.url} 
                                         target="_blank" 
                                         rel="noopener noreferrer" 
-                                        className="affiliate-link"
+                                        className="affiliate-link-inline"
                                         title={`${link.platform}で購入`}
                                       >
                                         <FaShoppingCart />
-                                        <span>{link.platform}</span>
                                       </a>
                                     ))}
                                   </div>
                                 )}
-                              </li>
+                              </div>
                             ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </>
-                  )}
-
-                  {/* 単独商品 */}
-                  {tabData.standalone && tabData.standalone.length > 0 && (
-                    <>
-                      <h3 className="list-title">
-                        {tab.code === 'all' ? '全商品一覧' : `${getCategoryLabel(tab.code)}商品一覧`}
-                      </h3>
-                      <ul className="list-items">
-                        {tabData.standalone.map(product => (
-                          <li className="list-item product-item" key={product.id}>
-                            <div className="item-header">
-                              <span className="item-title">{product.title}</span>
-                              {product.officialUrl && (
-                                <a href={product.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
-                                  <FaExternalLinkAlt />
-                                </a>
-                              )}
-                            </div>
-                            {product.variationDescription && (
-                              <span className="item-variation">{product.variationDescription}</span>
-                            )}
+                          </div>
+                        )}
+                        
+                        {/* 単一商品の場合のフォールバック */}
+                        {(!product.variants || product.variants.length === 0) && (
+                          <>
                             {product.productCode && (
                               <span className="item-code">品番: {product.productCode}</span>
                             )}
-                            <div className="item-date-section">
-                              <span className="item-date">
-                                {product.isPreorder && <span className="preorder-badge">予約受付中</span>}
-                                {formatDate(product.releaseDate, product.releaseDateDisplay)}
-                              </span>
-                            </div>
                             {product.description && (
                               <div className="item-detail">
                                 <span>{product.description}</span>
@@ -332,18 +388,19 @@ export default function ProductsPage({ productData }) {
                                 ))}
                               </div>
                             )}
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
+                          </>
+                        )}
+                      </li>
+                    ))
+                  }
+                </ul>
 
-                  {/* データがない場合 */}
-                  {(!tabData.series || tabData.series.length === 0) && 
-                   (!tabData.standalone || tabData.standalone.length === 0) && (
-                    <p className="text-center text-gray-600 mt-4">現在データがありません</p>
-                  )}
-                </div>
+                {/* データがない場合 */}
+                {(!tabData.series || tabData.series.length === 0) && 
+                 (!tabData.standalone || tabData.standalone.length === 0) && (
+                  <p className="text-center text-gray-600 mt-4">現在データがありません</p>
+                )}
+              </div>
               </div>
             );
           })}

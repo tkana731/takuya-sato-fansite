@@ -15,42 +15,42 @@ export default async function handler(req, res) {
       const threeMonthsLaterStr = threeMonthsLater.toISOString().split('T')[0];
 
       const { data, error } = await supabase
-        .from('products')
+        .from('product_base')
         .select(`
           *,
-          mst_product_categories!inner (
+          category:mst_product_categories!inner (
             id,
             name,
             code
           ),
-          product_variation_groups (
+          variants:product_variants (
             id,
-            name
-          ),
-          rel_product_affiliate_links (
-            url,
-            image_url,
-            mst_affiliate_platforms (
+            variant_name,
+            product_code,
+            price,
+            official_url,
+            special_features,
+            status,
+            display_order,
+            media_type:mst_media_types (
               name,
               code
+            ),
+            affiliate_links:rel_product_affiliate_links (
+              url,
+              image_url,
+              platform:mst_affiliate_platforms (
+                name,
+                code
+              )
             )
           ),
-          rel_work_products (
-            description,
-            works (
-              id,
-              title
-            )
-          ),
-          rel_schedule_products (
-            description,
-            schedules (
-              id,
-              title
-            )
+          work:works (
+            id,
+            title
           )
         `)
-        .or(`release_date.gte.${today}.and.release_date.lte.${threeMonthsLaterStr},is_preorder.eq.true.and.preorder_end_date.gte.${today}`)
+        .or(`release_date.gte.${today}.and.release_date.lte.${threeMonthsLaterStr}`)
         .order('release_date', { ascending: true })
         .order('display_order', { ascending: true })
         .limit(10);
@@ -64,56 +64,39 @@ export default async function handler(req, res) {
     } else if (tab) {
       // カテゴリ別の商品を取得
       let query = supabase
-        .from('products')
+        .from('product_base')
         .select(`
           *,
-          mst_product_categories!inner (
+          category:mst_product_categories!inner (
             id,
             name,
             code
           ),
-          product_variation_groups (
+          variants:product_variants (
             id,
-            name,
-            description
-          ),
-          rel_product_affiliate_links (
-            url,
-            image_url,
-            mst_affiliate_platforms (
+            variant_name,
+            product_code,
+            price,
+            official_url,
+            special_features,
+            status,
+            display_order,
+            media_type:mst_media_types (
               name,
               code
-            )
-          ),
-          rel_work_products (
-            description,
-            works (
-              id,
-              title
-            )
-          ),
-          rel_schedule_products (
-            description,
-            schedules (
-              id,
-              title
-            )
-          ),
-          rel_product_series_items (
-            volume_number,
-            volume_title,
-            display_order,
-            product_series (
-              id,
-              name,
-              description,
-              has_variations
             ),
-            product_series_variations (
-              id,
-              variation_name,
-              display_order
+            affiliate_links:rel_product_affiliate_links (
+              url,
+              image_url,
+              platform:mst_affiliate_platforms (
+                name,
+                code
+              )
             )
+          ),
+          work:works (
+            id,
+            title
           )
         `)
         .order('release_date', { ascending: false })
@@ -131,40 +114,36 @@ export default async function handler(req, res) {
         return res.status(200).json({ series: [], standalone: [] });
       }
 
-      // シリーズごとにグループ化
+      // 新しい構造では基本的に全て単独商品として扱う
+      // シリーズ名が同じものがあればグループ化
       const seriesMap = new Map();
       const standaloneProducts = [];
 
       (data || []).forEach(product => {
-        if (product.rel_product_series_items && product.rel_product_series_items.length > 0) {
-          product.rel_product_series_items.forEach(seriesItem => {
-            const seriesId = seriesItem.product_series.id;
-            if (!seriesMap.has(seriesId)) {
-              seriesMap.set(seriesId, {
-                series: seriesItem.product_series,
-                products: []
-              });
-            }
-            seriesMap.get(seriesId).products.push({
-              ...product,
-              volumeNumber: seriesItem.volume_number,
-              volumeTitle: seriesItem.volume_title,
-              variation: seriesItem.product_series_variations
+        if (product.series_name) {
+          const seriesKey = product.series_name;
+          if (!seriesMap.has(seriesKey)) {
+            seriesMap.set(seriesKey, {
+              id: seriesKey,
+              name: product.series_name,
+              description: null,
+              products: []
             });
+          }
+          seriesMap.get(seriesKey).products.push({
+            ...product,
+            volumeNumber: product.volume_number,
+            volumeTitle: product.volume_title
           });
         } else {
           standaloneProducts.push(product);
         }
       });
 
-      // シリーズ内でソート
+      // シリーズ内でボリューム番号でソート
       seriesMap.forEach((value) => {
         value.products.sort((a, b) => {
-          // 同じボリューム番号の場合はバリエーションでソート
-          if (a.volumeNumber === b.volumeNumber) {
-            return (a.variation?.display_order || 0) - (b.variation?.display_order || 0);
-          }
-          return (a.volumeNumber || 0) - (b.volumeNumber || 0);
+          return (a.volume_number || 0) - (b.volume_number || 0);
         });
       });
 
@@ -175,39 +154,57 @@ export default async function handler(req, res) {
     }
 
     // 商品データをフォーマット
-    const formatProduct = (product) => ({
-      id: product.id,
-      title: product.title,
-      productCode: product.product_code,
-      releaseDate: product.release_date,
-      releaseDateDisplay: product.release_date_display,
-      isPreorder: product.is_preorder,
-      preorderStartDate: product.preorder_start_date,
-      preorderEndDate: product.preorder_end_date,
-      description: product.description,
-      officialUrl: product.official_url,
-      category: product.mst_product_categories,
-      variationDescription: product.variation_description,
-      affiliateLinks: product.rel_product_affiliate_links?.map(link => ({
-        platform: link.mst_affiliate_platforms?.name,
-        code: link.mst_affiliate_platforms?.code,
-        url: link.url,
-        imageUrl: link.image_url
-      })),
-      relatedWorks: product.rel_work_products?.map(wp => ({
-        id: wp.works?.id,
-        title: wp.works?.title,
-        description: wp.description
-      })),
-      relatedSchedules: product.rel_schedule_products?.map(sp => ({
-        id: sp.schedules?.id,
-        title: sp.schedules?.title,
-        description: sp.description
-      })),
-      volumeNumber: product.volumeNumber,
-      volumeTitle: product.volumeTitle,
-      variation: product.variation
-    });
+    const formatProduct = (product) => {
+      // variants から代表的な情報を取得（通常は最初のvariant）
+      const primaryVariant = product.variants?.[0];
+      
+      return {
+        id: product.id,
+        title: product.title,
+        productCode: primaryVariant?.product_code || null,
+        releaseDate: product.release_date,
+        releaseDateDisplay: product.release_date_display,
+        isPreorder: false, // 新構造では予約管理は別で行う
+        preorderStartDate: null,
+        preorderEndDate: null,
+        description: product.description,
+        officialUrl: product.official_url || primaryVariant?.official_url,
+        category: product.category,
+        variationDescription: null, // 複数バリエーションは variants で管理
+        variants: product.variants?.map(variant => ({
+          id: variant.id,
+          name: variant.variant_name,
+          productCode: variant.product_code,
+          price: variant.price,
+          officialUrl: variant.official_url,
+          mediaType: variant.media_type,
+          specialFeatures: variant.special_features,
+          status: variant.status,
+          affiliateLinks: variant.affiliate_links?.map(link => ({
+            platform: link.platform?.name,
+            code: link.platform?.code,
+            url: link.url,
+            imageUrl: link.image_url
+          })) || []
+        })) || [],
+        affiliateLinks: primaryVariant?.affiliate_links?.map(link => ({
+          platform: link.platform?.name,
+          code: link.platform?.code,
+          url: link.url,
+          imageUrl: link.image_url
+        })) || [],
+        relatedWorks: product.work ? [{
+          id: product.work.id,
+          title: product.work.title,
+          description: null
+        }] : [],
+        relatedSchedules: [],
+        volumeNumber: product.volume_number,
+        volumeTitle: product.volume_title,
+        seriesName: product.series_name,
+        castInterviewUrl: product.cast_interview_url
+      };
+    };
 
     let response;
     if (category === 'upcoming') {

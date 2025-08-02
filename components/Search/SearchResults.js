@@ -133,13 +133,35 @@ function SearchResultItem({ item, query }) {
             作品: {highlightText(item.work_title, query)}
           </p>
         )}
-        {item.category && (
+        {item.category && item.type === 'schedule' && (
+          <span className="category-badge schedule-category" style={{ backgroundColor: item.categoryColor || 'var(--primary-color)' }}>
+            {item.category}
+          </span>
+        )}
+        {item.category && item.type !== 'schedule' && (
           <span className="result-category">{item.category}</span>
         )}
         {item.year && (
           <span className="result-year">{item.year}年</span>
         )}
-        {item.start_date && (
+        {item.start_date && item.type === 'schedule' && (
+          <>
+            <span className="result-date schedule-date">
+              <FaCalendarAlt className="date-icon" />
+              {formatDate(item.start_date)}
+            </span>
+            {item.performers && item.performers.length > 0 && (
+              <div className="result-performers">
+                出演: {item.performers.map((performer, index) => (
+                  <span key={index} className="performer-name">
+                    {highlightText(performer, query)}
+                  </span>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+        {item.start_date && item.type !== 'schedule' && (
           <span className="result-date">{formatDate(item.start_date)}</span>
         )}
         {item.birthday && (
@@ -150,7 +172,7 @@ function SearchResultItem({ item, query }) {
         )}
       </div>
       
-      {item.description && (
+      {item.description && item.type !== 'schedule' && (
         <p className="result-description">
           {highlightText(item.description, query)}
         </p>

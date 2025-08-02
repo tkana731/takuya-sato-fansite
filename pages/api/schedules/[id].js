@@ -1,100 +1,179 @@
 // pages/api/schedules/[id].js
 import { supabase } from '../../../lib/supabase';
+import { getWeekday } from '../../../lib/form-helpers';
 
 export default async function handler(req, res) {
     const { id } = req.query;
 
     if (!id) {
-        return res.status(400).json({
-            success: false,
-            message: 'スケジュールIDが指定されていません'
-        });
+        return res.status(400).json({ error: 'IDパラメータが必要です' });
     }
 
-    // GET: スケジュール取得
+    // GET: スケジュール詳細取得
     if (req.method === 'GET') {
         try {
-            console.log(`スケジュール取得: ID=${id}`);
+            console.log(`スケジュール詳細取得: ID=${id}`);
 
-            // スケジュールデータを取得
+            // スケジュール詳細データを取得
             const { data: schedule, error } = await supabase
                 .from('schedules')
                 .select(`
                     id,
                     title,
-                    category_id,
-                    venue_id,
-                    broadcast_station_id,
                     start_datetime,
                     end_datetime,
                     is_all_day,
                     description,
                     official_url,
-                    category:category_id (id, name),
-                    venue:venue_id (id, name),
-                    broadcastStation:broadcast_station_id (id, name)
+                    category:category_id (id, name, color_code),
+                    venue:venue_id (
+                        id, 
+                        name, 
+                        address,
+                        prefecture_id (id, name)
+                    ),
+                    broadcastStation:broadcast_station_id (id, name),
+                    performers:rel_schedule_performers (
+                        id,
+                        role_description,
+                        display_order,
+                        performer:performer_id (id, name, is_takuya_sato)
+                    )
                 `)
                 .eq('id', id)
                 .single();
 
             if (error) {
-                console.error('スケジュール取得エラー:', error);
+                console.error('スケジュール詳細取得エラー:', error);
                 throw error;
             }
 
             if (!schedule) {
-                return res.status(404).json({
-                    success: false,
-                    message: '指定されたスケジュールが見つかりません'
-                });
+                return res.status(404).json({ error: 'スケジュールが見つかりません' });
             }
 
-            console.log(`スケジュール取得成功: タイトル=${schedule.title}`);
+            console.log(`スケジュール詳細取得成功: タイトル=${schedule.title}`);
 
-            // 時刻情報をstart_datetimeから取得
-            // start_datetimeはtimestamptzなので、既に正しいタイムゾーン情報を持っている
-            const startDate = new Date(schedule.start_datetime);
-            
-            // Vercelのサーバーはタイムゾーンが異なる可能性があるため、
-            // 日本時間に明示的に変換する
+            // 日本時間での時刻計算
             const jstOffset = 9 * 60 * 60 * 1000; // 9時間をミリ秒に変換
-            const jstDate = new Date(startDate.getTime() + jstOffset);
-            
-            // ISO文字列から時刻を抽出
-            const jstString = jstDate.toISOString();
-            const [, timePart] = jstString.split('T');
-            const [hours, minutes] = timePart.split(':');
-            const performanceInfo = `${hours}:${minutes}`;
+            const startDate = new Date(schedule.start_datetime);
+            const endDate = schedule.end_datetime ? new Date(schedule.end_datetime) : null;
 
-            // フロントエンド用に整形したデータ
-            const formattedSchedule = {
+            // 長期開催の判定（開始日と終了日が異なる日）
+            const isLongTerm = endDate && 
+                startDate.toISOString().split('T')[0] !== endDate.toISOString().split('T')[0];
+
+            // 会期状況の判定
+            let periodStatus = null;
+            if (isLongTerm) {
+                const now = new Date();
+                const startDateOnly = new Date(startDate.toISOString().split('T')[0] + 'T00:00:00.000Z');
+                const endDateOnly = new Date(endDate.toISOString().split('T')[0] + 'T23:59:59.999Z');
+                
+                if (now < startDateOnly) {
+                    periodStatus = 'upcoming'; // 開催前
+                } else if (now > endDateOnly) {
+                    periodStatus = 'ended'; // 終了
+                } else {
+                    periodStatus = 'ongoing'; // 開催中
+                }
+            }
+
+            // 曜日計算（元のstartDateを使用して正しい曜日を取得）
+            const weekday = getWeekday(startDate);
+            
+            // 日本時間での日付・時刻整形
+            const jstDate = new Date(startDate.getTime() + jstOffset);
+            const jstString = jstDate.toISOString();
+            const [datePart, timePart] = jstString.split('T');
+            const [year, month, day] = datePart.split('-');
+            const [hours, minutes] = timePart.split(':');
+            
+            const formattedDate = `${year}-${month}-${day}`;
+            const timeInfo = `${hours}:${minutes}`;
+            
+            // 終了日の整形（長期開催の場合）
+            let endDateFormatted = null;
+            let endTimeInfo = null;
+            let endWeekday = null;
+            if (isLongTerm && endDate) {
+                // 終了日の曜日を正しく計算（元のendDateを使用）
+                endWeekday = getWeekday(endDate);
+                
+                // 日本時間での日付・時刻整形
+                const jstEndDate = new Date(endDate.getTime() + jstOffset);
+                const jstEndString = jstEndDate.toISOString();
+                const [endDatePart, endTimePart] = jstEndString.split('T');
+                const [endYear, endMonth, endDay] = endDatePart.split('-');
+                const [endHours, endMinutes] = endTimePart.split(':');
+                
+                endDateFormatted = `${endYear}-${endMonth}-${endDay}`;
+                endTimeInfo = `${endHours}:${endMinutes}`;
+            }
+
+            // カテゴリに応じてロケーション情報を選択
+            const isBroadcast = schedule.category?.name === '生放送';
+            const location = isBroadcast
+                ? (schedule.broadcastStation ? schedule.broadcastStation.name : '')
+                : (schedule.venue ? schedule.venue.name : '');
+            const prefecture = !isBroadcast && schedule.venue?.prefecture_id?.name || null;
+
+            // 出演者情報を整形（佐藤拓也さんを最初に）
+            const performers = schedule.performers
+                .filter(p => p.performer)
+                .sort((a, b) => {
+                    // 佐藤拓也さんを最初に
+                    if (a.performer.is_takuya_sato && !b.performer.is_takuya_sato) return -1;
+                    if (!a.performer.is_takuya_sato && b.performer.is_takuya_sato) return 1;
+                    // 表示順での並び替え
+                    return (a.display_order || 0) - (b.display_order || 0);
+                })
+                .map(p => ({
+                    name: p.performer.name,
+                    role: p.role_description,
+                    isTakuyaSato: p.performer.is_takuya_sato
+                }));
+
+            // カテゴリコード変換
+            const categoryCode = schedule.category?.name === 'イベント' ? 'event' :
+                schedule.category?.name === '舞台・朗読' ? 'stage' :
+                    schedule.category?.name === '生放送' ? 'broadcast' :
+                        schedule.category?.name === '音声ガイド' ? 'voice_guide' : 'other';
+
+            // レスポンス形式
+            const response = {
                 id: schedule.id,
                 title: schedule.title,
-                categoryId: schedule.category_id,
-                category: schedule.category,
-                venueId: schedule.venue_id,
-                venue: schedule.venue,
-                broadcastStationId: schedule.broadcast_station_id,
-                broadcastStation: schedule.broadcastStation,
-                startDate: schedule.start_datetime,
-                endDate: schedule.end_datetime,
-                isAllDay: schedule.is_all_day,
-                description: schedule.description,
-                officialUrl: schedule.official_url,
-                performanceInfo
+                date: formattedDate,
+                datetime: schedule.start_datetime,
+                endDatetime: schedule.end_datetime,
+                endDate: endDateFormatted,
+                endTime: endTimeInfo,
+                endWeekday: endWeekday,
+                isLongTerm: isLongTerm,
+                periodStatus: periodStatus,
+                weekday: weekday,
+                category: categoryCode,
+                categoryName: schedule.category?.name || '',
+                categoryColor: schedule.category?.color_code || null,
+                time: timeInfo,
+                isAllDay: schedule.is_all_day || false,
+                location: location,
+                locationType: isBroadcast ? '放送/配信' : '会場',
+                prefecture: prefecture,
+                address: !isBroadcast && schedule.venue?.address || null,
+                accessInfo: null, // access_infoカラムが存在しないため、nullを返す
+                description: schedule.description || '',
+                performers: performers,
+                officialUrl: schedule.official_url || null
             };
 
-            return res.status(200).json({
-                success: true,
-                data: formattedSchedule
-            });
+            return res.status(200).json(response);
         } catch (error) {
-            console.error('スケジュール取得エラー:', error);
+            console.error('スケジュール詳細取得エラー:', error);
             return res.status(500).json({
-                success: false,
-                message: 'スケジュールの取得に失敗しました',
-                error: error.message,
-                details: error.details || error.stack
+                error: 'スケジュール詳細の取得に失敗しました',
+                message: error.message
             });
         }
     }

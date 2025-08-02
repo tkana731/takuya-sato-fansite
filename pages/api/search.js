@@ -69,7 +69,7 @@ export default async function handler(req, res) {
       }
     });
 
-    // Schedules table search
+    // Schedules table search - イベント名と詳細情報で検索
     const { data: scheduleResults, error: scheduleError } = await supabase
       .from('schedules')
       .select(`
@@ -78,32 +78,131 @@ export default async function handler(req, res) {
         start_datetime,
         description,
         venue:venue_id (name),
-        category:category_id (name)
+        broadcastStation:broadcast_station_id (name),
+        category:category_id (name, color_code),
+        performers:rel_schedule_performers (
+          performer:performer_id (name)
+        )
       `)
       .or(`title.ilike.${searchPattern},description.ilike.${searchPattern}`)
+      .order('start_datetime', { ascending: false })
+      .limit(20);
+
+    // 会場名での検索
+    const { data: schedulesByVenue, error: venueError } = await supabase
+      .from('schedules')
+      .select(`
+        id,
+        title,
+        start_datetime,
+        description,
+        venue:venue_id!inner (name),
+        broadcastStation:broadcast_station_id (name),
+        category:category_id (name, color_code),
+        performers:rel_schedule_performers (
+          performer:performer_id (name)
+        )
+      `)
+      .ilike('venue.name', searchPattern)
+      .order('start_datetime', { ascending: false })
+      .limit(10);
+
+    // 放送局名での検索
+    const { data: schedulesByBroadcast, error: broadcastError } = await supabase
+      .from('schedules')
+      .select(`
+        id,
+        title,
+        start_datetime,
+        description,
+        venue:venue_id (name),
+        broadcastStation:broadcast_station_id!inner (name),
+        category:category_id (name, color_code),
+        performers:rel_schedule_performers (
+          performer:performer_id (name)
+        )
+      `)
+      .ilike('broadcastStation.name', searchPattern)
       .order('start_datetime', { ascending: false })
       .limit(10);
 
     if (scheduleError) throw scheduleError;
 
-    scheduleResults?.forEach(schedule => {
+    // 出演者での検索結果を追加取得
+    const { data: scheduleByPerformer, error: performerError } = await supabase
+      .from('rel_schedule_performers')
+      .select(`
+        schedules (
+          id,
+          title,
+          start_datetime,
+          description,
+          venue:venue_id (name),
+          broadcastStation:broadcast_station_id (name),
+          category:category_id (name, color_code),
+          performers:rel_schedule_performers (
+            performer:performer_id (name)
+          )
+        ),
+        performer:performer_id (name)
+      `)
+      .ilike('performer.name', searchPattern)
+      .order('schedules.start_datetime', { ascending: false })
+      .limit(10);
+
+    // 全ての検索結果をマージ
+    const allScheduleResults = [...(scheduleResults || [])];
+    
+    if (!venueError && schedulesByVenue) {
+      allScheduleResults.push(...schedulesByVenue);
+    }
+    
+    if (!broadcastError && schedulesByBroadcast) {
+      allScheduleResults.push(...schedulesByBroadcast);
+    }
+    
+    if (!performerError && scheduleByPerformer) {
+      const performerSchedules = scheduleByPerformer
+        .filter(item => item.schedules)
+        .map(item => item.schedules);
+      allScheduleResults.push(...performerSchedules);
+    }
+
+    // 重複を除去
+    const uniqueSchedules = allScheduleResults.filter((schedule, index, self) =>
+      index === self.findIndex(s => s.id === schedule.id)
+    );
+
+    uniqueSchedules.forEach(schedule => {
       let score = 5;
+      const title = schedule.title?.toLowerCase() || '';
+      const venue = schedule.venue?.name?.toLowerCase() || '';
+      const broadcastStation = schedule.broadcastStation?.name?.toLowerCase() || '';
+      const performers = schedule.performers?.map(p => p.performer?.name?.toLowerCase()).filter(Boolean) || [];
+      const searchLower = searchTerm.toLowerCase();
       
-      // Calculate score based on title match
+      // スコア計算（優先度順）
       if (schedule.title === searchTerm) score = 100;
-      else if (schedule.title.toLowerCase().startsWith(searchTerm.toLowerCase())) score = 50;
-      else if (schedule.title.toLowerCase().includes(searchTerm.toLowerCase())) score = 25;
-      else if (schedule.venue?.name?.toLowerCase().includes(searchTerm.toLowerCase())) score = 10;
+      else if (title.startsWith(searchLower)) score = 50;
+      else if (title.includes(searchLower)) score = 25;
+      else if (performers.some(p => p === searchLower)) score = 20;
+      else if (venue.includes(searchLower) || broadcastStation.includes(searchLower)) score = 15;
+      else if (performers.some(p => p.includes(searchLower))) score = 10;
+      
+      // 出演者情報を整形
+      const performerNames = schedule.performers?.map(p => p.performer?.name).filter(Boolean) || [];
       
       results.push({
         id: schedule.id,
         title: schedule.title,
         type: 'schedule',
         page: 'schedule',
-        url: '/schedule',
+        url: `/schedules/${schedule.id}`,
         description: schedule.description,
         start_date: schedule.start_datetime,
         category: schedule.category?.name,
+        categoryColor: schedule.category?.color_code,
+        performers: performerNames,
         score: score
       });
     });

@@ -2,7 +2,7 @@
 import { useState, useEffect, forwardRef, useRef } from 'react';
 import Link from 'next/link';
 import CalendarButton from '../CalendarButton/CalendarButton';
-import { FaExternalLinkAlt } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaMapMarkerAlt, FaCalendarAlt, FaClock, FaInfo, FaUser } from 'react-icons/fa';
 
 const Schedule = forwardRef((props, ref) => {
     const { schedules = [] } = props;
@@ -180,54 +180,82 @@ const Schedule = forwardRef((props, ref) => {
                                             return (
                                                 <li className="schedule-card long-term-card" key={schedule.id} data-category={schedule.category}>
                                                     <div className="schedule-date-badge long-term-badge">
-                                                        <div className={`long-term-period-badge ${schedule.periodStatus}`}>
-                                                            {schedule.periodStatus === 'ongoing' ? '会期中' : 
-                                                             schedule.periodStatus === 'upcoming' ? '開催予定' : '終了'}
-                                                        </div>
+                                                        <div className="schedule-year">{startDate.year}</div>
                                                         <div className="schedule-date-range">
                                                             <div className="date-start">
-                                                                <span className="date-label">開始</span>
                                                                 <span className="date-value">
-                                                                    {String(startDate.month).padStart(2, '0')}/{String(startDate.day).padStart(2, '0')}({startWeekday})
+                                                                    {String(startDate.month).padStart(2, '0')}/{String(startDate.day).padStart(2, '0')}
                                                                 </span>
+                                                                <div className="schedule-weekday">{startWeekday}</div>
                                                             </div>
                                                             <div className="date-separator">〜</div>
                                                             <div className="date-end">
-                                                                <span className="date-label">終了</span>
                                                                 <span className="date-value">
-                                                                    {String(endDate.month).padStart(2, '0')}/{String(endDate.day).padStart(2, '0')}({endWeekday})
+                                                                    {String(endDate.month).padStart(2, '0')}/{String(endDate.day).padStart(2, '0')}
                                                                 </span>
+                                                                <div className="schedule-weekday">{endWeekday}</div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div className="schedule-content">
-                                                        <h3 className="schedule-title">{schedule.title}</h3>
+                                                        <Link href={`/schedules/${schedule.id}`} className="schedule-title-link">
+                                                            <h3 className="schedule-title">{schedule.title}</h3>
+                                                        </Link>
+                                                        {schedule.categoryName && (
+                                                            <div className="header-badges" style={{ marginTop: '12px', marginBottom: '8px', justifyContent: 'flex-start' }}>
+                                                                <span 
+                                                                    className="category-badge"
+                                                                    style={{ backgroundColor: schedule.categoryColor || 'var(--primary-color)' }}
+                                                                >
+                                                                    {schedule.categoryName}
+                                                                </span>
+                                                                {schedule.isLongTerm && (
+                                                                    <span className={`period-badge ${schedule.periodStatus}`}>
+                                                                        {schedule.periodStatus === 'ongoing' ? '開催中' :
+                                                                         schedule.periodStatus === 'upcoming' ? '開催予定' :
+                                                                         '終了'}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                         <div className="schedule-details">
                                                             <div className="schedule-detail-item">
-                                                                <span className="detail-icon">{isBroadcast ? '📺' : '📍'}</span>
-                                                                <span>{schedule.location}</span>
+                                                                <span className="detail-icon">{isBroadcast ? '📺' : <FaMapMarkerAlt />}</span>
+                                                                <span>
+                                                                    {schedule.location}
+                                                                    {!isBroadcast && schedule.prefecture && (
+                                                                        <span className="prefecture">（{schedule.prefecture}）</span>
+                                                                    )}
+                                                                </span>
                                                             </div>
-                                                            {isBroadcast ? (
+                                                            {isBroadcast && (
                                                                 <div className="schedule-detail-item">
                                                                     <span className="detail-icon">📡</span>
                                                                     <span>{schedule.locationType}</span>
                                                                 </div>
-                                                            ) : schedule.prefecture && (
-                                                                <div className="schedule-detail-item">
-                                                                    <span className="detail-icon">🗾</span>
-                                                                    <span>{schedule.prefecture}</span>
-                                                                </div>
-                                                            )}
-                                                            {schedule.categoryName && (
-                                                                <div className="schedule-detail-item">
-                                                                    <span className="detail-icon">🏷️</span>
-                                                                    <span className="schedule-category-badge">{schedule.categoryName}</span>
-                                                                </div>
                                                             )}
                                                         </div>
-                                                        {schedule.description && (
+                                                        {schedule.performers && schedule.performers.length > 0 && (
                                                             <div className="schedule-description-wrapper">
-                                                                <p className="schedule-description">{schedule.description}</p>
+                                                                <div className="schedule-detail-item">
+                                                                    <span className="detail-icon"><FaUser /></span>
+                                                                    <div className="performers-list">
+                                                                        出演: {schedule.performers.map((performer, index) => (
+                                                                            <span key={index} className={`performer ${performer.isTakuyaSato ? 'takuya-sato' : ''}`}>
+                                                                                {performer.name}
+                                                                                {performer.role && ` (${performer.role})`}
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {!schedule.performers?.length && schedule.description && (
+                                                            <div className="schedule-description-wrapper">
+                                                                <div className="schedule-detail-item">
+                                                                    <span className="detail-icon"><FaInfo /></span>
+                                                                    <p className="schedule-description">{schedule.description}</p>
+                                                                </div>
                                                             </div>
                                                         )}
                                                         <div className="schedule-actions">
@@ -278,39 +306,63 @@ const Schedule = forwardRef((props, ref) => {
                                                 <div className="schedule-weekday">{weekday}</div>
                                             </div>
                                             <div className="schedule-content">
-                                                <h3 className="schedule-title">{schedule.title}</h3>
+                                                <Link href={`/schedules/${schedule.id}`} className="schedule-title-link">
+                                                    <h3 className="schedule-title">{schedule.title}</h3>
+                                                </Link>
+                                                {schedule.categoryName && (
+                                                    <div className="header-badges" style={{ marginTop: '12px', marginBottom: '8px', justifyContent: 'flex-start' }}>
+                                                        <span 
+                                                            className="category-badge"
+                                                            style={{ backgroundColor: schedule.categoryColor || 'var(--primary-color)' }}
+                                                        >
+                                                            {schedule.categoryName}
+                                                        </span>
+                                                    </div>
+                                                )}
                                                 <div className="schedule-details">
                                                     {!schedule.isAllDay && (
                                                         <div className="schedule-detail-item">
-                                                            <span className="detail-icon">🕒</span>
+                                                            <span className="detail-icon"><FaClock /></span>
                                                             <span>{schedule.time}</span>
                                                         </div>
                                                     )}
                                                     <div className="schedule-detail-item">
-                                                        <span className="detail-icon">{isBroadcast ? '📺' : '📍'}</span>
-                                                        <span>{schedule.location}</span>
+                                                        <span className="detail-icon">{isBroadcast ? '📺' : <FaMapMarkerAlt />}</span>
+                                                        <span>
+                                                            {schedule.location}
+                                                            {!isBroadcast && schedule.prefecture && (
+                                                                <span className="prefecture">（{schedule.prefecture}）</span>
+                                                            )}
+                                                        </span>
                                                     </div>
-                                                    {isBroadcast ? (
+                                                    {isBroadcast && (
                                                         <div className="schedule-detail-item">
                                                             <span className="detail-icon">📡</span>
                                                             <span>{schedule.locationType}</span>
                                                         </div>
-                                                    ) : schedule.prefecture && (
-                                                        <div className="schedule-detail-item">
-                                                            <span className="detail-icon">🗾</span>
-                                                            <span>{schedule.prefecture}</span>
-                                                        </div>
-                                                    )}
-                                                    {schedule.categoryName && (
-                                                        <div className="schedule-detail-item">
-                                                            <span className="detail-icon">🏷️</span>
-                                                            <span className="schedule-category-badge">{schedule.categoryName}</span>
-                                                        </div>
                                                     )}
                                                 </div>
-                                                {schedule.description && (
+                                                {schedule.performers && schedule.performers.length > 0 && (
                                                     <div className="schedule-description-wrapper">
-                                                        <p className="schedule-description">{schedule.description}</p>
+                                                        <div className="schedule-detail-item">
+                                                            <span className="detail-icon"><FaUser /></span>
+                                                            <div className="performers-list">
+                                                                出演: {schedule.performers.map((performer, index) => (
+                                                                    <span key={index} className={`performer ${performer.isTakuyaSato ? 'takuya-sato' : ''}`}>
+                                                                        {performer.name}
+                                                                        {performer.role && ` (${performer.role})`}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {!schedule.performers?.length && schedule.description && (
+                                                    <div className="schedule-description-wrapper">
+                                                        <div className="schedule-detail-item">
+                                                            <span className="detail-icon"><FaInfo /></span>
+                                                            <p className="schedule-description">{schedule.description}</p>
+                                                        </div>
                                                     </div>
                                                 )}
                                                 <div className="schedule-actions">
@@ -334,7 +386,9 @@ const Schedule = forwardRef((props, ref) => {
                                     );
                                 })
                                 ) : (
-                                    <div className="no-schedule">該当する予定はありません。</div>
+                                    longTermSchedules.length === 0 && (
+                                        <div className="no-schedule">該当する予定はありません。</div>
+                                    )
                                 )}
                             </ul>
                         </>

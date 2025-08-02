@@ -1,6 +1,7 @@
 // pages/api/schedules/index.js
 import { fetchData } from '../../../lib/api-helpers';
 import { formatDate, getWeekday } from '../../../lib/form-helpers';
+import { supabase } from '../../../lib/supabase';
 
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
@@ -69,10 +70,9 @@ export default async function handler(req, res) {
 
         // スケジュールデータ取得 - 月を跨ぐイベントに対応
         // 条件1: 開始日が検索期間内のイベント
-        const { data: schedulesByStart } = await fetchData(
-            'schedules',
-            {
-                select: `
+        let query1 = supabase
+            .from('schedules')
+            .select(`
           id,
           title,
           start_datetime,
@@ -89,14 +89,30 @@ export default async function handler(req, res) {
             display_order,
             performer:performer_id (id, name, is_takuya_sato)
           )
-        `,
-                filters: {
-                    start_datetime: { gte: fromDateStr + 'T00:00:00+09:00', lte: toDateStr + 'T23:59:59+09:00' },
-                    ...categoryFilter
-                },
-                order: 'start_datetime'
+        `)
+            .gte('start_datetime', fromDateStr + 'T00:00:00+09:00')
+            .lte('start_datetime', toDateStr + 'T23:59:59+09:00');
+
+        // カテゴリフィルターを適用
+        if (category && category !== 'all') {
+            const categoryName = {
+                'event': 'イベント',
+                'stage': '舞台・朗読',
+                'broadcast': '生放送',
+                'voice_guide': '音声ガイド'
+            }[category];
+            
+            if (categoryName) {
+                query1 = query1.eq('category.name', categoryName);
             }
-        );
+        }
+
+        const { data: schedulesByStart, error: errorByStart } = await query1.order('start_datetime');
+
+        if (errorByStart) {
+            console.error('スケジュール取得エラー (条件1):', errorByStart);
+        }
+
 
         // 条件2: 終了日が検索期間内の長期開催イベント（開始日が期間外でも）
         const { data: schedulesByEnd } = await fetchData(
@@ -241,10 +257,14 @@ export default async function handler(req, res) {
             // 出演者情報を整形
             const performers = schedule.performers
                 .filter(p => p.performer)
-                .map(p => p.performer.name)
-                .join('、');
+                .map(p => ({
+                    name: p.performer.name,
+                    role: p.role_description || null,
+                    isTakuyaSato: p.performer.is_takuya_sato
+                }));
 
-            const description = schedule.description || (performers ? `出演：${performers}` : '');
+
+            const description = schedule.description;
 
             // カテゴリコード変換
             const categoryCode = schedule.category?.name === 'イベント' ? 'event' :
@@ -264,6 +284,7 @@ export default async function handler(req, res) {
                 weekday: weekday,
                 category: categoryCode,
                 categoryName: schedule.category?.name || '',
+                categoryColor: schedule.category?.color_code || null,
                 title: schedule.title,
                 time: timeInfo,
                 isAllDay: schedule.is_all_day || false,
@@ -271,6 +292,7 @@ export default async function handler(req, res) {
                 locationType: isBroadcast ? '放送/配信' : '会場',
                 prefecture: prefecture,
                 description: description,
+                performers: performers,
                 link: schedule.official_url || '#'
             };
         }) || [];

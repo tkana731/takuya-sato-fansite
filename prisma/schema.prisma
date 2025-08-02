@@ -209,6 +209,7 @@ model Schedule {
   createdAt          DateTime             @default(now()) @map("created_at")
   startDateTime      DateTime?            @map("start_datetime") @db.Timestamptz(6)
   endDateTime        DateTime?            @map("end_datetime") @db.Timestamptz(6)
+  ticketStatus       TicketStatus?        @map("ticket_status")
   performers         SchedulePerformer[]
   scheduleProducts   ScheduleProduct[]
   socialPosts        SocialPostSchedule[]
@@ -656,4 +657,12 @@ enum ProductStatus {
   NOT_NEEDED
 
   @@map("product_status")
+}
+
+enum TicketStatus {
+  NOT_RESERVED
+  ATTENDING
+  NOT_ATTENDING
+
+  @@map("ticket_status")
 }

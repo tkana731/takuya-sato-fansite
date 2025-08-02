@@ -115,7 +115,7 @@ export default function SearchPage() {
                   </div>
                   <div className="search-info-item">
                     <h3>📅 スケジュール</h3>
-                    <p>イベント名、開催場所で検索できます</p>
+                    <p>イベント名、開催場所、出演者名で検索できます</p>
                   </div>
                   <div className="search-info-item">
                     <h3>👤 キャラクター</h3>

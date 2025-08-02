@@ -206,23 +206,8 @@ img {
   overflow: hidden;
 }
 
-.header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 10px 20px;
-  position: relative;
-  z-index: 20;
-}
 
 /* ヘッダーのスタイル調整 */
-.header {
-  position: relative;
-  margin: 0;
-  padding: 0;
-}
 
 .nav-menu {
   display: flex;
@@ -236,8 +221,6 @@ img {
   min-width: 200px;
   white-space: nowrap;
 }
-
-
 
 .nav {
   display: flex;
@@ -544,19 +527,22 @@ img {
 .schedule-card {
   display: flex;
   background-color: white;
-  border-radius: 15px;
-  padding: 20px 20px 12px 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s;
-  align-items: flex-start;
-  gap: 20px;
+  border-radius: 16px;
+  padding: 0;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  align-items: stretch;
+  gap: 0;
   position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  overflow: hidden;
 }
 
 .schedule-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.06);
 }
 
 .schedule-card .schedule-content {
@@ -567,13 +553,12 @@ img {
 
 .schedule-date-badge {
   flex-shrink: 0;
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, var(--primary-color) 0%, #2c7be5 100%);
   color: white;
-  padding: 12px 15px;
-  border-radius: 10px;
+  padding: 20px 16px;
   text-align: center;
-  min-width: 95px;
-  width: 95px;
+  min-width: 88px;
+  width: 88px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -609,37 +594,35 @@ img {
 
 .schedule-details {
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin: 12px 0;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
 }
 
 .schedule-detail-item {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 12px;
   font-size: 14px;
   color: var(--gray-dark);
+  line-height: 1.5;
 }
 
 .detail-icon {
   font-size: 16px;
   flex-shrink: 0;
-  margin-top: 1px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
 }
 
-.schedule-category-badge {
-  background-color: var(--primary-light);
-  color: var(--primary-color);
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-}
 
 
 .schedule-description-wrapper {
-  margin: 8px 0 4px 0;
+  margin: 0;
 }
 
 .schedule-description {
@@ -661,24 +644,26 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 0 16px;
-  height: 42px;
+  padding: 0 20px;
+  height: 44px;
   background-color: white;
   color: var(--primary-color);
-  border: 2px solid var(--primary-color);
-  border-radius: 8px;
-  font-size: 15px;
+  border: 1.5px solid var(--primary-color);
+  border-radius: 12px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   text-decoration: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .schedule-link-button:hover {
   background-color: var(--primary-color);
   color: white;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .schedule-link-button svg {
@@ -693,23 +678,25 @@ img {
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
-  padding: 0 16px !important;
-  height: 42px !important;
+  padding: 0 20px !important;
+  height: 44px !important;
   background-color: white !important;
   color: var(--primary-color) !important;
-  border: 2px solid var(--primary-color) !important;
-  border-radius: 8px !important;
-  font-size: 15px !important;
+  border: 1.5px solid var(--primary-color) !important;
+  border-radius: 12px !important;
+  font-size: 14px !important;
   font-weight: 600 !important;
   cursor: pointer !important;
-  transition: all 0.3s !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   white-space: nowrap !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 .schedule-card .google-calendar-button:hover {
   background-color: var(--primary-color) !important;
   color: white !important;
-  transform: translateY(-2px) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 .schedule-card .google-calendar-button svg {
@@ -720,12 +707,13 @@ img {
 
 .schedule-content {
   flex: 1;
-  padding: 15px 15px 30px 15px;
+  padding: 24px 24px 20px 24px;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .schedule-category {
-  position: absolute;
   top: 15px;
   right: 15px;
   font-size: 12px;
@@ -751,9 +739,10 @@ img {
 .schedule-card .schedule-title {
   font-size: 18px;
   font-weight: 700;
-  color: var(--dark-color);
+  color: var(--text-color);
   margin-bottom: 0;
   line-height: 1.4;
+  letter-spacing: -0.02em;
 }
 
 /* 古いスタイル（後方互換性のため残す） */
@@ -1512,7 +1501,7 @@ img {
 }
 
 .hamburger-button.active .hamburger-line:nth-child(1) {
-  transform: translateY(8px) rotate(45deg);
+  transform: translateY(7px) rotate(45deg);
 }
 
 .hamburger-button.active .hamburger-line:nth-child(2) {
@@ -1520,7 +1509,7 @@ img {
 }
 
 .hamburger-button.active .hamburger-line:nth-child(3) {
-  transform: translateY(-8px) rotate(-45deg);
+  transform: translateY(-7px) rotate(-45deg);
 }
 
 /* モバイルメニューオーバーレイ */
@@ -1856,24 +1845,48 @@ img {
     justify-content: center !important;
   }
 
-  .schedule-actions {
+  .schedule-card .schedule-actions {
     gap: 8px;
     margin-top: 8px;
+    flex-direction: row !important;
+    justify-content: center !important;
+    margin-left: 0 !important;
+  }
+  
+  .schedule-card.long-term-card {
+    min-height: auto;
   }
 
   .schedule-date-badge {
-    width: 100%;
+    width: calc(100% + 30px);
+    margin: -15px -15px 0 -15px;
     flex-direction: row;
     min-height: auto;
     padding: 10px 15px;
     justify-content: center;
     gap: 10px;
+    border-radius: 16px 16px 0 0;
   }
 
   .schedule-year,
   .schedule-month-day,
   .schedule-weekday {
     margin: 0;
+  }
+  
+  .schedule-date-badge.long-term-badge .schedule-year {
+    display: inline-block;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+  
+  
+  .schedule-date-badge.long-term-badge .schedule-weekday {
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.8;
   }
 
   .schedule-month-day {
@@ -4890,20 +4903,35 @@ img {
 }
 
 .schedule-card.long-term-card {
-  background: linear-gradient(135deg, #fff5f5 0%, #f0f8ff 100%);
-  border-left: 4px solid var(--accent-color);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #fff8f8 0%, #f8fbff 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(228, 21, 126, 0.12);
+  min-height: 300px;
+}
+
+.schedule-card.long-term-card .schedule-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+}
+
+.schedule-card.long-term-card .schedule-actions {
+  margin-top: auto;
 }
 
 .schedule-date-badge.long-term-badge {
-  background: linear-gradient(135deg, var(--accent-color), #ff6b8a);
+  flex-shrink: 0;
+  background: var(--accent-color);
   color: white;
-  min-width: 140px;
-  padding: 15px;
+  padding: 20px 16px;
+  text-align: center;
+  min-width: 88px;
+  width: 88px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
 }
 
 .long-term-period-badge {
@@ -4917,17 +4945,17 @@ img {
 }
 
 .long-term-period-badge.ongoing {
-  background: rgba(76, 175, 80, 0.9);
+  background: #4CAF50;
   color: white;
 }
 
 .long-term-period-badge.upcoming {
-  background: rgba(33, 150, 243, 0.9);
+  background: #2196F3;
   color: white;
 }
 
 .long-term-period-badge.ended {
-  background: rgba(158, 158, 158, 0.9);
+  background: #757575;
   color: white;
 }
 
@@ -4935,9 +4963,8 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  width: 100%;
+  gap: 2px;
+  font-size: 10px;
 }
 
 .date-start,
@@ -4949,21 +4976,21 @@ img {
 }
 
 .date-label {
-  font-size: 10px;
+  font-size: 9px;
   opacity: 0.8;
   font-weight: 500;
 }
 
 .date-value {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .date-separator {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
-  margin: 2px 0;
+  margin: 1px 0;
 }
 
 @media (max-width: 768px) {
@@ -4973,16 +5000,39 @@ img {
   }
   
   .schedule-date-badge.long-term-badge {
-    min-width: 120px;
-    padding: 12px;
+    width: calc(100% + 30px);
+    margin: -15px -15px 0 -15px;
+    min-width: auto;
+    padding: 10px 15px;
+    border-radius: 16px 16px 0 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
   }
   
   .date-value {
-    font-size: 11px;
+    font-size: 18px;
   }
   
   .date-separator {
     font-size: 12px;
+  }
+  
+  .schedule-date-range {
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .date-start,
+  .date-end {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
   }
 }
 
@@ -5712,6 +5762,34 @@ img {
   opacity: 0.7;
 }
 
+/* スケジュール詳細ページでの統一 */
+.schedule-detail .breadcrumb-list {
+  gap: 8px !important;
+}
+
+.schedule-detail .breadcrumb-separator {
+  margin: 0 8px !important;
+}
+
+.schedule-detail .breadcrumb-link {
+  padding: 4px 8px !important;
+}
+
+/* モバイル表示での統一 */
+@media (max-width: 768px) {
+  .schedule-detail .breadcrumb-list {
+    gap: 6px !important;
+  }
+  
+  .schedule-detail .breadcrumb-separator {
+    margin: 0 6px !important;
+  }
+  
+  .schedule-detail .breadcrumb-link {
+    padding: 3px 6px !important;
+  }
+}
+
 .breadcrumb-current {
   display: flex;
   align-items: center;
@@ -6209,8 +6287,6 @@ img {
   width: 100%;
 }
 
-/* 検索ボックスのタイトル（削除：重複のため） */
-
 .search-form {
   display: flex;
   gap: 15px;
@@ -6610,6 +6686,7 @@ img {
   margin: 10px 0;
   font-size: 0.9rem;
   color: var(--gray-dark);
+  justify-content: flex-start;
 }
 
 .result-category,
@@ -6621,6 +6698,193 @@ img {
   padding: 3px 8px;
   border-radius: 12px;
   font-size: 0.8rem;
+}
+
+.result-date.schedule-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.result-date .date-icon {
+  font-size: 0.85rem;
+  color: var(--primary-color);
+}
+
+/* スケジュールの検索結果でカテゴリ名の次の行に日時を表示 */
+.result-details .category-badge.schedule-category + .result-date.schedule-date {
+  flex-basis: 100%;
+  margin-top: 5px;
+}
+
+/* スケジュールの検索結果で日時を左寄せ */
+.result-date.schedule-date {
+  justify-self: flex-start;
+  align-self: flex-start;
+}
+
+/* 検索結果の出演者表示 */
+.result-performers {
+  flex-basis: 100%;
+  margin-top: 3px;
+  font-size: 0.85rem;
+  color: var(--gray-dark);
+  margin-left: 0;
+}
+
+.result-performers .performer-name:not(:last-child)::after {
+  content: "、";
+  margin-left: 2px;
+}
+
+/* スケジュール詳細ページのSNSシェアボタン */
+.schedule-share-section {
+  margin-top: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  border: 1px solid var(--secondary-color);
+}
+
+.share-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  color: var(--text-color);
+}
+
+.share-section-header svg {
+  color: var(--primary-color);
+  font-size: 18px;
+}
+
+.share-section-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.share-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.share-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  text-decoration: none;
+}
+
+.share-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.share-button svg {
+  font-size: 16px;
+}
+
+.share-button.twitter {
+  background: #1da1f2;
+}
+
+.share-button.twitter:hover {
+  background: #0d8bd9;
+}
+
+.share-button.facebook {
+  background: #4267b2;
+}
+
+.share-button.facebook:hover {
+  background: #365899;
+}
+
+.share-button.line {
+  background: #00c300;
+}
+
+.share-button.line:hover {
+  background: #00a000;
+}
+
+.share-button.instagram {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.share-button.instagram:hover {
+  background: linear-gradient(45deg, #e8832c 0%, #dc5f35 25%, #d3203c 50%, #c11c5f 75%, #b11181 100%);
+}
+
+.share-button.native {
+  background: var(--gray-dark);
+  color: white;
+}
+
+.share-button.native:hover {
+  background: #333333;
+}
+
+/* PC表示でのシェアボタン中央揃えを強化 */
+@media (min-width: 769px) {
+  .share-buttons {
+    justify-content: center !important;
+    align-items: center;
+  }
+  
+  .share-button {
+    flex-shrink: 0;
+  }
+}
+
+/* モバイル表示でのシェアボタン調整 */
+@media (max-width: 768px) {
+  .share-section-header {
+    justify-content: flex-start;
+  }
+  
+  .share-buttons {
+    justify-content: center;
+  }
+  
+  .share-button {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+  
+  .schedule-share-section {
+    margin-top: 20px;
+    padding: 15px;
+  }
+}
+
+/* 出演者表示スタイル */
+.performers-list {
+  display: inline;
+}
+
+.performer.takuya-sato {
+  font-weight: 700;
+  color: var(--primary-color);
 }
 
 .result-description {
@@ -6815,7 +7079,18 @@ img {
   }
   
   .result-details {
-    justify-content: center;
+    justify-content: flex-start;
+  }
+  
+  /* スケジュールの検索結果でカテゴリ名の次の行に日時を表示 */
+  .result-details .category-badge.schedule-category + .result-date.schedule-date {
+    flex-basis: 100%;
+    margin-top: 5px;
+  }
+  
+  /* モバイルでも日時を左寄せ */
+  .result-date.schedule-date {
+    justify-content: flex-start;
   }
   
   .search-info {
@@ -6878,5 +7153,408 @@ img {
     right: 8px;
     width: 24px;
     height: 24px;
+  }
+}
+
+/* ======================================
+   スケジュール詳細ページ
+   ====================================== */
+
+.schedule-detail {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.schedule-detail-header {
+  text-align: center;
+  padding: 30px 30px 20px 30px;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.header-badges {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.category-badge {
+  display: inline-block;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.schedule-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+  line-height: 1.3;
+}
+
+
+.period-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+}
+
+.period-badge.ongoing {
+  background: #4CAF50;
+}
+
+.period-badge.upcoming {
+  background: #2196F3;
+}
+
+.period-badge.ended {
+  background: #757575;
+}
+
+.period-date-range {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.period-separator {
+  color: var(--gray-medium);
+  margin: 0 8px;
+  font-weight: 500;
+}
+
+.schedule-detail-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.schedule-info-section {
+  padding: 32px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.info-grid {
+  display: grid;
+  gap: 28px;
+}
+
+.info-item {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+}
+
+.info-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: var(--primary-light);
+  color: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.info-content {
+  flex: 1;
+}
+
+.info-label {
+  font-weight: 600;
+  color: var(--gray-medium);
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+.time-info {
+  color: var(--text-color);
+  margin-left: 10px;
+}
+
+.all-day-badge {
+  background: var(--accent-color);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  margin-left: 10px;
+}
+
+.prefecture {
+  color: var(--gray-medium);
+  font-weight: 500;
+}
+
+.address {
+  color: var(--gray-medium);
+  font-size: 0.95rem;
+  margin-top: 5px;
+  line-height: 1.4;
+}
+
+.performers-list {
+  display: grid;
+  gap: 8px;
+}
+
+.performer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.performer.takuya-sato .performer-name {
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+.performer-name {
+  font-weight: 600;
+}
+
+.performer-role {
+  color: var(--gray-medium);
+  font-size: 0.9rem;
+}
+
+.schedule-description-section,
+.schedule-access-section {
+  padding: 30px;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.schedule-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  color: var(--primary-color);
+}
+
+.schedule-section-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.description-content,
+.access-content {
+  line-height: 1.7;
+  color: var(--text-color);
+}
+
+.description-content p,
+.access-content p {
+  margin: 0 0 12px 0;
+}
+
+.description-content p:last-child,
+.access-content p:last-child {
+  margin-bottom: 0;
+}
+
+.schedule-detail .schedule-actions {
+  padding: 30px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* スケジュールタイトルリンク */
+.schedule-title-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.schedule-title-link:hover {
+  text-decoration: none;
+}
+
+.schedule-title-link:hover .schedule-title {
+  color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.schedule-title {
+  transition: all 0.3s ease;
+}
+
+/* スケジュール詳細ページのカレンダーボタン用スタイル */
+.schedule-detail .google-calendar-button {
+  position: static !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 20px !important;
+  height: 44px !important;
+  background-color: white !important;
+  color: var(--primary-color) !important;
+  border: 1.5px solid var(--primary-color) !important;
+  border-radius: 12px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+.schedule-detail .google-calendar-button:hover {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.schedule-detail .google-calendar-button svg {
+  font-size: 18px !important;
+}
+
+/* ローディング・エラー表示 */
+.loading,
+.error,
+.not-found {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--gray-light);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error h1,
+.not-found h1 {
+  color: var(--text-color);
+  margin-bottom: 15px;
+}
+
+.error p,
+.not-found p {
+  color: var(--gray-medium);
+  font-size: 1.1rem;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .schedule-detail {
+    padding: 15px;
+  }
+
+  .schedule-title {
+    font-size: 1.5rem;
+  }
+
+  .period-info {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .period-dates {
+    font-size: 1rem;
+  }
+
+  .schedule-info-section,
+  .schedule-description-section,
+  .schedule-access-section,
+  .schedule-actions {
+    padding: 20px;
+  }
+
+  .info-item {
+    gap: 12px;
+  }
+
+  .info-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+
+  .info-value {
+    font-size: 1rem;
+  }
+
+  .schedule-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .official-link-button {
+    min-width: 200px;
+    justify-content: center;
+  }
+
+  /* 詳細ページのボタンもモバイルで統一 */
+  .schedule-detail .schedule-actions .schedule-link-button,
+  .schedule-detail .schedule-actions .google-calendar-button {
+    width: 42px !important;
+    min-width: 42px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+  }
+
+  .schedule-detail .schedule-actions .schedule-link-button .button-text,
+  .schedule-detail .schedule-actions .google-calendar-button .button-text {
+    display: none;
+  }
+
+  .schedule-detail .schedule-actions {
+    flex-direction: row;
+    justify-content: center;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .schedule-detail {
+    padding: 10px;
+  }
+
+  .schedule-title {
+    font-size: 1.3rem;
+  }
+
+  .schedule-info-section,
+  .schedule-description-section,
+  .schedule-access-section,
+  .schedule-actions {
+    padding: 15px;
   }
 }

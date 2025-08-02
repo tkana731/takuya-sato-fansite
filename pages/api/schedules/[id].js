@@ -79,11 +79,11 @@ export default async function handler(req, res) {
                 }
             }
 
-            // 曜日計算（元のstartDateを使用して正しい曜日を取得）
-            const weekday = getWeekday(startDate);
-            
             // 日本時間での日付・時刻整形
             const jstDate = new Date(startDate.getTime() + jstOffset);
+            
+            // 曜日計算（JST変換後の日付を使用して正しい曜日を取得）
+            const weekday = getWeekday(jstDate);
             const jstString = jstDate.toISOString();
             const [datePart, timePart] = jstString.split('T');
             const [year, month, day] = datePart.split('-');
@@ -97,11 +97,11 @@ export default async function handler(req, res) {
             let endTimeInfo = null;
             let endWeekday = null;
             if (isLongTerm && endDate) {
-                // 終了日の曜日を正しく計算（元のendDateを使用）
-                endWeekday = getWeekday(endDate);
-                
                 // 日本時間での日付・時刻整形
                 const jstEndDate = new Date(endDate.getTime() + jstOffset);
+                
+                // 終了日の曜日を正しく計算（JST変換後の日付を使用）
+                endWeekday = getWeekday(jstEndDate);
                 const jstEndString = jstEndDate.toISOString();
                 const [endDatePart, endTimePart] = jstEndString.split('T');
                 const [endYear, endMonth, endDay] = endDatePart.split('-');

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FaFilm, FaCalendarAlt, FaUser, FaMusic, FaShoppingCart } from 'react-icons/fa';
+import { FaFilm, FaCalendarAlt, FaUser, FaMusic, FaShoppingCart, FaMapMarkerAlt, FaRadio } from 'react-icons/fa';
 
 const typeIcons = {
   work: FaFilm,
@@ -150,6 +150,18 @@ function SearchResultItem({ item, query }) {
               <FaCalendarAlt className="date-icon" />
               {formatDate(item.start_date)}
             </span>
+            {item.venue && (
+              <span className="result-venue">
+                <FaMapMarkerAlt className="venue-icon" />
+                {highlightText(item.venue, query)}
+              </span>
+            )}
+            {item.broadcastStation && (
+              <span className="result-broadcast">
+                <FaRadio className="broadcast-icon" />
+                {highlightText(item.broadcastStation, query)}
+              </span>
+            )}
             {item.performers && item.performers.length > 0 && (
               <div className="result-performers">
                 出演: {item.performers.map((performer, index) => (

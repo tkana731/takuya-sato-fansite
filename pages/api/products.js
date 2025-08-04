@@ -50,7 +50,8 @@ export default async function handler(req, res) {
             title
           )
         `)
-        .or(`release_date.gte.${today}.and.release_date.lte.${threeMonthsLaterStr}`)
+        .gte('release_date', today)
+        .lte('release_date', threeMonthsLaterStr)
         .order('release_date', { ascending: true })
         .order('display_order', { ascending: true })
         .limit(10);

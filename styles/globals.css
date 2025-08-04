@@ -6716,6 +6716,23 @@ img {
   color: var(--primary-color);
 }
 
+/* 会場と放送局の表示スタイル */
+.result-venue,
+.result-broadcast {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  margin-right: 12px;
+}
+
+.result-venue .venue-icon,
+.result-broadcast .broadcast-icon {
+  font-size: 0.85rem;
+  color: var(--primary-color);
+}
+
 /* スケジュールの検索結果でカテゴリ名の次の行に日時を表示 */
 .result-details .category-badge.schedule-category + .result-date.schedule-date {
   flex-basis: 100%;
@@ -6802,12 +6819,12 @@ img {
   font-size: 16px;
 }
 
-.share-button.twitter {
-  background: #1da1f2;
+.share-button.x {
+  background: #000000;
 }
 
-.share-button.twitter:hover {
-  background: #0d8bd9;
+.share-button.x:hover {
+  background: #333333;
 }
 
 .share-button.facebook {

@@ -179,13 +179,8 @@ const Products = ({ products }) => {
           ))}
         </div>
 
-        <div className="section-footer">
-          <Link href="/products">
-            <a className="view-all-button">
-              すべての商品を見る
-              <span className="arrow">→</span>
-            </a>
-          </Link>
+        <div className="view-all-container">
+          <Link href="/products" className="view-all">VIEW ALL</Link>
         </div>
       </div>
     </section>

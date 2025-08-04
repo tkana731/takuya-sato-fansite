@@ -5,7 +5,8 @@ import Layout from '../../components/Layout/Layout';
 import SEO from '../../components/SEO/SEO';
 import SchemaOrg from '../../components/SEO/SchemaOrg';
 import CalendarButton from '../../components/CalendarButton/CalendarButton';
-import { FaCalendarAlt, FaExternalLinkAlt, FaMapMarkerAlt, FaClock, FaUsers, FaInfo, FaHome, FaTwitter, FaFacebook, FaLine, FaShareAlt, FaInstagram } from 'react-icons/fa';
+import { FaCalendarAlt, FaExternalLinkAlt, FaMapMarkerAlt, FaClock, FaUsers, FaInfo, FaHome, FaFacebook, FaLine, FaShareAlt, FaInstagram } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 
 export default function ScheduleDetailPage() {
     const router = useRouter();
@@ -137,8 +138,8 @@ export default function ScheduleDetailPage() {
         let shareUrl = '';
         
         switch (platform) {
-            case 'twitter':
-                shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+            case 'x':
+                shareUrl = `https://x.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
                 break;
             case 'facebook':
                 shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
@@ -396,13 +397,13 @@ export default function ScheduleDetailPage() {
                             </div>
                             <div className="share-buttons">
                                 <button
-                                    onClick={() => handleShare('twitter')}
-                                    className="share-button twitter"
-                                    title="Twitterでシェア"
-                                    aria-label="Twitterでシェア"
+                                    onClick={() => handleShare('x')}
+                                    className="share-button x"
+                                    title="Xでシェア"
+                                    aria-label="Xでシェア"
                                 >
-                                    <FaTwitter />
-                                    <span>Twitter</span>
+                                    <FaXTwitter />
+                                    <span>Post</span>
                                 </button>
                                 <button
                                     onClick={() => handleShare('facebook')}

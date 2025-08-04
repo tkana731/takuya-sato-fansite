@@ -203,6 +203,8 @@ export default async function handler(req, res) {
         category: schedule.category?.name,
         categoryColor: schedule.category?.color_code,
         performers: performerNames,
+        venue: schedule.venue?.name,
+        broadcastStation: schedule.broadcastStation?.name,
         score: score
       });
     });

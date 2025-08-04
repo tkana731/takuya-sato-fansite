@@ -118,16 +118,10 @@ export default async function handler(req, res) {
                 : (schedule.venue ? schedule.venue.name : '');
             const prefecture = !isBroadcast && schedule.venue?.prefecture_id?.name || null;
 
-            // 出演者情報を整形（佐藤拓也さんを最初に）
+            // 出演者情報を整形（表示順で並び替え）
             const performers = schedule.performers
                 .filter(p => p.performer)
-                .sort((a, b) => {
-                    // 佐藤拓也さんを最初に
-                    if (a.performer.is_takuya_sato && !b.performer.is_takuya_sato) return -1;
-                    if (!a.performer.is_takuya_sato && b.performer.is_takuya_sato) return 1;
-                    // 表示順での並び替え
-                    return (a.display_order || 0) - (b.display_order || 0);
-                })
+                .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
                 .map(p => ({
                     name: p.performer.name,
                     role: p.role_description,

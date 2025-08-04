@@ -39,6 +39,13 @@ export default function SocialPosts({ posts = [], limit = 6, showFilters = false
     return match ? (match[1] || match[2]) : null;
   };
 
+  const extractInstagramId = (url) => {
+    if (!url) return null;
+    // Instagram投稿URLのパターン: https://www.instagram.com/p/[POST_ID]/
+    const match = url.match(/instagram\.com\/p\/([A-Za-z0-9_-]+)/);
+    return match ? match[1] : null;
+  };
+
   const getPlatformIcon = (platform) => {
     return platform === 'x' ? '𝕏' : '📷';
   };
@@ -80,6 +87,7 @@ export default function SocialPosts({ posts = [], limit = 6, showFilters = false
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayPosts.map((post) => {
               const tweetId = extractTweetId(post.postUrl);
+              const instagramId = extractInstagramId(post.postUrl);
               
               return (
                 <div key={post.id} className="mb-6">
@@ -96,8 +104,34 @@ export default function SocialPosts({ posts = [], limit = 6, showFilters = false
                       loading="lazy"
                       title="X Post"
                     />
+                  ) : post.platform === 'instagram' && instagramId ? (
+                    // Instagram投稿の埋め込み
+                    <div style={{ 
+                      position: 'relative', 
+                      width: '100%', 
+                      paddingBottom: '100%', // 正方形のアスペクト比
+                      backgroundColor: '#fafafa',
+                      borderRadius: '12px',
+                      overflow: 'hidden'
+                    }}>
+                      <iframe
+                        src={`https://www.instagram.com/p/${instagramId}/embed/`}
+                        width="100%"
+                        height="100%"
+                        style={{ 
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          border: 'none',
+                          borderRadius: '12px'
+                        }}
+                        loading="lazy"
+                        title="Instagram Post"
+                        allowtransparency="true"
+                      />
+                    </div>
                   ) : (
-                    // Instagram やその他のプラットフォーム
+                    // その他のプラットフォーム（フォールバック）
                     <div style={{ 
                       position: 'relative', 
                       width: '100%', 

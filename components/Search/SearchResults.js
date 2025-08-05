@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FaFilm, FaCalendarAlt, FaUser, FaMusic, FaShoppingCart, FaMapMarkerAlt, FaRadio } from 'react-icons/fa';
+import { FaFilm, FaCalendarAlt, FaUser, FaMusic, FaShoppingCart, FaMapMarkerAlt, FaMicrophone } from 'react-icons/fa';
 
 const typeIcons = {
   work: FaFilm,
@@ -158,7 +158,7 @@ function SearchResultItem({ item, query }) {
             )}
             {item.broadcastStation && (
               <span className="result-broadcast">
-                <FaRadio className="broadcast-icon" />
+                <FaMicrophone className="broadcast-icon" />
                 {highlightText(item.broadcastStation, query)}
               </span>
             )}

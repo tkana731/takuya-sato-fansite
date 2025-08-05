@@ -42,7 +42,7 @@ export default function VideoPage({ initialVideos, initialYear }) {
         if (selectedYear !== (initialYear || currentYear)) {
             fetchVideosByYear();
         }
-    }, [selectedYear]);
+    }, [selectedYear, currentYear, initialYear]);
 
     // YouTube動画IDを抽出する関数
     const extractYoutubeVideoId = (url) => {

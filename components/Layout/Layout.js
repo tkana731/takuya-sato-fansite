@@ -185,7 +185,7 @@ export default function Layout({ children, title = '佐藤拓也さん非公式�
             window.removeEventListener('scroll', handleScroll);
             router.events.off('routeChangeComplete', handleRouteChangeComplete);
         };
-    }, [router.asPath]); // ルートが変わるたびに再実行
+    }, [router.asPath, handleRouteChangeComplete, router.events, scrollToHashElement, setupHashLinkHandler]); // ルートが変わるたびに再実行
 
     return (
         <div ref={layoutRef}>

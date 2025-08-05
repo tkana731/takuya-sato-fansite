@@ -5,7 +5,7 @@ import Layout from '../../components/Layout/Layout';
 import SEO from '../../components/SEO/SEO';
 import SchemaOrg from '../../components/SEO/SchemaOrg';
 import Link from 'next/link';
-import { FaExternalLinkAlt, FaHome, FaMusic, FaShoppingCart, FaUsers, FaUser, FaCalendarAlt, FaTv, FaGamepad, FaFilm, FaMicrophone } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaHome, FaMusic, FaShoppingCart, FaUsers, FaUser, FaCalendarAlt, FaTv, FaGamepad, FaFilm, FaMicrophone, FaInfo } from 'react-icons/fa';
 
 export default function WorkDetailPage() {
     const router = useRouter();

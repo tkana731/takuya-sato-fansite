@@ -92,7 +92,7 @@ export default function Home({ onAirContent, schedules, works, videos, socialPos
     if (router.isReady && !loading) {
       scrollToHashSection();
     }
-  }, [router.isReady, loading, router.asPath]);
+  }, [router.isReady, loading, router.asPath, scrollToHashSection]);
 
   // データはSSGで事前取得済みなので、ローディング関連のuseEffectは削除
 

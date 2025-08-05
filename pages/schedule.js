@@ -55,7 +55,7 @@ export default function SchedulePage({ initialSchedules, initialYearRange }) {
                 query: { year: currentYear, month: currentMonth + 1 }
             }, undefined, { shallow: true });
         }
-    }, [router.query, router.isReady, currentYear, currentMonth]);
+    }, [router.query, router.isReady, currentYear, currentMonth, router]);
 
     // 年月選択モーダルの表示状態
     const [showDatePicker, setShowDatePicker] = useState(false);

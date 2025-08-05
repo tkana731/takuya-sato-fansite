@@ -1,5 +1,6 @@
 // pages/works.js
 import { useState } from 'react';
+import Link from 'next/link';
 import Layout from '../components/Layout/Layout';
 import SEO from '../components/SEO/SEO';
 import SchemaOrg from '../components/SEO/SchemaOrg';
@@ -144,7 +145,9 @@ export default function WorksPage({ works }) {
                                     {works.anime && works.anime.map(item => (
                                         <li className="list-item" key={item.id}>
                                             <div className="item-header">
-                                                <span className="item-title">{item.title}</span>
+                                                <Link href={`/works/${item.id}`} className="item-title-link">
+                                                    <span className="item-title">{item.title}</span>
+                                                </Link>
                                                 {item.officialUrl && (
                                                     <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                         <FaExternalLinkAlt />
@@ -181,7 +184,9 @@ export default function WorksPage({ works }) {
                                     {works.game && works.game.map(item => (
                                         <li className="list-item" key={item.id}>
                                             <div className="item-header">
-                                                <span className="item-title">{item.title}</span>
+                                                <Link href={`/works/${item.id}`} className="item-title-link">
+                                                    <span className="item-title">{item.title}</span>
+                                                </Link>
                                                 {item.officialUrl && (
                                                     <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                         <FaExternalLinkAlt />
@@ -218,7 +223,9 @@ export default function WorksPage({ works }) {
                                     {works.dub && works.dub.movie && works.dub.movie.map(item => (
                                         <li className="list-item" key={item.id}>
                                             <div className="item-header">
-                                                <span className="item-title">{item.title}</span>
+                                                <Link href={`/works/${item.id}`} className="item-title-link">
+                                                    <span className="item-title">{item.title}</span>
+                                                </Link>
                                                 {item.officialUrl && (
                                                     <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                         <FaExternalLinkAlt />
@@ -253,7 +260,9 @@ export default function WorksPage({ works }) {
                                     {works.dub && works.dub.drama && works.dub.drama.map(item => (
                                         <li className="list-item" key={item.id}>
                                             <div className="item-header">
-                                                <span className="item-title">{item.title}</span>
+                                                <Link href={`/works/${item.id}`} className="item-title-link">
+                                                    <span className="item-title">{item.title}</span>
+                                                </Link>
                                                 {item.officialUrl && (
                                                     <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                         <FaExternalLinkAlt />
@@ -288,7 +297,9 @@ export default function WorksPage({ works }) {
                                     {works.dub && works.dub.anime && works.dub.anime.map(item => (
                                         <li className="list-item" key={item.id}>
                                             <div className="item-header">
-                                                <span className="item-title">{item.title}</span>
+                                                <Link href={`/works/${item.id}`} className="item-title-link">
+                                                    <span className="item-title">{item.title}</span>
+                                                </Link>
                                                 {item.officialUrl && (
                                                     <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                         <FaExternalLinkAlt />
@@ -328,7 +339,9 @@ export default function WorksPage({ works }) {
                                     {works.other && works.other.special && works.other.special.map(item => (
                                         <li className="list-item" key={item.id}>
                                             <div className="item-header">
-                                                <span className="item-title">{item.title}</span>
+                                                <Link href={`/works/${item.id}`} className="item-title-link">
+                                                    <span className="item-title">{item.title}</span>
+                                                </Link>
                                                 {item.officialUrl && (
                                                     <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                         <FaExternalLinkAlt />
@@ -363,7 +376,9 @@ export default function WorksPage({ works }) {
                                     {works.other && works.other.radio && works.other.radio.map(item => (
                                         <li className="list-item" key={item.id}>
                                             <div className="item-header">
-                                                <span className="item-title">{item.title}</span>
+                                                <Link href={`/works/${item.id}`} className="item-title-link">
+                                                    <span className="item-title">{item.title}</span>
+                                                </Link>
                                                 {item.officialUrl && (
                                                     <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                         <FaExternalLinkAlt />
@@ -392,7 +407,9 @@ export default function WorksPage({ works }) {
                                     {works.other && works.other.voice && works.other.voice.map(item => (
                                         <li className="list-item" key={item.id}>
                                             <div className="item-header">
-                                                <span className="item-title">{item.title}</span>
+                                                <Link href={`/works/${item.id}`} className="item-title-link">
+                                                    <span className="item-title">{item.title}</span>
+                                                </Link>
                                                 {item.officialUrl && (
                                                     <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                         <FaExternalLinkAlt />
@@ -450,7 +467,9 @@ export default function WorksPage({ works }) {
                                     {works.other && works.other.drama && works.other.drama.map(item => (
                                         <li className="list-item" key={item.id}>
                                             <div className="item-header">
-                                                <span className="item-title">{item.title}</span>
+                                                <Link href={`/works/${item.id}`} className="item-title-link">
+                                                    <span className="item-title">{item.title}</span>
+                                                </Link>
                                                 {item.officialUrl && (
                                                     <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                         <FaExternalLinkAlt />
@@ -479,7 +498,9 @@ export default function WorksPage({ works }) {
                                     {works.other && works.other.dramaCD && works.other.dramaCD.map(item => (
                                         <li className="list-item" key={item.id}>
                                             <div className="item-header">
-                                                <span className="item-title">{item.title}</span>
+                                                <Link href={`/works/${item.id}`} className="item-title-link">
+                                                    <span className="item-title">{item.title}</span>
+                                                </Link>
                                                 {item.officialUrl && (
                                                     <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                         <FaExternalLinkAlt />
@@ -514,7 +535,9 @@ export default function WorksPage({ works }) {
                                     {works.other && works.other.blcd && works.other.blcd.map(item => (
                                         <li className="list-item" key={item.id}>
                                             <div className="item-header">
-                                                <span className="item-title">{item.title}</span>
+                                                <Link href={`/works/${item.id}`} className="item-title-link">
+                                                    <span className="item-title">{item.title}</span>
+                                                </Link>
                                                 {item.officialUrl && (
                                                     <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                         <FaExternalLinkAlt />

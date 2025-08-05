@@ -240,7 +240,7 @@ const Schedule = forwardRef((props, ref) => {
                                                                 <div className="schedule-detail-item">
                                                                     <span className="detail-icon"><FaUser /></span>
                                                                     <div className="performers-list">
-                                                                        出演: {schedule.performers.map((performer, index) => (
+                                                                        {schedule.performers.map((performer, index) => (
                                                                             <span key={index} className={`performer ${performer.isTakuyaSato ? 'takuya-sato' : ''}`}>
                                                                                 {performer.name}
                                                                                 {performer.role && ` (${performer.role})`}

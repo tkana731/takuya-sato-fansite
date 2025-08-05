@@ -3145,14 +3145,6 @@ img {
   margin-bottom: 40px;
 }
 
-.work-group-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--primary-dark);
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid var(--primary-color);
-}
 
 .characters-grid {
   display: grid;
@@ -3365,9 +3357,6 @@ img {
     gap: 15px;
   }
 
-  .work-group-title {
-    font-size: 18px;
-  }
 
   .character-card {
     padding: 15px;
@@ -5480,12 +5469,6 @@ img {
   margin-bottom: 5px;
 }
 
-.variant-features {
-  font-size: 13px;
-  color: var(--text-color);
-  margin-bottom: 10px;
-  font-style: italic;
-}
 
 .variant-links {
   display: flex;
@@ -7245,6 +7228,285 @@ img {
   color: var(--gray-medium);
   margin: 0 8px;
   font-weight: 500;
+}
+
+/* 作品詳細ページ - Work Detail Page */
+.work-detail {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.info-section {
+  margin-bottom: 32px;
+}
+
+.info-section:last-child {
+  margin-bottom: 0;
+}
+
+.work-detail .section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-icon {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+
+/* 出演者リスト */
+.performers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.performer-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--gray-light);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.performer-item:hover {
+  background: var(--gray-lighter);
+}
+
+.performer-item.takuya-sato {
+  background: linear-gradient(45deg, var(--accent-color), #ff6b9d);
+  color: white;
+}
+
+.performer-item.takuya-sato:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(228, 21, 126, 0.3);
+}
+
+.performer-name {
+  font-weight: 600;
+  min-width: 120px;
+}
+
+.performer-character {
+  color: inherit;
+  opacity: 0.9;
+}
+
+.performer-item.takuya-sato .performer-character {
+  color: white;
+  opacity: 1;
+}
+
+/* スタッフリスト */
+.staff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+
+/* 楽曲リスト */
+.songs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.song-type-group {
+  background: var(--gray-light);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.song-type-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 12px;
+}
+
+.song-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.song-item {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.song-item:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: translateX(4px);
+}
+
+.song-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.song-artist {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* 商品リスト */
+.products-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.product-item {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: var(--gray-light);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.product-item:hover {
+  background: white;
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-base);
+}
+
+.product-title {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 4px;
+}
+
+.product-category {
+  font-size: 0.85rem;
+  color: var(--accent-color);
+  margin-bottom: 4px;
+}
+
+.product-date {
+  font-size: 0.85rem;
+  color: var(--gray-medium);
+}
+
+
+.official-link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.official-link-button:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-base);
+}
+
+/* ステータスバッジ */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+}
+
+.status-badge.new {
+  background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+}
+
+.status-badge.rebroadcast {
+  background: #9E9E9E;
+}
+
+/* 作品タイトルリンク */
+.item-title-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: color 0.2s;
+}
+
+.item-title-link:hover .item-title {
+  color: var(--primary-color);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .work-detail {
+    padding: 24px 16px;
+  }
+
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .work-detail .section-title {
+    font-size: 1.3rem;
+  }
+
+  .performer-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .performer-name {
+    min-width: auto;
+  }
+
+
+  .products-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .work-detail {
+    padding: 20px 12px;
+  }
+
+
+  .header-badges {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 }
 
 .schedule-detail-content {

@@ -57,7 +57,9 @@ const Works = forwardRef((props, ref) => {
                             {works.anime && works.anime.slice(0, 10).map(item => (
                                 <li className="list-item" key={item.id}>
                                     <div className="item-header">
-                                        <span className="item-title">{item.title}</span>
+                                        <Link href={`/works/${item.id}`} className="item-title-link">
+                                            <span className="item-title">{item.title}</span>
+                                        </Link>
                                         {item.officialUrl && (
                                             <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                 <FaExternalLinkAlt />
@@ -98,7 +100,9 @@ const Works = forwardRef((props, ref) => {
                             {works.game && works.game.slice(0, 10).map(item => (
                                 <li className="list-item" key={item.id}>
                                     <div className="item-header">
-                                        <span className="item-title">{item.title}</span>
+                                        <Link href={`/works/${item.id}`} className="item-title-link">
+                                            <span className="item-title">{item.title}</span>
+                                        </Link>
                                         {item.officialUrl && (
                                             <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                 <FaExternalLinkAlt />
@@ -139,7 +143,9 @@ const Works = forwardRef((props, ref) => {
                             {works.dub && works.dub.movie && works.dub.movie.slice(0, 5).map(item => (
                                 <li className="list-item" key={item.id}>
                                     <div className="item-header">
-                                        <span className="item-title">{item.title}</span>
+                                        <Link href={`/works/${item.id}`} className="item-title-link">
+                                            <span className="item-title">{item.title}</span>
+                                        </Link>
                                         {item.officialUrl && (
                                             <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                 <FaExternalLinkAlt />
@@ -176,7 +182,9 @@ const Works = forwardRef((props, ref) => {
                             {works.dub && works.dub.drama && works.dub.drama.slice(0, 5).map(item => (
                                 <li className="list-item" key={item.id}>
                                     <div className="item-header">
-                                        <span className="item-title">{item.title}</span>
+                                        <Link href={`/works/${item.id}`} className="item-title-link">
+                                            <span className="item-title">{item.title}</span>
+                                        </Link>
                                         {item.officialUrl && (
                                             <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                 <FaExternalLinkAlt />

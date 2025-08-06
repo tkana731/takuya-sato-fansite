@@ -216,19 +216,21 @@ export default function CharactersPage({ characters }) {
                                             </div>
                                             <div className="works-grid">
                                                 {filteredWorks.map(work => (
-                                                    <div className="work-card" key={work.workId}>
-                                                        <div className="work-content">
-                                                            <h4 className="work-title">{work.workTitle}</h4>
-                                                            {work.mediaType && (
-                                                                <span className={`media-type-badge ${work.mediaType.toLowerCase()}`}>
-                                                                    {work.mediaType}
-                                                                </span>
-                                                            )}
-                                                            {work.isMainRole && (
-                                                                <span className="main-role-badge">メイン</span>
-                                                            )}
+                                                    <Link href={`/works/${work.workId}`} key={work.workId} className="work-card-link">
+                                                        <div className="work-card">
+                                                            <div className="work-content">
+                                                                <h4 className="work-title">{work.workTitle}</h4>
+                                                                {work.mediaType && (
+                                                                    <span className={`media-type-badge ${work.mediaType.toLowerCase()}`}>
+                                                                        {work.mediaType}
+                                                                    </span>
+                                                                )}
+                                                                {work.isMainRole && (
+                                                                    <span className="main-role-badge">メイン</span>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    </Link>
                                                 ))}
                                             </div>
                                         </div>

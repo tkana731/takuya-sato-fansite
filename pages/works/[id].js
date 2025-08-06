@@ -5,7 +5,8 @@ import Layout from '../../components/Layout/Layout';
 import SEO from '../../components/SEO/SEO';
 import SchemaOrg from '../../components/SEO/SchemaOrg';
 import Link from 'next/link';
-import { FaExternalLinkAlt, FaHome, FaMusic, FaShoppingCart, FaUsers, FaUser, FaCalendarAlt, FaTv, FaGamepad, FaFilm, FaMicrophone, FaInfo } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaHome, FaMusic, FaShoppingCart, FaUsers, FaUser, FaCalendarAlt, FaTv, FaGamepad, FaFilm, FaMicrophone, FaInfo, FaShareAlt, FaFacebook, FaLine, FaInstagram } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 
 export default function WorkDetailPage() {
     const router = useRouter();
@@ -13,6 +14,76 @@ export default function WorkDetailPage() {
     const [work, setWork] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // SNSシェア機能
+    const getShareData = () => {
+        const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+        const shareText = `佐藤拓也さん出演「${work?.title}」\nメディア: ${work?.categoryName || ''}`;
+        
+        return {
+            url: currentUrl,
+            text: shareText,
+            title: work?.title || ''
+        };
+    };
+
+    const handleShare = (platform) => {
+        const { url, text, title } = getShareData();
+        const encodedUrl = encodeURIComponent(url);
+        const encodedText = encodeURIComponent(text);
+        // const encodedTitle = encodeURIComponent(title); // 未使用のため削除
+
+        let shareUrl = '';
+        
+        switch (platform) {
+            case 'x':
+                shareUrl = `https://x.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+                break;
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+                break;
+            case 'line':
+                shareUrl = `https://social-plugins.line.me/lineit/share?url=${encodedUrl}&text=${encodedText}`;
+                break;
+            case 'instagram':
+                // InstagramはWebからの直接シェアが制限されているため、URLをクリップボードにコピー
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        alert('URLをクリップボードにコピーしました。Instagramアプリで投稿してください。');
+                    }).catch(() => {
+                        alert('URLのコピーに失敗しました。');
+                    });
+                } else {
+                    alert('お使いのブラウザではクリップボード機能がサポートされていません。');
+                }
+                return;
+            default:
+                // Web Share API（対応ブラウザの場合）
+                if (navigator.share) {
+                    navigator.share({
+                        title: title,
+                        text: text,
+                        url: url
+                    }).catch(console.error);
+                    return;
+                }
+                // Web Share APIが利用できない場合はURLをクリップボードにコピー
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        alert('URLをクリップボードにコピーしました。');
+                    }).catch(() => {
+                        alert('URLのコピーに失敗しました。');
+                    });
+                } else {
+                    alert('お使いのブラウザではクリップボード機能がサポートされていません。');
+                }
+                return;
+        }
+        
+        if (shareUrl) {
+            window.open(shareUrl, '_blank', 'width=600,height=400');
+        }
+    };
 
     useEffect(() => {
         if (!id) return;
@@ -98,43 +169,6 @@ export default function WorkDetailPage() {
         );
     }
 
-    // メディアタイプのアイコンを取得
-    const getMediaTypeIcon = (mediaType) => {
-        switch (mediaType) {
-            case 'TV':
-            case 'OVA':
-            case 'WEB':
-            case 'MOVIE':
-                return <FaTv />;
-            case 'GAME':
-                return <FaGamepad />;
-            case 'DUB_MOVIE':
-            case 'DUB_DRAMA':
-            case 'DUB_ANIME':
-                return <FaFilm />;
-            default:
-                return <FaMicrophone />;
-        }
-    };
-
-    // メディアタイプの表示名を取得
-    const getMediaTypeLabel = (mediaType) => {
-        const labels = {
-            'TV': 'TVアニメ',
-            'OVA': 'OVA',
-            'WEB': 'WEB配信',
-            'MOVIE': '劇場版',
-            'GAME': 'ゲーム',
-            'DUB_MOVIE': '吹き替え（映画）',
-            'DUB_DRAMA': '吹き替え（ドラマ）',
-            'DUB_ANIME': '吹き替え（アニメ）',
-            'RADIO': 'ラジオ',
-            'DRAMA_CD': 'ドラマCD',
-            'NARRATION': 'ナレーション'
-        };
-        return labels[mediaType] || mediaType;
-    };
-
     // カテゴリカラーを取得
     const getCategoryColor = (workType) => {
         const colors = {
@@ -161,7 +195,7 @@ export default function WorkDetailPage() {
     // カスタムパンくずリスト
     const customBreadcrumb = [
         { label: 'HOME', path: '/', icon: FaHome },
-        { label: '出演作品', path: '/works' },
+        { label: 'WORKS', path: '/works' },
         { label: work.title, path: `/works/${work.id}` }
     ];
 
@@ -206,19 +240,25 @@ export default function WorkDetailPage() {
                                             <FaCalendarAlt />
                                         </div>
                                         <div className="info-content">
-                                            <div className="info-label">放送開始年</div>
+                                            <div className="info-label">{work.categoryName === 'ゲーム' ? 'リリース年' : '放送開始年'}</div>
                                             <div className="info-value">{work.broadcastPeriod}</div>
                                         </div>
                                     </div>
                                 )}
-                                {work.broadcastStation && (
+                                {work.broadcastStations && work.broadcastStations.length > 0 && (
                                     <div className="info-item">
                                         <div className="info-icon">
                                             <FaTv />
                                         </div>
                                         <div className="info-content">
                                             <div className="info-label">放送局</div>
-                                            <div className="info-value">{work.broadcastStation}</div>
+                                            <div className="info-value">
+                                                {work.broadcastStations.map((station, index) => (
+                                                    <div key={index} className="broadcast-station-item">
+                                                        {station}
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -337,6 +377,61 @@ export default function WorkDetailPage() {
                                     <span className="button-text">公式サイト</span>
                                 </a>
                             )}
+                        </div>
+
+                        {/* SNSシェアボタン */}
+                        <div className="schedule-share-section">
+                            <div className="share-section-header">
+                                <FaShareAlt />
+                                <h3>この作品をシェア</h3>
+                            </div>
+                            <div className="share-buttons">
+                                <button
+                                    onClick={() => handleShare('x')}
+                                    className="share-button x"
+                                    title="Xでシェア"
+                                    aria-label="Xでシェア"
+                                >
+                                    <FaXTwitter />
+                                    <span>Post</span>
+                                </button>
+                                <button
+                                    onClick={() => handleShare('facebook')}
+                                    className="share-button facebook"
+                                    title="Facebookでシェア"
+                                    aria-label="Facebookでシェア"
+                                >
+                                    <FaFacebook />
+                                    <span>Facebook</span>
+                                </button>
+                                <button
+                                    onClick={() => handleShare('line')}
+                                    className="share-button line"
+                                    title="LINEでシェア"
+                                    aria-label="LINEでシェア"
+                                >
+                                    <FaLine />
+                                    <span>LINE</span>
+                                </button>
+                                <button
+                                    onClick={() => handleShare('instagram')}
+                                    className="share-button instagram"
+                                    title="Instagram用にURLをコピー"
+                                    aria-label="Instagram用にURLをコピー"
+                                >
+                                    <FaInstagram />
+                                    <span>Instagram</span>
+                                </button>
+                                <button
+                                    onClick={() => handleShare('native')}
+                                    className="share-button native"
+                                    title="その他のアプリでシェア / URLをコピー"
+                                    aria-label="その他のアプリでシェア / URLをコピー"
+                                >
+                                    <FaShareAlt />
+                                    <span>その他</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

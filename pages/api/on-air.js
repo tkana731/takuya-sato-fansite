@@ -16,12 +16,14 @@ export default async function handler(req, res) {
             .select(`
                 id,
                 title,
+                official_url,
                 category:category_id (id, name),
                 broadcastChannels:rel_broadcast_channels(
                     id,
                     broadcast_start_date,
                     broadcast_end_date,
                     display_broadcast_time,
+                    official_url,
                     station:station_id (id, name),
                     weekday:weekday_id (id, name, short_name)
                 ),
@@ -48,12 +50,14 @@ export default async function handler(req, res) {
             .select(`
                 id,
                 title,
+                official_url,
                 category:category_id (id, name),
                 broadcastChannels:rel_broadcast_channels(
                     id,
                     broadcast_start_date,
                     broadcast_end_date,
                     display_broadcast_time,
+                    official_url,
                     station:station_id (id, name),
                     weekday:weekday_id (id, name, short_name)
                 ),
@@ -80,12 +84,14 @@ export default async function handler(req, res) {
             .select(`
                 id,
                 title,
+                official_url,
                 category:category_id (id, name),
                 broadcastChannels:rel_broadcast_channels(
                     id,
                     broadcast_start_date,
                     broadcast_end_date,
                     display_broadcast_time,
+                    official_url,
                     station:station_id (id, name),
                     weekday:weekday_id (id, name, short_name)
                 ),
@@ -171,7 +177,8 @@ export default async function handler(req, res) {
                 .map(bc => {
                     return {
                         channel: bc.station?.name || 'チャンネル不明',
-                        time: bc.display_broadcast_time || '時間未定'
+                        time: bc.display_broadcast_time || '時間未定',
+                        officialUrl: bc.official_url
                     };
                 });
 
@@ -183,8 +190,6 @@ export default async function handler(req, res) {
                 );
                 roleInfo = takuyaRole ? `${takuyaRole.role.name} 役` : '';
             }
-
-            console.log(`作品 "${work.title}" の放送情報:`, activeChannels);
 
             return {
                 id: work.id,

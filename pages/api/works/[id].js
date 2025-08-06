@@ -110,6 +110,7 @@ export default async function handler(req, res) {
                     mediaType: null,
                     mediaTypeDetail: null,
                     category: work.category,
+                    categoryName: work.category?.name,
                     officialUrl: work.official_url,
                     description: work.description,
                     broadcastPeriod: work.year ? `${work.year}年` : null,
@@ -122,6 +123,9 @@ export default async function handler(req, res) {
                     broadcastStation: work.broadcastChannels && work.broadcastChannels.length > 0 
                         ? work.broadcastChannels.map(bc => bc.station?.name).filter(Boolean).join('、')
                         : null,
+                    broadcastStations: work.broadcastChannels && work.broadcastChannels.length > 0 
+                        ? work.broadcastChannels.map(bc => bc.station?.name).filter(Boolean)
+                        : [],
                     productionCompany: null,
                     performers: performers,
                     staff: staffByRole,

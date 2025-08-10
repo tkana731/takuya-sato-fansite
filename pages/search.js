@@ -78,9 +78,15 @@ export default function SearchPage() {
             </div>
 
             {isLoading && (
-              <div className="search-loading">
-                <div className="loading-spinner"></div>
-                <p>検索中...</p>
+              <div className="loading-container">
+                <div className="audio-wave">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <p className="loading-text">検索中...</p>
               </div>
             )}
 

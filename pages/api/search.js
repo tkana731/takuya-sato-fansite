@@ -25,12 +25,12 @@ export default async function handler(req, res) {
         id,
         title,
         year,
-        official_url,
+        officialUrl:official_url,
         description,
         workRoles:rel_work_roles(
-          role:role_id (
+          role:mst_roles(
             name,
-            actor:voice_actor_id (name)
+            voiceActor:mst_actors!mst_roles_voice_actor_id_fkey(name)
           )
         )
       `)
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     // Filter for works where 佐藤拓也 has a role
     workResults?.forEach(work => {
       const takuyaRoles = work.workRoles?.filter(wr => 
-        wr.role?.actor?.name === '佐藤拓也'
+        wr.role?.voiceActor?.name === '佐藤拓也'
       );
       
       if (takuyaRoles && takuyaRoles.length > 0) {
@@ -77,11 +77,11 @@ export default async function handler(req, res) {
         title,
         start_datetime,
         description,
-        venue:venue_id (name),
-        broadcastStation:broadcast_station_id (name),
-        category:category_id (name, color_code),
+        venue:mst_venues (name),
+        broadcastStation:mst_broadcast_stations (name),
+        category:mst_schedule_categories (name, color_code),
         performers:rel_schedule_performers (
-          performer:performer_id (name)
+          performer:mst_performers (name)
         )
       `)
       .or(`title.ilike.${searchPattern},description.ilike.${searchPattern}`)
@@ -96,11 +96,11 @@ export default async function handler(req, res) {
         title,
         start_datetime,
         description,
-        venue:venue_id!inner (name),
-        broadcastStation:broadcast_station_id (name),
-        category:category_id (name, color_code),
+        venue:mst_venues!inner (name),
+        broadcastStation:mst_broadcast_stations (name),
+        category:mst_schedule_categories (name, color_code),
         performers:rel_schedule_performers (
-          performer:performer_id (name)
+          performer:mst_performers (name)
         )
       `)
       .ilike('venue.name', searchPattern)
@@ -115,11 +115,11 @@ export default async function handler(req, res) {
         title,
         start_datetime,
         description,
-        venue:venue_id (name),
-        broadcastStation:broadcast_station_id!inner (name),
-        category:category_id (name, color_code),
+        venue:mst_venues (name),
+        broadcastStation:mst_broadcast_stations!inner (name),
+        category:mst_schedule_categories (name, color_code),
         performers:rel_schedule_performers (
-          performer:performer_id (name)
+          performer:mst_performers (name)
         )
       `)
       .ilike('broadcastStation.name', searchPattern)
@@ -132,22 +132,22 @@ export default async function handler(req, res) {
     const { data: scheduleByPerformer, error: performerError } = await supabase
       .from('rel_schedule_performers')
       .select(`
-        schedules (
+        schedule:schedules (
           id,
           title,
           start_datetime,
           description,
-          venue:venue_id (name),
-          broadcastStation:broadcast_station_id (name),
-          category:category_id (name, color_code),
+          venue:mst_venues (name),
+          broadcastStation:mst_broadcast_stations (name),
+          category:mst_schedule_categories (name, color_code),
           performers:rel_schedule_performers (
-            performer:performer_id (name)
+            performer:mst_performers (name)
           )
         ),
-        performer:performer_id (name)
+        performer:mst_performers (name)
       `)
       .ilike('performer.name', searchPattern)
-      .order('schedules.start_datetime', { ascending: false })
+      .order('schedule.start_datetime', { ascending: false })
       .limit(10);
 
     // 全ての検索結果をマージ
@@ -163,8 +163,8 @@ export default async function handler(req, res) {
     
     if (!performerError && scheduleByPerformer) {
       const performerSchedules = scheduleByPerformer
-        .filter(item => item.schedules)
-        .map(item => item.schedules);
+        .filter(item => item.schedule)
+        .map(item => item.schedule);
       allScheduleResults.push(...performerSchedules);
     }
 
@@ -216,8 +216,8 @@ export default async function handler(req, res) {
         id,
         name,
         birthday,
-        rel_work_roles (
-          works (
+        workRoles:rel_work_roles (
+          work:works (
             id,
             title
           )
@@ -238,7 +238,7 @@ export default async function handler(req, res) {
       else if (character.name.toLowerCase().includes(searchTerm.toLowerCase())) score = 25;
       
       // Get work titles for this character
-      const workTitles = character.rel_work_roles?.map(wr => wr.works?.title).filter(Boolean) || [];
+      const workTitles = character.workRoles?.map(wr => wr.work?.title).filter(Boolean) || [];
       
       results.push({
         id: character.id,
@@ -261,9 +261,9 @@ export default async function handler(req, res) {
         title,
         artist,
         song_type,
-        rel_song_staff(
-          mst_staff (name),
-          mst_song_staff_roles (name)
+        songStaff:rel_song_staff(
+          staff:mst_staff (name),
+          songStaffRole:mst_song_staff_roles (name)
         )
       `)
       .or(`title.ilike.${searchPattern},artist.ilike.${searchPattern}`)
@@ -282,8 +282,8 @@ export default async function handler(req, res) {
       else if (song.artist?.toLowerCase().includes(searchTerm.toLowerCase())) score = 10;
       
       // Extract lyrics and composition info
-      const lyricsBy = song.rel_song_staff?.filter(s => s.mst_song_staff_roles?.name === '作詞')?.map(s => s.mst_staff?.name).join('、') || '';
-      const composedBy = song.rel_song_staff?.filter(s => s.mst_song_staff_roles?.name === '作曲')?.map(s => s.mst_staff?.name).join('、') || '';
+      const lyricsBy = song.songStaff?.filter(s => s.songStaffRole?.name === '作詞')?.map(s => s.staff?.name).join('、') || '';
+      const composedBy = song.songStaff?.filter(s => s.songStaffRole?.name === '作曲')?.map(s => s.staff?.name).join('、') || '';
       
       results.push({
         id: song.id,
@@ -301,14 +301,13 @@ export default async function handler(req, res) {
 
     // Products table search
     const { data: productResults, error: productError } = await supabase
-      .from('products')
+      .from('product_base')
       .select(`
         id,
         title,
-        product_code,
         release_date,
         description,
-        mst_product_categories (
+        category:mst_product_categories (
           name,
           code
         )
@@ -326,7 +325,7 @@ export default async function handler(req, res) {
       if (product.title === searchTerm) score = 100;
       else if (product.title.toLowerCase().startsWith(searchTerm.toLowerCase())) score = 50;
       else if (product.title.toLowerCase().includes(searchTerm.toLowerCase())) score = 25;
-      else if (product.mst_product_categories?.name?.toLowerCase().includes(searchTerm.toLowerCase())) score = 10;
+      else if (product.category?.name?.toLowerCase().includes(searchTerm.toLowerCase())) score = 10;
       
       results.push({
         id: product.id,
@@ -337,7 +336,7 @@ export default async function handler(req, res) {
         description: product.description,
         price: null, // price情報が不明なのでnullに設定
         release_date: product.release_date,
-        category: product.mst_product_categories?.name,
+        category: product.category?.name,
         score: score
       });
     });

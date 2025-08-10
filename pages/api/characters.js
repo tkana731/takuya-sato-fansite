@@ -14,6 +14,7 @@ export default async function handler(req, res) {
                 name,
                 birthday,
                 height,
+                series_name,
                 rel_work_roles (
                     work_id,
                     is_main_role,
@@ -35,37 +36,27 @@ export default async function handler(req, res) {
             throw error;
         }
 
-        // データを整形（複数の作品に出演している場合を考慮）
+        // データを整形（誕生日カレンダー用に重複を避ける）
         const formattedCharacters = [];
+        const processedCharacters = new Set(); // 重複チェック用
+        
         characters.forEach(character => {
-            if (character.rel_work_roles && character.rel_work_roles.length > 0) {
-                character.rel_work_roles.forEach(workRole => {
-                    if (workRole.works) {
-                        formattedCharacters.push({
-                            id: `${character.id}-${workRole.work_id}`,
-                            name: character.name,
-                            birthday: character.birthday,
-                            height: character.height,
-                            mediaType: workRole.works.mst_work_categories?.name || null,
-                            mediaTypeOrder: workRole.works.mst_work_categories?.display_order || 999,
-                            workId: workRole.works.id,
-                            workTitle: workRole.works.title || null,
-                            isMainRole: workRole.is_main_role
-                        });
-                    }
-                });
-            } else {
-                // 作品が紐付いていないキャラクターも表示
+            // 同じキャラクター名の重複を避ける（誕生日カレンダー用）
+            if (!processedCharacters.has(character.name)) {
+                processedCharacters.add(character.name);
+                
                 formattedCharacters.push({
                     id: character.id,
                     name: character.name,
                     birthday: character.birthday,
                     height: character.height,
-                    mediaType: null,
-                    mediaTypeOrder: 999,
-                    workId: null,
-                    workTitle: null,
-                    isMainRole: false
+                    seriesName: character.series_name || null, // series_nameを使用
+                    // 以下は互換性のため残す（他のページで使用している可能性）
+                    mediaType: character.rel_work_roles?.[0]?.works?.mst_work_categories?.name || null,
+                    mediaTypeOrder: character.rel_work_roles?.[0]?.works?.mst_work_categories?.display_order || 999,
+                    workId: character.rel_work_roles?.[0]?.works?.id || null,
+                    workTitle: character.rel_work_roles?.[0]?.works?.title || null,
+                    isMainRole: character.rel_work_roles?.[0]?.is_main_role || false
                 });
             }
         });

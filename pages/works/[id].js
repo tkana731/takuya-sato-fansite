@@ -5,7 +5,7 @@ import Layout from '../../components/Layout/Layout';
 import SEO from '../../components/SEO/SEO';
 import SchemaOrg from '../../components/SEO/SchemaOrg';
 import Link from 'next/link';
-import { FaExternalLinkAlt, FaHome, FaMusic, FaShoppingCart, FaUsers, FaUser, FaCalendarAlt, FaTv, FaGamepad, FaFilm, FaMicrophone, FaInfo, FaShareAlt, FaFacebook, FaLine, FaInstagram } from 'react-icons/fa';
+import { FaExternalLinkAlt, FaHome, FaMusic, FaShoppingCart, FaUsers, FaUser, FaCalendarAlt, FaTv, FaGamepad, FaFilm, FaMicrophone, FaInfo, FaShareAlt, FaFacebook, FaLine, FaInstagram, FaPlay } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 
 export default function WorkDetailPage() {
@@ -124,9 +124,15 @@ export default function WorkDetailPage() {
                     description="佐藤拓也さんの作品詳細情報を表示しています。"
                 />
                 <div className="container">
-                    <div className="loading">
-                        <div className="loading-spinner"></div>
-                        <p>作品を読み込み中...</p>
+                    <div className="loading-container">
+                        <div className="audio-wave">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <p className="loading-text">作品を読み込み中...</p>
                     </div>
                 </div>
             </Layout>
@@ -251,7 +257,7 @@ export default function WorkDetailPage() {
                                             <FaTv />
                                         </div>
                                         <div className="info-content">
-                                            <div className="info-label">放送局</div>
+                                            <div className="info-label">{work.categoryName === 'WEB' ? '配信サイト' : '放送局'}</div>
                                             <div className="info-value">
                                                 {work.broadcastStations.map((station, index) => (
                                                     <div key={index} className="broadcast-station-item">
@@ -307,6 +313,74 @@ export default function WorkDetailPage() {
                                         </div>
                                     ))
                                 }
+
+                                {/* 関連動画 */}
+                                {work.relatedVideos && work.relatedVideos.length > 0 && (
+                                    <div className="info-item video-section-wide">
+                                        <div className="info-icon">
+                                            <FaPlay />
+                                        </div>
+                                        <div className="info-content">
+                                            <div className="info-label">関連動画</div>
+                                            <div className="info-value">
+                                                <div className="related-videos-list">
+                                                    {work.relatedVideos.slice(0, 3).map((video) => {
+                                                        // YouTubeURLからembed URLに変換
+                                                        const getYouTubeEmbedUrl = (url) => {
+                                                            if (!url) return null;
+                                                            
+                                                            // YouTube URLのパターンマッチング
+                                                            const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+                                                            const match = url.match(youtubeRegex);
+                                                            
+                                                            if (match && match[1]) {
+                                                                return `https://www.youtube.com/embed/${match[1]}`;
+                                                            }
+                                                            
+                                                            return null;
+                                                        };
+
+                                                        const embedUrl = getYouTubeEmbedUrl(video.videoUrl);
+
+                                                        return (
+                                                            <div key={video.id} className="video-item">
+                                                                {embedUrl ? (
+                                                                    <div className="video-embed">
+                                                                        <iframe
+                                                                            src={embedUrl}
+                                                                            title={video.title}
+                                                                            frameBorder="0"
+                                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                                            allowFullScreen
+                                                                            className="youtube-iframe"
+                                                                        />
+                                                                    </div>
+                                                                ) : (
+                                                                    <a 
+                                                                        href={video.videoUrl} 
+                                                                        target="_blank" 
+                                                                        rel="noopener noreferrer"
+                                                                        className="video-external-link"
+                                                                    >
+                                                                        <FaPlay className="video-play-icon" />
+                                                                        動画を視聴する
+                                                                    </a>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                                {work.relatedVideos.length > 3 && (
+                                                    <div className="view-all-container">
+                                                        <Link href="/video" className="view-all">
+                                                            VIEW ALL
+                                                        </Link>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -339,23 +413,6 @@ export default function WorkDetailPage() {
                                                     ))}
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* 関連商品 */}
-                        {work.relatedProducts && work.relatedProducts.length > 0 && (
-                            <div className="schedule-description-wrapper">
-                                <div className="schedule-detail-item">
-                                    <span className="detail-icon"><FaShoppingCart /></span>
-                                    <div className="products-info">
-                                        {work.relatedProducts.map((product, index) => (
-                                            <span key={product.id} className="product-item">
-                                                {product.title} ({product.category})
-                                                {index < work.relatedProducts.length - 1 && '、'}
-                                            </span>
                                         ))}
                                     </div>
                                 </div>

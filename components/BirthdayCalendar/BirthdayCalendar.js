@@ -44,10 +44,11 @@ const BirthdayCalendar = ({ characters }) => {
             if (!acc[key]) {
                 acc[key] = [];
             }
-            // 同じキャラクターの重複を避ける
+            // キャラクター名の重複を避ける（既にAPIで重複は除去されているが念のため）
             if (!acc[key].some(c => c.name === character.name)) {
                 acc[key].push({
                     name: character.name,
+                    seriesName: character.seriesName, // series_nameを使用
                     month: birthdayData.month,
                     day: birthdayData.day
                 });
@@ -94,14 +95,18 @@ const BirthdayCalendar = ({ characters }) => {
         setCurrentDate(newDate);
     };
     
-    // カレンダーの日付を生成
+    // カレンダーの日付を生成（月曜始まり）
     const generateCalendarDays = () => {
         const daysInMonth = getDaysInMonth(currentDate);
         const firstDay = getFirstDayOfMonth(currentDate);
+        
+        // 月曜始まりに調整（日曜日=0 → 6, 月曜日=1 → 0）
+        const mondayStartDay = firstDay === 0 ? 6 : firstDay - 1;
+        
         const days = [];
         
-        // 空白のセルを追加
-        for (let i = 0; i < firstDay; i++) {
+        // 空白のセルを追加（月曜始まり）
+        for (let i = 0; i < mondayStartDay; i++) {
             days.push(null);
         }
         
@@ -161,13 +166,13 @@ const BirthdayCalendar = ({ characters }) => {
             
             <div className="calendar-grid">
                 <div className="weekday-headers">
-                    <div className="weekday">日</div>
                     <div className="weekday">月</div>
                     <div className="weekday">火</div>
                     <div className="weekday">水</div>
                     <div className="weekday">木</div>
                     <div className="weekday">金</div>
                     <div className="weekday">土</div>
+                    <div className="weekday">日</div>
                 </div>
                 
                 <div className="calendar-days">
@@ -227,9 +232,12 @@ const BirthdayCalendar = ({ characters }) => {
                                     </div>
                                     <div className="birthday-names">
                                         {chars.map((char, i) => (
-                                            <span key={i} className={`character-chip ${char.isVoiceActor ? 'voice-actor' : ''}`}>
-                                                {char.name}
-                                            </span>
+                                            <div key={i} className={`birthday-character ${char.isVoiceActor ? 'voice-actor' : ''}`}>
+                                                <div className="character-name">{char.name}</div>
+                                                {char.seriesName && (
+                                                    <div className="work-title">{char.seriesName}</div>
+                                                )}
+                                            </div>
                                         ))}
                                     </div>
                                 </div>

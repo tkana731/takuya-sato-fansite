@@ -437,7 +437,9 @@ export default function WorksPage({ works }) {
                                         return (
                                             <li className="list-item" key={item.id}>
                                                 <div className="item-header">
-                                                    <span className="item-title">{item.title}</span>
+                                                    <Link href={`/works/${item.id}`} className="item-title-link">
+                                                        <span className="item-title">{item.title}</span>
+                                                    </Link>
                                                     {item.officialUrl && (
                                                         <a href={item.officialUrl} target="_blank" rel="noopener noreferrer" className="official-link">
                                                             <FaExternalLinkAlt />

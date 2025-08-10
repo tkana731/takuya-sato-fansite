@@ -19,6 +19,9 @@ export default function Layout({ children, title = '佐藤拓也さん非公式�
             const bubbles = document.querySelector('.bubbles');
             if (!bubbles) return;
 
+            // 既にバブルが作成されている場合は何もしない
+            if (bubbles.children.length > 6) return;
+
             const numberOfBubbles = 25;
             const solidColors = ['#ffffff', '#E3F2FD', '#BBDEFB', '#90CAF9', '#64B5F6', '#42A5F5', '#2196F3'];
             const outlineColors = ['#ffffff', '#E3F2FD', '#90CAF9', '#2196F3', '#1976D2'];

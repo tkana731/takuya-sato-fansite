@@ -2,6 +2,7 @@
 import { fetchData } from '../../../lib/api-helpers';
 import { formatDate, getWeekday } from '../../../lib/form-helpers';
 import { supabase } from '../../../lib/supabase';
+import { processScheduleTimeInfo, getCategoryCode, getLocationInfo } from '../../../utils/scheduleUtils';
 
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
@@ -191,68 +192,10 @@ export default async function handler(req, res) {
 
         // フロントエンドで利用しやすい形式に整形
         const formattedSchedules = sortedSchedules.map(schedule => {
-            // start_datetimeはtimestamptzなので、既に正しいタイムゾーン情報を持っている
-            const startDate = new Date(schedule.start_datetime);
-            const endDate = schedule.end_datetime ? new Date(schedule.end_datetime) : null;
-            
-            // 日本時間で日付と時刻を取得
-            // Vercelのサーバーはタイムゾーンが異なる可能性があるため、
-            // 日本時間に明示的に変換する
-            const jstOffset = 9 * 60 * 60 * 1000; // 9時間をミリ秒に変換
-            const jstDate = new Date(startDate.getTime() + jstOffset);
-            
-            // 長期開催の判定（開始日と終了日が異なる日）
-            const isLongTerm = endDate && 
-                startDate.toISOString().split('T')[0] !== endDate.toISOString().split('T')[0];
-            
-            // 会期状況の判定
-            let periodStatus = null;
-            if (isLongTerm) {
-                const now = new Date();
-                const startDateOnly = new Date(startDate.toISOString().split('T')[0] + 'T00:00:00.000Z');
-                const endDateOnly = new Date(endDate.toISOString().split('T')[0] + 'T23:59:59.999Z');
-                
-                if (now < startDateOnly) {
-                    periodStatus = 'upcoming'; // 開催前
-                } else if (now > endDateOnly) {
-                    periodStatus = 'ended'; // 終了
-                } else {
-                    periodStatus = 'ongoing'; // 開催中
-                }
-            }
-            
-            // ISO文字列から日本時間の各要素を抽出
-            const jstString = jstDate.toISOString(); // YYYY-MM-DDTHH:mm:ss.sssZ
-            const [datePart, timePart] = jstString.split('T');
-            const [year, month, day] = datePart.split('-');
-            const [hours, minutes] = timePart.split(':');
-            
-            const formattedDate = `${year}-${month}-${day}`;
-            const timeInfo = `${hours}:${minutes}`;
-            
-            // 終了日の整形（長期開催の場合）
-            let endDateFormatted = null;
-            let endTimeInfo = null;
-            if (isLongTerm && endDate) {
-                const jstEndDate = new Date(endDate.getTime() + jstOffset);
-                const jstEndString = jstEndDate.toISOString();
-                const [endDatePart, endTimePart] = jstEndString.split('T');
-                const [endYear, endMonth, endDay] = endDatePart.split('-');
-                const [endHours, endMinutes] = endTimePart.split(':');
-                
-                endDateFormatted = `${endYear}-${endMonth}-${endDay}`;
-                endTimeInfo = `${endHours}:${endMinutes}`;
-            }
-            
-            // 曜日計算も日本時間で行う
-            const weekday = getWeekday(jstDate);
-
-            // カテゴリに応じてロケーション情報を選択
-            const isBroadcast = schedule.category?.name === '生放送';
-            const location = isBroadcast
-                ? (schedule.broadcastStation ? schedule.broadcastStation.name : '')
-                : (schedule.venue ? schedule.venue.name : '');
-            const prefecture = !isBroadcast && schedule.venue?.prefecture_id?.name || null;
+            // 共通の時間処理関数を使用
+            const timeProcessing = processScheduleTimeInfo(schedule);
+            const categoryCode = getCategoryCode(schedule);
+            const locationInfo = getLocationInfo(schedule);
 
             // 出演者情報を整形
             const performers = schedule.performers
@@ -263,34 +206,27 @@ export default async function handler(req, res) {
                     isTakuyaSato: p.performer.is_takuya_sato
                 }));
 
-
             const description = schedule.description;
-
-            // カテゴリコード変換
-            const categoryCode = schedule.category?.name === 'イベント' ? 'event' :
-                schedule.category?.name === '舞台・朗読' ? 'stage' :
-                    schedule.category?.name === '生放送' ? 'broadcast' :
-                        schedule.category?.name === '音声ガイド' ? 'voice_guide' : 'other';
 
             return {
                 id: schedule.id,
-                date: formattedDate,
+                date: timeProcessing.formattedDate,
                 datetime: schedule.start_datetime,
                 endDatetime: schedule.end_datetime,
-                endDate: endDateFormatted,
-                endTime: endTimeInfo,
-                isLongTerm: isLongTerm,
-                periodStatus: periodStatus,
-                weekday: weekday,
+                endDate: timeProcessing.endDateFormatted,
+                endTime: timeProcessing.endTimeInfo,
+                isLongTerm: timeProcessing.isLongTerm,
+                periodStatus: timeProcessing.periodStatus,
+                weekday: timeProcessing.weekday,
                 category: categoryCode,
                 categoryName: schedule.category?.name || '',
                 categoryColor: schedule.category?.color_code || null,
                 title: schedule.title,
-                time: timeInfo,
+                time: timeProcessing.timeInfo,
                 isAllDay: schedule.is_all_day || false,
-                location: location,
-                locationType: isBroadcast ? '放送/配信' : '会場',
-                prefecture: prefecture,
+                location: locationInfo.location,
+                locationType: locationInfo.locationType,
+                prefecture: locationInfo.prefecture,
                 description: description,
                 performers: performers,
                 link: schedule.official_url || '#'
@@ -300,9 +236,9 @@ export default async function handler(req, res) {
         // 検索期間のフォーマット
         const formatDateForDisplay = (date) => {
             const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const day = date.getDate().toString().padStart(2, '0');
-            return `${year}.${month}.${day}`;
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            return `${year}/${month}/${day}`;
         };
 
         // レスポンス形式を変更し、期間情報を含める

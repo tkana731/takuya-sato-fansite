@@ -1,5 +1,6 @@
 // pages/api/event-map.js
 import { fetchData } from '../../lib/api-helpers';
+import { processScheduleTimeInfo, getCategoryCode, getLocationInfo } from '../../utils/scheduleUtils';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -16,13 +17,19 @@ export default async function handler(req, res) {
           title,
           start_datetime,
           end_datetime,
-          category:category_id (id, name),
+          is_all_day,
+          category:category_id (id, name, color_code),
           venue:venue_id (
             id, 
             name,
             prefecture:prefecture_id (name)
           ),
-          broadcastStation:broadcast_station_id (id, name)
+          broadcastStation:broadcast_station_id (id, name),
+          performers:rel_schedule_performers (
+            id,
+            role_description,
+            performer:performer_id (id, name, is_takuya_sato)
+          )
         `,
         order: 'start_datetime'
       }
@@ -35,6 +42,7 @@ export default async function handler(req, res) {
     // 都道府県別にイベントを集計
     const prefectureMap = {};
     const yearlyData = {}; // 年別のデータを保持
+    const performerStats = {}; // 共演者統計データ
     const prefectureList = [
       '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
       '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県',
@@ -61,9 +69,10 @@ export default async function handler(req, res) {
 
       // カテゴリに応じてロケーション情報を取得
       const isBroadcast = schedule.category?.name === '生放送';
+      const isVoiceGuide = schedule.category?.name === '音声ガイド';
       
-      // 生放送は除外（会場開催のイベントのみを対象とする）
-      if (isBroadcast) {
+      // 生放送と音声ガイドは除外（会場開催のイベントのみを対象とする）
+      if (isBroadcast || isVoiceGuide) {
         return;
       }
       
@@ -83,7 +92,9 @@ export default async function handler(req, res) {
       }
 
       if (prefecture && prefectureMap[prefecture]) {
-        const eventYear = new Date(schedule.start_datetime).getFullYear();
+        // 共通の時間処理関数を使用
+        const timeProcessing = processScheduleTimeInfo(schedule);
+        const eventYear = timeProcessing.jstDate.getFullYear();
         
         // 年別データの集計
         if (!yearlyData[eventYear]) {
@@ -103,9 +114,53 @@ export default async function handler(req, res) {
           date: schedule.start_datetime,
           location: locationName,
           category: schedule.category?.name || '',
+          categoryColor: schedule.category?.color_code || null,
+          time: timeProcessing.timeInfo,
+          isAllDay: schedule.is_all_day || false,
           year: eventYear,
-          id: schedule.id
+          id: schedule.id,
+          performers: schedule.performers?.map(p => ({
+            name: p.performer?.name,
+            role: p.role_description,
+            isTakuyaSato: p.performer?.is_takuya_sato
+          })) || []
         });
+
+        // 共演者統計の集計（佐藤拓也さんが出演するイベントのみ）
+        const hasTakuyaSato = schedule.performers?.some(p => p.performer?.is_takuya_sato);
+        if (hasTakuyaSato && schedule.performers?.length > 1) {
+          schedule.performers.forEach(performer => {
+            if (performer.performer && !performer.performer.is_takuya_sato) {
+              const performerName = performer.performer.name;
+              
+              if (!performerStats[performerName]) {
+                performerStats[performerName] = {
+                  name: performerName,
+                  count: 0,
+                  events: [],
+                  yearlyBreakdown: {}
+                };
+              }
+              
+              performerStats[performerName].count++;
+              performerStats[performerName].events.push({
+                title: schedule.title,
+                date: schedule.start_datetime,
+                location: locationName,
+                prefecture: prefecture,
+                category: schedule.category?.name || '',
+                year: eventYear,
+                role: performer.role_description || null
+              });
+              
+              // 年別集計
+              if (!performerStats[performerName].yearlyBreakdown[eventYear]) {
+                performerStats[performerName].yearlyBreakdown[eventYear] = 0;
+              }
+              performerStats[performerName].yearlyBreakdown[eventYear]++;
+            }
+          });
+        }
       }
     });
 
@@ -126,6 +181,16 @@ export default async function handler(req, res) {
     // 開催日の降順でソート
     allEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
     
+    // 共演者統計データの整形
+    const performerStatsArray = Object.values(performerStats)
+      .sort((a, b) => b.count - a.count)
+      .map(performer => ({
+        ...performer,
+        events: performer.events
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 5) // 最新5件まで
+      }));
+
     // レスポンスデータを整形
     const responseData = {
       prefectures: Object.entries(prefectureMap).map(([name, data]) => ({
@@ -138,6 +203,7 @@ export default async function handler(req, res) {
           .slice(0, 10) // 最新10件まで
       })), // 全ての都道府県を返す（0件も含む）
       allEvents: allEvents, // 全イベントリストを追加
+      performerStats: performerStatsArray, // 共演者統計を追加
       totalEvents: schedules.filter(s => s.category?.name !== '生放送').length,
       yearlyData: yearlyData,
       availableYears: availableYears,

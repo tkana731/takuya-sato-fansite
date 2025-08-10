@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import Layout from '../components/Layout/Layout';
 import SEO from '../components/SEO/SEO';
 import SchemaOrg from '../components/SEO/SchemaOrg';
+import ScheduleCard from '../components/ScheduleCard/ScheduleCard';
 
 export default function EventMapPage({ eventData }) {
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const [selectedPrefecture, setSelectedPrefecture] = useState('all');
+  const [selectedPerformer, setSelectedPerformer] = useState('all');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'stats'
 
   // 初期化時に現在年のイベントを設定
@@ -34,8 +36,19 @@ export default function EventMapPage({ eventData }) {
       filtered = filtered.filter(event => event.prefecture === selectedPrefecture);
     }
 
+    // 出演者でフィルタリング
+    if (selectedPerformer !== 'all') {
+      filtered = filtered.filter(event => {
+        // イベントデータから出演者情報を取得して絞り込み
+        // API側で出演者情報を含める必要がある
+        return event.performers && event.performers.some(performer => 
+          performer.name === selectedPerformer
+        );
+      });
+    }
+
     setFilteredEvents(filtered);
-  }, [selectedYear, selectedPrefecture, eventData]);
+  }, [selectedYear, selectedPrefecture, selectedPerformer, eventData]);
 
   // 構造化データ
   const eventMapSchema = {
@@ -106,22 +119,22 @@ export default function EventMapPage({ eventData }) {
           </div>
 
           <>
-              {/* 表示モード切り替え */}
-              <div className="view-mode-toggle">
-                <button 
-                  className={`mode-button ${viewMode === 'list' ? 'active' : ''}`}
-                  onClick={() => setViewMode('list')}
-                >
-                  <span className="mode-icon">📋</span>
-                  イベント一覧
-                </button>
-                <button 
-                  className={`mode-button ${viewMode === 'stats' ? 'active' : ''}`}
-                  onClick={() => setViewMode('stats')}
-                >
-                  <span className="mode-icon">📊</span>
-                  統計データ
-                </button>
+              {/* 表示モード切り替え - 楽曲一覧と同じタブ構造 */}
+              <div className="works-tabs">
+                <div className="works-tabs-container">
+                  <button
+                    className={`works-tab ${viewMode === 'list' ? 'active' : ''}`}
+                    onClick={() => setViewMode('list')}
+                  >
+                    イベント一覧
+                  </button>
+                  <button
+                    className={`works-tab ${viewMode === 'stats' ? 'active' : ''}`}
+                    onClick={() => setViewMode('stats')}
+                  >
+                    統計データ
+                  </button>
+                </div>
               </div>
 
               {/* フィルター */}
@@ -150,12 +163,43 @@ export default function EventMapPage({ eventData }) {
                     className="filter-select"
                   >
                     <option value="all">全都道府県</option>
-                    {eventData?.prefectures
-                      ?.filter(p => p.count > 0)
-                      .sort((a, b) => b.count - a.count)
-                      .map(prefecture => (
-                        <option key={prefecture.name} value={prefecture.name}>
-                          {prefecture.name} ({prefecture.count}件)
+                    {(() => {
+                      // 都道府県コード順序の定義（01北海道〜47沖縄県）
+                      const prefectureOrder = [
+                        '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
+                        '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県',
+                        '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県',
+                        '静岡県', '愛知県', '三重県', '滋賀県', '京都府', '大阪府', '兵庫県',
+                        '奈良県', '和歌山県', '鳥取県', '島根県', '岡山県', '広島県', '山口県',
+                        '徳島県', '香川県', '愛媛県', '高知県', '福岡県', '佐賀県', '長崎県',
+                        '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'
+                      ];
+                      
+                      return eventData?.prefectures
+                        ?.filter(p => p.count > 0)
+                        .sort((a, b) => prefectureOrder.indexOf(a.name) - prefectureOrder.indexOf(b.name))
+                        .map(prefecture => (
+                          <option key={prefecture.name} value={prefecture.name}>
+                            {prefecture.name}
+                          </option>
+                        ));
+                    })()}
+                  </select>
+                </div>
+                
+                <div className="filter-group">
+                  <label className="filter-label">出演者：</label>
+                  <select 
+                    value={selectedPerformer} 
+                    onChange={(e) => setSelectedPerformer(e.target.value)}
+                    className="filter-select"
+                  >
+                    <option value="all">全出演者</option>
+                    {eventData?.performerStats
+                      ?.sort((a, b) => b.count - a.count)
+                      .map(performer => (
+                        <option key={performer.name} value={performer.name}>
+                          {performer.name}
                         </option>
                       ))
                     }
@@ -171,51 +215,39 @@ export default function EventMapPage({ eventData }) {
                 /* イベント一覧表示 */
                 <div className="events-list-container">
                   {filteredEvents.length > 0 ? (
-                    <div className="events-list">
-                      {filteredEvents.map((event) => (
-                        <div key={`${event.id}-${event.date}`} className="event-card">
-                          <div className="event-date-badge">
-                            <div className="event-year">{new Date(event.date).getFullYear()}</div>
-                            <div className="event-month-day">
-                              {(() => {
-                                const date = new Date(event.date);
-                                const month = String(date.getMonth() + 1).padStart(2, '0');
-                                const day = String(date.getDate()).padStart(2, '0');
-                                return `${month}/${day}`;
-                              })()}
-                            </div>
-                            <div className="event-weekday">
-                              {(() => {
-                                const date = new Date(event.date);
-                                const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
-                                return weekdays[date.getDay()];
-                              })()}
-                            </div>
-                          </div>
-                          <div className="event-content">
-                            <h3 className="event-title">{event.title}</h3>
-                            <div className="event-details">
-                              <div className="event-detail-item">
-                                <span className="detail-icon">📍</span>
-                                <span>{event.location}</span>
-                              </div>
-                              <div className="event-detail-item">
-                                <span className="detail-icon">🗾</span>
-                                <span>{event.prefecture}</span>
-                              </div>
-                              {event.category && (
-                                <div className="event-detail-item">
-                                  <span className="detail-icon">🏷️</span>
-                                  <span className="event-category-badge">{event.category}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <ul className="schedule-items">
+                      {filteredEvents.map((event) => {
+                        // イベントデータをスケジュールカード形式に変換
+                        const scheduleData = {
+                          id: event.id,
+                          title: event.title,
+                          date: event.date,
+                          location: event.location,
+                          prefecture: event.prefecture,
+                          categoryName: event.category,
+                          categoryColor: event.categoryColor || 'var(--primary-color)',
+                          locationType: '会場開催',
+                          time: event.time,
+                          isAllDay: event.isAllDay,
+                          link: event.link || null,
+                          description: event.description || null,
+                          performers: event.performers || [],
+                          isLongTerm: false
+                        };
+                        
+                        return (
+                          <ScheduleCard 
+                            key={`${event.id}-${event.date}`}
+                            schedule={scheduleData}
+                            showLink={!!event.link}
+                            showCalendarButton={true}
+                            linkPath={null}
+                          />
+                        );
+                      })}
+                    </ul>
                   ) : (
-                    <div className="no-events">
+                    <div className="no-schedule">
                       <p>該当するイベントが見つかりませんでした。</p>
                     </div>
                   )}
@@ -227,10 +259,11 @@ export default function EventMapPage({ eventData }) {
                   <div className="stats-summary">
                     <div className="stat-card">
                       <div className="stat-value">
-                        {selectedYear === 'all' 
-                          ? eventData?.prefectures?.filter(p => p.count > 0).length
-                          : eventData?.prefectures?.filter(p => p.yearlyBreakdown?.[selectedYear] > 0).length
-                        }
+                        {selectedPrefecture !== 'all' || selectedPerformer !== 'all' ? '-' : (
+                          selectedYear === 'all' 
+                            ? eventData?.prefectures?.filter(p => p.count > 0).length
+                            : eventData?.prefectures?.filter(p => p.yearlyBreakdown?.[selectedYear] > 0).length
+                        )}
                       </div>
                       <div className="stat-label">開催都道府県数</div>
                     </div>
@@ -246,13 +279,51 @@ export default function EventMapPage({ eventData }) {
                           if (selectedYear === 'all') {
                             return '-';
                           }
+                          
                           const currentYear = parseInt(selectedYear);
                           const previousYear = (currentYear - 1).toString();
-                          const currentCount = eventData?.yearlyData?.[selectedYear] || 0;
-                          const previousCount = eventData?.yearlyData?.[previousYear] || 0;
+                          
+                          // 絞り込み条件に基づいて前年比を計算
+                          let currentCount = 0;
+                          let previousCount = 0;
+                          
+                          if (selectedPrefecture === 'all' && selectedPerformer === 'all') {
+                            // 全都道府県・全出演者の場合：年別総データを使用
+                            currentCount = eventData?.yearlyData?.[selectedYear] || 0;
+                            previousCount = eventData?.yearlyData?.[previousYear] || 0;
+                          } else {
+                            // 絞り込み条件がある場合：実際のフィルタリング結果から計算
+                            const allEvents = eventData?.allEvents || [];
+                            
+                            // 当年の絞り込み件数
+                            let currentYearEvents = allEvents.filter(event => event.year === parseInt(selectedYear));
+                            if (selectedPrefecture !== 'all') {
+                              currentYearEvents = currentYearEvents.filter(event => event.prefecture === selectedPrefecture);
+                            }
+                            if (selectedPerformer !== 'all') {
+                              currentYearEvents = currentYearEvents.filter(event => 
+                                event.performers && event.performers.some(performer => performer.name === selectedPerformer)
+                              );
+                            }
+                            currentCount = currentYearEvents.length;
+                            
+                            // 前年の絞り込み件数
+                            let previousYearEvents = allEvents.filter(event => event.year === parseInt(previousYear));
+                            if (selectedPrefecture !== 'all') {
+                              previousYearEvents = previousYearEvents.filter(event => event.prefecture === selectedPrefecture);
+                            }
+                            if (selectedPerformer !== 'all') {
+                              previousYearEvents = previousYearEvents.filter(event => 
+                                event.performers && event.performers.some(performer => performer.name === selectedPerformer)
+                              );
+                            }
+                            previousCount = previousYearEvents.length;
+                          }
+                          
                           const change = currentCount - previousCount;
                           
-                          if (!eventData?.yearlyData?.[previousYear]) {
+                          // 前年データがない場合は'-'を表示
+                          if (previousCount === 0 && currentCount === 0) {
                             return '-';
                           }
                           
@@ -270,24 +341,125 @@ export default function EventMapPage({ eventData }) {
                     <h2 className="ranking-title">都道府県別開催件数</h2>
                     <div className="ranking-list">
                       {(() => {
-                        const rankedPrefectures = selectedYear === 'all'
-                          ? eventData?.prefectures?.sort((a, b) => b.count - a.count)
-                          : eventData?.prefectures
-                              ?.map(p => ({
-                                ...p,
-                                yearCount: p.yearlyBreakdown?.[selectedYear] || 0
-                              }))
-                              .sort((a, b) => b.yearCount - a.yearCount);
+                        let rankedPrefectures;
                         
+                        // 年度による絞り込み
+                        if (selectedYear === 'all') {
+                          rankedPrefectures = eventData?.prefectures?.map(p => ({
+                            ...p,
+                            displayCount: p.count
+                          }));
+                        } else {
+                          rankedPrefectures = eventData?.prefectures?.map(p => ({
+                            ...p,
+                            displayCount: p.yearlyBreakdown?.[selectedYear] || 0
+                          }));
+                        }
+                        
+                        // 都道府県による絞り込み
+                        if (selectedPrefecture !== 'all') {
+                          rankedPrefectures = rankedPrefectures?.filter(p => p.name === selectedPrefecture);
+                        }
+                        
+                        // 出演者による絞り込み
+                        if (selectedPerformer !== 'all') {
+                          // 年度・出演者の複合フィルタ用に filteredEvents を使用
+                          rankedPrefectures = eventData?.prefectures?.map(p => ({
+                            ...p,
+                            displayCount: filteredEvents.filter(e => e.prefecture === p.name).length
+                          })).filter(p => p.displayCount > 0);
+                        }
+                        
+                        // 件数でソートして0件は除外
                         return rankedPrefectures
-                          ?.filter(p => selectedYear === 'all' ? p.count > 0 : p.yearCount > 0)
+                          ?.filter(p => p.displayCount > 0)
+                          .sort((a, b) => b.displayCount - a.displayCount)
                           .map((prefecture, index) => (
                             <div key={prefecture.name} className="ranking-item">
                               <div className="rank-number">#{index + 1}</div>
-                              <div className="prefecture-name">{prefecture.name}</div>
-                              <div className="event-count">
-                                {selectedYear === 'all' ? prefecture.count : prefecture.yearCount}件
+                              <div 
+                                className="prefecture-name clickable"
+                                onClick={() => {
+                                  setSelectedPrefecture(prefecture.name);
+                                  setViewMode('list');
+                                }}
+                              >
+                                {prefecture.name}
                               </div>
+                              <div className="event-count">
+                                {prefecture.displayCount}件
+                              </div>
+                            </div>
+                          ));
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* 共演者統計 */}
+                  <div className="performer-stats">
+                    <h2 className="stats-title">共演の多い出演者</h2>
+                    <div className="performer-stats-list">
+                      {(() => {
+                        let performers = eventData?.performerStats || [];
+                        
+                        // 年度による絞り込み
+                        if (selectedYear !== 'all') {
+                          performers = performers.map(p => ({
+                            ...p,
+                            displayCount: p.yearlyBreakdown?.[selectedYear] || 0
+                          })).filter(p => p.displayCount > 0);
+                        } else {
+                          performers = performers.map(p => ({
+                            ...p,
+                            displayCount: p.count
+                          })).filter(p => p.displayCount > 0);
+                        }
+                        
+                        // 都道府県による絞り込み
+                        if (selectedPrefecture !== 'all') {
+                          performers = performers.map(p => ({
+                            ...p,
+                            displayCount: p.events.filter(e => e.prefecture === selectedPrefecture).length
+                          })).filter(p => p.displayCount > 0);
+                        }
+                        
+                        // 選択された出演者がいる場合は、filteredEventsに基づいて共演回数を再計算
+                        if (selectedPerformer !== 'all') {
+                          // フィルタリングされたイベントでの実際の共演回数を計算
+                          const selectedPerformerData = performers.find(p => p.name === selectedPerformer);
+                          if (selectedPerformerData) {
+                            // filteredEventsからその出演者が出演するイベント数をカウント
+                            const actualCount = filteredEvents.filter(event => 
+                              event.performers && event.performers.some(performer => 
+                                performer.name === selectedPerformer
+                              )
+                            ).length;
+                            
+                            performers = [{
+                              ...selectedPerformerData,
+                              displayCount: actualCount
+                            }];
+                          } else {
+                            performers = [];
+                          }
+                        }
+                        
+                        return performers
+                          .sort((a, b) => b.displayCount - a.displayCount)
+                          .slice(0, 10) // 上位10名まで表示
+                          .map((performer, index) => (
+                            <div key={performer.name} className="performer-stats-item">
+                              <div className="performer-rank">#{index + 1}</div>
+                              <div 
+                                className="performer-name clickable"
+                                onClick={() => {
+                                  setSelectedPerformer(performer.name);
+                                  setViewMode('list');
+                                }}
+                              >
+                                {performer.name}
+                              </div>
+                              <div className="performer-count">{performer.displayCount}回共演</div>
                             </div>
                           ));
                       })()}

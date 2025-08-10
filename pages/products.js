@@ -17,8 +17,8 @@ export default function ProductsPage({ productData }) {
     const categoryLabels = {
       'all': 'すべて',
       'cd': 'CD',
-      'dvd': 'DVD',
-      'blu-ray': 'Blu-ray',
+      'video': '映像',
+      'voice_drama': '音声ドラマ',
       'photobook': 'フォトブック',
       'pamphlet': 'パンフレット',
       'magazine': '雑誌',
@@ -123,8 +123,8 @@ export default function ProductsPage({ productData }) {
   const tabs = [
     { code: 'all', label: 'すべて' },
     { code: 'cd', label: 'CD' },
-    { code: 'dvd', label: 'DVD' },
-    { code: 'blu-ray', label: 'Blu-ray' },
+    { code: 'video', label: '映像' },
+    { code: 'voice_drama', label: '音声ドラマ' },
     { code: 'photobook', label: 'フォトブック' },
     { code: 'pamphlet', label: 'パンフレット' },
     { code: 'magazine', label: '雑誌' },
@@ -416,7 +416,7 @@ export async function getStaticProps() {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     
     // 各カテゴリのデータを並行で取得
-    const categories = ['cd', 'dvd', 'blu-ray', 'photobook', 'pamphlet', 'magazine', 'clear_card', 'goods'];
+    const categories = ['cd', 'video', 'voice_drama', 'photobook', 'pamphlet', 'magazine', 'clear_card', 'goods'];
     const productPromises = categories.map(async (category) => {
       const response = await fetch(`${baseUrl}/api/products?tab=${category}`);
       if (!response.ok) {

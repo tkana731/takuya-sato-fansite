@@ -184,7 +184,7 @@ export default async function handler(req, res) {
 
             // 佐藤拓也の役を抽出（アニメの場合）
             let roleInfo = '';
-            if (work.category?.name === 'アニメ') {
+            if (work.category?.name === 'TVアニメ') {
                 const takuyaRole = work.workRoles && work.workRoles.find(wr =>
                     wr.role?.actor?.name === '佐藤拓也'
                 );

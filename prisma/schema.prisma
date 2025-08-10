@@ -462,7 +462,6 @@ model ProductCategory {
   displayOrder Int           @map("display_order")
   createdAt    DateTime      @default(now()) @map("created_at")
   productBases ProductBase[]
-  products     products[]
 
   @@map("mst_product_categories")
 }
@@ -491,14 +490,13 @@ model AffiliatePlatform {
 
 model ProductAffiliateLink {
   id               String            @id @default(dbgenerated("uuid_generate_v4()"))
-  product_id       String
+  product_id       String?
   platformId       String            @map("platform_id")
   url              String
   imageUrl         String?           @map("image_url")
   createdAt        DateTime          @default(now()) @map("created_at")
   productVariantId String?           @map("product_variant_id")
   platform         AffiliatePlatform @relation(fields: [platformId], references: [id])
-  products         products          @relation(fields: [product_id], references: [id])
   productVariant   ProductVariant?   @relation(fields: [productVariantId], references: [id])
 
   @@unique([product_id, platformId])
@@ -508,13 +506,12 @@ model ProductAffiliateLink {
 model WorkProduct {
   id            String       @id @default(dbgenerated("uuid_generate_v4()"))
   workId        String       @map("work_id")
-  product_id    String
+  product_id    String?
   description   String?
   displayOrder  Int          @map("display_order")
   createdAt     DateTime     @default(now()) @map("created_at")
   productBaseId String?      @map("product_base_id")
   productBase   ProductBase? @relation(fields: [productBaseId], references: [id])
-  products      products     @relation(fields: [product_id], references: [id])
   work          Work         @relation(fields: [workId], references: [id])
 
   @@unique([workId, product_id])
@@ -524,82 +521,18 @@ model WorkProduct {
 model ScheduleProduct {
   id            String       @id @default(dbgenerated("uuid_generate_v4()"))
   scheduleId    String       @map("schedule_id")
-  product_id    String
+  product_id    String?
   description   String?
   displayOrder  Int          @map("display_order")
   createdAt     DateTime     @default(now()) @map("created_at")
   productBaseId String?      @map("product_base_id")
   productBase   ProductBase? @relation(fields: [productBaseId], references: [id])
-  products      products     @relation(fields: [product_id], references: [id])
   schedule      Schedule     @relation(fields: [scheduleId], references: [id])
 
   @@unique([scheduleId, product_id])
   @@map("rel_schedule_products")
 }
 
-model product_series {
-  id                        String                      @id @default(dbgenerated("uuid_generate_v4()"))
-  name                      String
-  description               String?
-  has_variations            Boolean                     @default(false)
-  created_at                DateTime                    @default(now())
-  product_series_variations product_series_variations[]
-  rel_product_series_items  rel_product_series_items[]
-}
-
-model product_series_variations {
-  id                       String                     @id @default(dbgenerated("uuid_generate_v4()"))
-  series_id                String
-  variation_name           String
-  display_order            Int
-  created_at               DateTime                   @default(now())
-  product_series           product_series             @relation(fields: [series_id], references: [id])
-  rel_product_series_items rel_product_series_items[]
-}
-
-model products {
-  id                          String                     @id @default(dbgenerated("uuid_generate_v4()"))
-  category_id                 String
-  title                       String
-  product_code                String?
-  release_date                DateTime?                  @db.Date
-  release_date_display        String?
-  is_preorder                 Boolean                    @default(false)
-  preorder_start_date         DateTime?                  @db.Date
-  preorder_end_date           DateTime?                  @db.Date
-  description                 String?
-  official_url                String?
-  variation_description       String?
-  display_order               Int
-  created_at                  DateTime                   @default(now())
-  price                       Int?
-  variation_group             String?
-  mst_product_categories      ProductCategory            @relation(fields: [category_id], references: [id])
-  rel_product_affiliate_links ProductAffiliateLink[]
-  rel_product_series_items    rel_product_series_items[]
-  rel_schedule_products       ScheduleProduct[]
-  rel_work_products           WorkProduct[]
-
-  @@index([category_id], map: "idx_products_category_id")
-  @@index([release_date], map: "idx_products_release_date")
-  @@index([variation_group], map: "idx_products_variation_group")
-}
-
-model rel_product_series_items {
-  id                        String                     @id @default(dbgenerated("uuid_generate_v4()"))
-  series_id                 String
-  product_id                String
-  volume_number             Int?
-  volume_title              String?
-  variation_id              String?
-  display_order             Int
-  created_at                DateTime                   @default(now())
-  products                  products                   @relation(fields: [product_id], references: [id])
-  product_series            product_series             @relation(fields: [series_id], references: [id])
-  product_series_variations product_series_variations? @relation(fields: [variation_id], references: [id])
-
-  @@unique([series_id, product_id])
-}
 
 model ProductBase {
   id                 String            @id @default(dbgenerated("(gen_random_uuid())::text"))

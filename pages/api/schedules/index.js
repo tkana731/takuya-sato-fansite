@@ -42,6 +42,7 @@ export default async function handler(req, res) {
             jstNow: today.toISOString()
         });
 
+
         // カテゴリフィルタリングの準備
         let categoryFilter = {};
         if (category && category !== 'all') {
@@ -49,7 +50,9 @@ export default async function handler(req, res) {
                 'event': 'イベント',
                 'stage': '舞台・朗読',
                 'broadcast': '生放送',
-                'voice_guide': '音声ガイド'
+                'streaming': '配信',
+                'voice_guide': '音声ガイド',
+                'other': 'その他'
             };
 
             if (categoryMapping[category]) {

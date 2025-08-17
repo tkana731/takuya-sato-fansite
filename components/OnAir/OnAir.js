@@ -1,4 +1,5 @@
 // components/OnAir/OnAir.js
+import Link from 'next/link';
 import { FaYoutube, FaTv, FaPlay } from 'react-icons/fa';
 import { SiNiconico, SiTwitch } from 'react-icons/si';
 
@@ -43,7 +44,9 @@ export default function OnAir({ content = [] }) {
                             <ul className="on-air-list">
                                 {content.anime.map(item => (
                                     <li className="on-air-item" key={item.id}>
-                                        <span className="on-air-title">{item.title}</span>
+                                        <Link href={`/works/${item.id}`} className="on-air-title-link">
+                                            {item.title}
+                                        </Link>
                                         {item.role && <span className="on-air-role">{item.role}</span>}
                                         <div className="broadcast-info">
                                             {item.broadcasts && item.broadcasts.length > 0 ? (
@@ -87,7 +90,9 @@ export default function OnAir({ content = [] }) {
                             <ul className="on-air-list">
                                 {content.radio.map(item => (
                                     <li className="on-air-item" key={item.id}>
-                                        <span className="on-air-title">{item.title}</span>
+                                        <Link href={`/works/${item.id}`} className="on-air-title-link">
+                                            {item.title}
+                                        </Link>
                                         {item.role && <span className="on-air-role">{item.role}</span>}
                                         <div className="broadcast-info">
                                             {item.broadcasts && item.broadcasts.length > 0 ? (
@@ -131,7 +136,9 @@ export default function OnAir({ content = [] }) {
                             <ul className="on-air-list">
                                 {content.web.map(item => (
                                     <li className="on-air-item" key={item.id}>
-                                        <span className="on-air-title">{item.title}</span>
+                                        <Link href={`/works/${item.id}`} className="on-air-title-link">
+                                            {item.title}
+                                        </Link>
                                         {item.role && <span className="on-air-role">{item.role}</span>}
                                         <div className="broadcast-info">
                                             {item.broadcasts && item.broadcasts.length > 0 ? (

@@ -115,39 +115,24 @@ const Schedule = forwardRef((props, ref) => {
                         <h3 className="schedule-period">{schedulePeriod}</h3>
                     </div>
 
-                    <div className="schedule-tabs-wrapper">
-                        <div className="schedule-tabs">
-                            <button
-                                className={`schedule-tab ${activeFilter === 'all' ? 'active' : ''}`}
-                                onClick={() => setActiveFilter('all')}
-                            >
-                                <span className="tab-text">すべて</span>
-                            </button>
-                            <button
-                                className={`schedule-tab ${activeFilter === 'event' ? 'active' : ''}`}
-                                onClick={() => setActiveFilter('event')}
-                            >
-                                <span className="tab-text">イベント</span>
-                            </button>
-                            <button
-                                className={`schedule-tab ${activeFilter === 'stage' ? 'active' : ''}`}
-                                onClick={() => setActiveFilter('stage')}
-                            >
-                                <span className="tab-text">舞台・朗読</span>
-                            </button>
-                            <button
-                                className={`schedule-tab ${activeFilter === 'broadcast' ? 'active' : ''}`}
-                                onClick={() => setActiveFilter('broadcast')}
-                            >
-                                <span className="tab-text">生放送</span>
-                            </button>
-                            <button
-                                className={`schedule-tab ${activeFilter === 'voice_guide' ? 'active' : ''}`}
-                                onClick={() => setActiveFilter('voice_guide')}
-                            >
-                                <span className="tab-text">音声ガイド</span>
-                            </button>
-                        </div>
+                    <div className="category-select-container">
+                        <label htmlFor="schedule-category-select" className="category-select-label">
+                            カテゴリー:
+                        </label>
+                        <select
+                            id="schedule-category-select"
+                            className="category-select"
+                            value={activeFilter}
+                            onChange={(e) => setActiveFilter(e.target.value)}
+                        >
+                            <option value="all">すべて</option>
+                            <option value="event">イベント</option>
+                            <option value="stage">舞台・朗読</option>
+                            <option value="broadcast">生放送</option>
+                            <option value="streaming">配信</option>
+                            <option value="voice_guide">音声ガイド</option>
+                            <option value="other">その他</option>
+                        </select>
                     </div>
 
                     {loading ? (

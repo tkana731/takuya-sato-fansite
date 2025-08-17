@@ -117,7 +117,9 @@ export const getCategoryCode = (schedule) => {
         'イベント': 'event',
         '舞台・朗読': 'stage',
         '生放送': 'broadcast',
-        '音声ガイド': 'voice_guide'
+        '配信': 'streaming',
+        '音声ガイド': 'voice_guide',
+        'その他': 'other'
     };
     
     return categoryMapping[categoryName] || 'other';
@@ -129,7 +131,7 @@ export const getCategoryCode = (schedule) => {
  * @returns {Object} ロケーション情報
  */
 export const getLocationInfo = (schedule) => {
-    const isBroadcast = schedule.category?.name === '生放送';
+    const isBroadcast = schedule.category?.name === '生放送' || schedule.category?.name === '配信';
     
     const location = isBroadcast
         ? (schedule.broadcastStation ? schedule.broadcastStation.name : '')

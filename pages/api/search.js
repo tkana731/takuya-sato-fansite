@@ -60,7 +60,7 @@ export default async function handler(req, res) {
           title: work.title,
           type: 'work',
           page: 'works',
-          url: '/works',
+          url: `/works/${work.id}`,
           role: roleNames.join('、'),
           year: work.year,
           description: work.description,

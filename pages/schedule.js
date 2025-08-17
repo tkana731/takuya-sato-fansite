@@ -373,60 +373,26 @@ export default function SchedulePage({ initialSchedules, initialYearRange }) {
                         </div>
                     </div>
 
-                    {/* カテゴリタブ */}
-                    <div className="schedule-tabs-wrapper">
-                        <div className="schedule-tabs" role="tablist" aria-label="スケジュールカテゴリー">
-                            <button
-                                className={`schedule-tab ${activeFilter === 'all' ? 'active' : ''}`}
-                                onClick={() => setActiveFilter('all')}
-                                role="tab"
-                                aria-selected={activeFilter === 'all'}
-                                aria-controls="all-content"
-                                id="all-tab"
-                            >
-                                <span className="tab-text">すべて</span>
-                            </button>
-                            <button
-                                className={`schedule-tab ${activeFilter === 'event' ? 'active' : ''}`}
-                                onClick={() => setActiveFilter('event')}
-                                role="tab"
-                                aria-selected={activeFilter === 'event'}
-                                aria-controls="event-content"
-                                id="event-tab"
-                            >
-                                <span className="tab-text">イベント</span>
-                            </button>
-                            <button
-                                className={`schedule-tab ${activeFilter === 'stage' ? 'active' : ''}`}
-                                onClick={() => setActiveFilter('stage')}
-                                role="tab"
-                                aria-selected={activeFilter === 'stage'}
-                                aria-controls="stage-content"
-                                id="stage-tab"
-                            >
-                                <span className="tab-text">舞台・朗読</span>
-                            </button>
-                            <button
-                                className={`schedule-tab ${activeFilter === 'broadcast' ? 'active' : ''}`}
-                                onClick={() => setActiveFilter('broadcast')}
-                                role="tab"
-                                aria-selected={activeFilter === 'broadcast'}
-                                aria-controls="broadcast-content"
-                                id="broadcast-tab"
-                            >
-                                <span className="tab-text">生放送</span>
-                            </button>
-                            <button
-                                className={`schedule-tab ${activeFilter === 'voice_guide' ? 'active' : ''}`}
-                                onClick={() => setActiveFilter('voice_guide')}
-                                role="tab"
-                                aria-selected={activeFilter === 'voice_guide'}
-                                aria-controls="voice_guide-content"
-                                id="voice_guide-tab"
-                            >
-                                <span className="tab-text">音声ガイド</span>
-                            </button>
-                        </div>
+                    {/* カテゴリ選択 */}
+                    <div className="category-select-container">
+                        <label htmlFor="schedule-page-category-select" className="category-select-label">
+                            カテゴリー:
+                        </label>
+                        <select
+                            id="schedule-page-category-select"
+                            className="category-select"
+                            value={activeFilter}
+                            onChange={(e) => setActiveFilter(e.target.value)}
+                            aria-label="スケジュールカテゴリーを選択"
+                        >
+                            <option value="all">すべて</option>
+                            <option value="event">イベント</option>
+                            <option value="stage">舞台・朗読</option>
+                            <option value="broadcast">生放送</option>
+                            <option value="streaming">配信</option>
+                            <option value="voice_guide">音声ガイド</option>
+                            <option value="other">その他</option>
+                        </select>
                     </div>
 
                     {loading ? (

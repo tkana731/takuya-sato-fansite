@@ -1115,11 +1115,19 @@ img {
   border-bottom: none;
 }
 
-.on-air-title {
+.on-air-title-link {
   display: block;
   font-weight: 600;
   font-size: 16px;
   margin-bottom: 8px;
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.on-air-title-link:hover {
+  color: var(--primary-color);
+  transform: translateY(-1px);
 }
 
 .broadcast-info {
@@ -5174,6 +5182,10 @@ img {
 .category-select-container {
   margin-bottom: 30px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .category-select-container .filter-group {

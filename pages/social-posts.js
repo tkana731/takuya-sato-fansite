@@ -61,9 +61,9 @@ export default function SocialPosts() {
 
   const extractInstagramId = (url) => {
     if (!url) return null;
-    // Instagram投稿URLのパターン: https://www.instagram.com/p/[POST_ID]/
-    const match = url.match(/instagram\.com\/p\/([A-Za-z0-9_-]+)/);
-    return match ? match[1] : null;
+    // Instagram投稿URLのパターン: /p/[POST_ID]/ または /reel/[POST_ID]/
+    const match = url.match(/instagram\.com\/(p|reel)\/([A-Za-z0-9_-]+)/);
+    return match ? match[2] : null;
   };
 
   const getPlatformIcon = (platform) => {
@@ -129,7 +129,7 @@ export default function SocialPosts() {
             </div>
           ) : (
             posts.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="social-posts-grid">
                 {posts.map((post) => {
                   const tweetId = extractTweetId(post.postUrl);
                   const instagramId = extractInstagramId(post.postUrl);
@@ -138,37 +138,44 @@ export default function SocialPosts() {
                     <div key={post.id} className="mb-6">
                       {post.platform === 'x' && tweetId ? (
                         // X（Twitter）投稿の埋め込み
-                        <iframe
-                          src={`https://platform.twitter.com/embed/Tweet.html?id=${tweetId}&theme=light&width=550`}
-                          width="100%"
-                          height="550"
-                          style={{ 
-                            border: 'none', 
-                            borderRadius: '12px'
-                          }}
-                          loading="lazy"
-                          title="X Post"
-                        />
+                        <div style={{ 
+                          position: 'relative',
+                          width: '100%',
+                          minHeight: '400px',
+                          maxHeight: '800px'
+                        }}>
+                          <iframe
+                            src={`https://platform.twitter.com/embed/Tweet.html?id=${tweetId}&theme=light&width=550`}
+                            width="100%"
+                            height="700"
+                            style={{ 
+                              border: 'none',
+                              borderRadius: '12px'
+                            }}
+                            loading="lazy"
+                            title="X Post"
+                          />
+                        </div>
                       ) : post.platform === 'instagram' && instagramId ? (
                         // Instagram投稿の埋め込み
                         <div style={{ 
                           position: 'relative', 
                           width: '100%', 
-                          paddingBottom: '100%', // 正方形のアスペクト比
+                          minHeight: '540px',
+                          maxHeight: '800px',
                           backgroundColor: '#fafafa',
                           borderRadius: '12px',
-                          overflow: 'hidden'
+                          overflow: 'hidden',
+                          border: '1px solid #e5e7eb'
                         }}>
                           <iframe
                             src={`https://www.instagram.com/p/${instagramId}/embed/`}
                             width="100%"
-                            height="100%"
+                            height="540"
                             style={{ 
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
                               border: 'none',
-                              borderRadius: '12px'
+                              borderRadius: '12px',
+                              minHeight: '540px'
                             }}
                             loading="lazy"
                             title="Instagram Post"
@@ -227,6 +234,43 @@ export default function SocialPosts() {
           )}
         </div>
       </section>
+
+      <style jsx>{`
+        .social-posts-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+          gap: 2rem;
+          width: 100%;
+        }
+
+        @media (max-width: 768px) {
+          .social-posts-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .social-posts-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (min-width: 1025px) {
+          .social-posts-grid {
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 1200px;
+            margin: 0 auto;
+          }
+        }
+
+        @media (min-width: 1440px) {
+          .social-posts-grid {
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 1400px;
+          }
+        }
+      `}</style>
     </Layout>
   );
 }
